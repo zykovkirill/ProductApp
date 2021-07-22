@@ -1,0 +1,183 @@
+﻿@*@if (string.IsNullOrWhiteSpace(Query))
+    {
+        <h2>Мои продукты - Страница: @PageNumber</h2>
+    }
+    else
+    {
+    <h2>Мои продукты - Результат поиска: '@Query' - Страница: @PageNumber</h2>
+    }
+
+    @if (isBusy)
+    {
+        <h2>Загрузка...</h2>
+    }
+    else
+    {
+        <div class="row">
+            <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" /><RadzenButton Text="Искать" Click="async () => await getProductsAsync()" />
+        </div>
+        <hr />
+
+        <div class="row">
+            @foreach (var product in products)
+            {
+                <div class="col-4">
+                    <RadzenCard Style="margin:10px">
+                        <img src="@product.CoverPath" style="height:90%;margin:5px" />
+                        <a href='/userproducts/details/@product.Id'> @product.Name </a>
+                        <p>@product</p>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-6">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Редактировать" Click=' () => navigationManager.NavigateTo($"/products/details/{product.Id}")' class="btn-block" />
+                            </div>
+                            <div class="col-6">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
+                            </div>
+                            @if (selectedPlanId == product.Id)
+                            {
+                            <div class="row">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Подтвердить" class="btn-block"  Click="async () => await deleteProductAsync()"/>
+                            </div>
+                            }
+                        </div>
+                    </RadzenCard>
+                </div>
+            }
+
+        </div>
+        <hr />
+        <div class="row">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                int page = i;
+                @if (page == PageNumber)
+                {
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
+                }
+                else
+                {
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
+                }
+            }
+
+        </div>
+    }*@
+
+<h1>
+    Подбери игрушку и создай уникального персонажа
+</h1>
+
+
+
+
+@page "/edituserproducts"
+@page "/edituserproducts/{PageNumber:int}"
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+@inject ProductsService productsService
+@using SixLabors.ImageSharp;
+@using SixLabors.ImageSharp.PixelFormats;
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.ImageSharp.Formats;
+@using SixLabors.ImageSharp.Formats.Png;
+@using System.IO
+@using System.Net.Http
+@inject HttpClient Http
+@attribute [Authorize]
+@*//TODO: ЧТО ЭТО AuthorizeView как её лучше применить*@
+<AuthorizeView>
+    <img src="@ImgSrc" />
+    <div class="row">
+        <div id="unity-container" class="unity-desktop">
+            <canvas id="unity-canvas" width=960 height=600></canvas>
+            <div id="unity-loading-bar">
+                <div id="unity-logo"></div>
+                <div id="unity-progress-bar-empty">
+                    <div id="unity-progress-bar-full"></div>
+                </div>
+            </div>
+            <div id="unity-warning"> </div>
+            <div id="unity-footer">
+                <div id="unity-webgl-logo"></div>
+                <div id="unity-fullscreen-button"></div>
+                <div id="unity-build-title">New Unity Project (2)</div>
+            </div>
+        </div>
+    </div>
+</AuthorizeView>
+@code {
+    //TODO: добавить defult.jpg в Image
+
+    [Parameter]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    public string Query { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+    private List<Product> products = new List<Product>();
+
+    private int totalPages = 1;
+
+    private string pathToy = String.Empty;
+    private string pathСhevron = String.Empty;
+    private string filterType = String.Empty;
+    private string ImgSrc;
+
+    async Task getProductsAsync()
+    {
+      
+    }
+
+    async Task moveToPageAsync(int pageNumber)
+    {
+        PageNumber = pageNumber;
+        await getProductsAsync();
+    }
+
+    string selectedPlanId = string.Empty;
+
+    void selectProduct(string id)
+    {
+        selectedPlanId = id;
+
+    }
+
+    async Task deleteProductAsync()
+    {
+        isBusy = true;
+        var result = await productsService.DeleteProductAsync(selectedPlanId);
+        if (result.IsSuccess)
+        {
+            var deletedProducts = products.SingleOrDefault(p => p.Id == selectedPlanId);
+            products.Remove(deletedProducts);
+        }
+        else
+        {
+            await getProductsAsync();
+        }
+        isBusy = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await getProductsAsync();
+    }
+
+    //TODO: сделать один метод с дополнительным аргументом принимающим TOY или Chevron
+    void OnChange(object value, int type)
+    {
+        if (type == (int)ProductTypeEnum.Toy)
+            pathToy = (string)value;
+        if (type == (int)ProductTypeEnum.Сhevron)
+            pathСhevron = (string)value;
+
+    }
+
+  
+
+}

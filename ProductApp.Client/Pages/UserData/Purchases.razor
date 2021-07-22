@@ -1,0 +1,157 @@
+﻿
+
+@page "/UserData/Purchases"
+@inject ProductsService productsService
+@inject NavigationManager navigationManager
+@attribute [Authorize]
+
+<h2>Заказы</h2>
+
+@if (isBusy)
+{
+    <h2>Загрузка...</h2>
+}
+else
+{
+
+    <hr />
+    // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
+    <div class="row">
+        @foreach (var product in products)
+        {
+
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                <RadzenImage Path="@product.ProductCoverPath" Style="height:auto; max-width:100%; margin:5px" />
+                <p> @product.ProductName </p>
+                <p>Цена за 1 штуку: @product.ProductPrice</p>
+                <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="product.ProductCount" Style="margin:10px;" />
+                <hr />
+                <div class="row">
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
+                    @if (selectedUserId == product.Id)
+                    {
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync()" />
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
+                    }
+                </div>
+            </RadzenCard>
+
+        }
+    </div>
+    <hr />
+    <div class="row">
+        <RadzenCard Style=" margin: 15px 15px 15px 15px">
+            <h2> Общая сумма :</h2>
+            <p> @products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
+            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await deleteProductAsync()" />
+        </RadzenCard>
+    </div>
+
+
+    <hr />
+    @*<div class="row">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                int page = i;
+                @if (page == PageNumber)
+                {
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
+                }
+                else
+                {
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
+                }
+            }
+
+        </div>*@
+}
+
+
+@code {
+    [Parameter]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    public string Query { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+    IList<UserProductInCart> products = new List<UserProductInCart>();
+
+    int totalPages = 1;
+
+    async Task getProductsAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+
+
+        if (PageNumber == null)
+            PageNumber = 1;
+
+        OperationResponse<UserCart> result;
+
+        result = await productsService.GetProductFromCartAsync();
+
+
+        // 50 plans | page size = 10 => 5 pages
+        // 54 plans | page size = 10 => 5 pages -> page = 4 plans
+        if (result.IsSuccess)// Добавить вывод ошибок
+        {
+            //if (result.Count % result.PageSize == 0)
+            //    totalPages = result.Count / result.PageSize;
+            //else
+            //    totalPages = (result.Count / result.PageSize) + 1;
+
+
+            products = result.Record.Products;
+        }
+        isBusy = false;
+    }
+
+    async Task moveToPageAsync(int pageNumber)
+    {
+        PageNumber = pageNumber;
+        await getProductsAsync();
+    }
+
+    string selectedUserId;
+
+    void selectProduct(string id)
+    {
+        selectedUserId = id;
+
+    }
+
+    void cancelSelectProduct()
+    {
+        selectedUserId = String.Empty;
+
+    }
+
+    async Task deleteProductAsync()
+    {
+        isBusy = true;
+        var result = await productsService.DeleteProductFromCartAsync(selectedUserId);
+        if (result.IsSuccess)
+        {
+            var deletedProducts = products.SingleOrDefault(p => p.Id == selectedUserId);
+            products.Remove(deletedProducts);
+        }
+        else
+        {
+            await getProductsAsync();
+        }
+        isBusy = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await getProductsAsync();
+    }
+
+}

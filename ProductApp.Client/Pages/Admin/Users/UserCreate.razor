@@ -1,0 +1,66 @@
+﻿@page "/admin/users/create"
+@inject UsersService usersService
+@inject IFileReaderService fileReaderService
+@inject NavigationManager navigatorManager
+@using System.IO;
+
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Добавить пользователя</h3>
+
+<div class="row">
+    <div class=" =col-6">
+        <EditForm Model="model" OnValidSubmit="async () => await postUserAsync() ">
+            <RadzenCard>
+                <AlertMessage Message="@message" MessageType="@messageType" />
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <RadzenTextBox Placeholder="Электронная почта" @bind-Value="model.Email" Style="margin:10px;" />
+                <Radzen.Blazor.RadzenTextArea Placeholder="Пароль" @bind-Value="model.Password" Style="margin:10px;" />
+                <hr />
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" ButtonStyle="Radzen.ButtonStyle.Success" Disabled="isBusy" Style="margin:5px" class="btn-block" Text="Отправить" />
+            </RadzenCard>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    CreateUserViewModel model = new CreateUserViewModel();
+    //System.IO.Stream fileStream = null;
+    //string imageContent = string.Empty;
+    //string fileName = string.Empty;
+
+    bool isBusy = false;
+
+    ElementReference inputReference;
+
+    //Сообщения об ошибках
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+
+    async Task postUserAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        usersService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+        var result = await usersService.PostUserAsync(model);
+        if (result.IsSuccess)
+            navigatorManager.NavigateTo("/admin/users");
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+
+        isBusy = false;
+
+    }
+
+}

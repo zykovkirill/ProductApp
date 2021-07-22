@@ -1,0 +1,104 @@
+﻿@page "/auth/login"
+
+@layout AuthLayout
+@using ProductApp.Shared.Models
+@inject AuthenticationService authService
+@inject NavigationManager navigationManager
+@inject ILocalStorageService storegeService
+@inject AuthenticationStateProvider authenticationStateProvider
+
+<div class="row">
+    <div class="middle-box-inside">
+        <h2>Войти в аккаунт</h2>
+        <EditForm Model="model" OnValidSubmit="LoginUser">
+            <RadzenCard>
+
+                <AlertMessage Message="@message" MessageType="@messageType" />
+
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <label> Электронная почта </label>
+                <RadzenTextBox @bind-Value="model.Email"></RadzenTextBox>
+
+                <label> Пароль </label>
+                <RadzenPassword @bind-Value="model.Password"></RadzenPassword>
+                <hr />
+                <div class="section">
+                    <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6LeLvoIaAAAAAC9hTspjaZJR2TXbMHCK4xqrzh93" OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                </div>
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Войти"
+                              ButtonStyle="Radzen.ButtonStyle.Primary" class="btn-block mr-2"
+                              Disabled="ValidReCAPTCHA" />
+                <RadzenButton ButtonType="Radzen.ButtonType.Button" Text="Зарегистрироваться"
+                              ButtonStyle="Radzen.ButtonStyle.Secondary" class="btn-block mr-2"
+                              Disabled="isBusy" Click="GoToRegister" />
+            </RadzenCard>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    LoginRequest model = new LoginRequest();
+
+    bool isBusy = false;
+    // TODO : ПОРТИРОВАТЬ ПРЕДУПРЕЖДЕНИЯ ВО ВСЕ ПРИЛОЖЕНИЕ
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    Dictionary<string, string> userInfo = new Dictionary<string, string>();
+
+
+    private ReCAPTCHA reCAPTCHAComponent;
+
+    private bool ValidReCAPTCHA = false;//true - на RELEASE
+
+    private void OnSuccess()
+    {
+        ValidReCAPTCHA = false;
+    }
+
+    private void OnExpired()
+    {
+        ValidReCAPTCHA = true;
+    }
+
+    public async Task LoginUser()
+    {
+        ValidReCAPTCHA = true;
+        isBusy = true;
+        var result = await authService.LoginUserAsync(model);
+        if (result.IsSuccess)
+        {
+
+            var userInfo = new ProductApp.Client.Models.LocalUserInfo()
+            {
+                AccessToken = result.Message,
+                Email = result.UserInfo["Email"],
+                FirstName = result.UserInfo["FirstName"],
+                LastName = result.UserInfo["LastName"],
+                Id = result.UserInfo[System.Security.Claims.ClaimTypes.NameIdentifier],
+                Role = result.UserInfo[System.Security.Claims.ClaimTypes.Role],
+            };
+
+            await storegeService.SetItemAsync("User", userInfo);
+            await authenticationStateProvider.GetAuthenticationStateAsync();
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+        ValidReCAPTCHA = false;
+
+    }
+
+    void GoToRegister()
+    {
+        navigationManager.NavigateTo("/auth/register");
+    }
+
+}
+
