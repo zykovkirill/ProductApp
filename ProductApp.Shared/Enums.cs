@@ -15,7 +15,9 @@ namespace ProductApp.Shared.Models
         /// <summary>Ошибка</summary>
         Error = 2,
         /// <summary>Доставка</summary>
-        Delivery = 3
+        Delivery = 3,
+        /// <summary>Оплачено</summary>
+        Buy = 4
     }
 
     //TODO: убрать или переделать

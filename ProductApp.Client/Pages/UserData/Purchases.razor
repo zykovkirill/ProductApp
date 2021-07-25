@@ -17,35 +17,17 @@ else
     <hr />
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
     <div class="row">
-        @foreach (var product in products)
+        @foreach (var purchase in purchases)
         {
 
             <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-                <RadzenImage Path="@product.ProductCoverPath" Style="height:auto; max-width:100%; margin:5px" />
-                <p> @product.ProductName </p>
-                <p>Цена за 1 штуку: @product.ProductPrice</p>
-                <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="product.ProductCount" Style="margin:10px;" />
-                <hr />
-                <div class="row">
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
-                    @if (selectedUserId == product.Id)
-                    {
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync()" />
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
-                    }
-                </div>
+                <RadzenImage Path="@purchase.PurchaseTime.ToString()" Style="height:auto; max-width:100%; margin:5px" />
+                <p> @purchase.Satus </p>
             </RadzenCard>
 
         }
     </div>
-    <hr />
-    <div class="row">
-        <RadzenCard Style=" margin: 15px 15px 15px 15px">
-            <h2> Общая сумма :</h2>
-            <p> @products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
-            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await deleteProductAsync()" />
-        </RadzenCard>
-    </div>
+  
 
 
     <hr />
@@ -77,11 +59,11 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     bool isBusy = false;
-    IList<UserProductInCart> products = new List<UserProductInCart>();
+    List<UserPurchase> purchases = new List<UserPurchase>();
 
     int totalPages = 1;
 
-    async Task getProductsAsync()
+    async Task getPurchasesAsync()
     {
         isBusy = true;
 
@@ -93,9 +75,9 @@ else
         if (PageNumber == null)
             PageNumber = 1;
 
-        OperationResponse<UserCart> result;
+        CollectionPagingResponse<UserPurchase> result;
 
-        result = await productsService.GetProductFromCartAsync();
+        result = await productsService.GetPurchasesAsync();
 
 
         // 50 plans | page size = 10 => 5 pages
@@ -108,7 +90,7 @@ else
             //    totalPages = (result.Count / result.PageSize) + 1;
 
 
-            products = result.Record.Products;
+            purchases = result.Records.ToList();
         }
         isBusy = false;
     }
@@ -116,7 +98,7 @@ else
     async Task moveToPageAsync(int pageNumber)
     {
         PageNumber = pageNumber;
-        await getProductsAsync();
+        await getPurchasesAsync();
     }
 
     string selectedUserId;
@@ -133,25 +115,25 @@ else
 
     }
 
-    async Task deleteProductAsync()
-    {
-        isBusy = true;
-        var result = await productsService.DeleteProductFromCartAsync(selectedUserId);
-        if (result.IsSuccess)
-        {
-            var deletedProducts = products.SingleOrDefault(p => p.Id == selectedUserId);
-            products.Remove(deletedProducts);
-        }
-        else
-        {
-            await getProductsAsync();
-        }
-        isBusy = false;
-    }
+    //async Task deleteProductAsync()
+    //{
+    //    isBusy = true;
+    //    var result = await productsService.DeleteProductFromCartAsync(selectedUserId);
+    //    if (result.IsSuccess)
+    //    {
+    //        var deletedProducts = purchases.SingleOrDefault(p => p.Id == selectedUserId);
+    //        purchases.Remove(deletedProducts);
+    //    }
+    //    else
+    //    {
+    //        await getPurchasesAsync();
+    //    }
+    //    isBusy = false;
+    //}
 
     protected override async Task OnInitializedAsync()
     {
-        await getProductsAsync();
+        await getPurchasesAsync();
     }
 
 }

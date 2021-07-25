@@ -155,6 +155,30 @@ namespace WebAPIApp.Controllers
         //    });
         //}
 
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserPurchase>))]
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] IList<UserProductInCart> model)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var purchase = await _productsService.BuyProductsAsync(model);
+            if (purchase == null)
+                return
+                    BadRequest(new OperationResponse<Product>
+                    {
+                        IsSuccess = false,
+                        Message = $"Errors",
+                        OperationDate = DateTime.UtcNow,
+                       
+                    });
+            return Ok(new OperationResponse<UserPurchase>
+            {
+                IsSuccess = true,
+                Message = $"Products of  received successfully!",
+                OperationDate = DateTime.UtcNow,
+                Record = purchase
+            });
+        }
 
         #endregion
 

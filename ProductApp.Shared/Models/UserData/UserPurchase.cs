@@ -14,7 +14,7 @@ namespace ProductApp.Shared.Models.UserData
     public class UserPurchase 
     {
         public int Id { get; set; }
-        public UserCart UserCart{ get; set; }
+        public List <UserProductBuy> UserProductBuy { get; set; }
         public DateTime? PurchaseTime { get; set; }
 
         public Status Satus { get; set; }

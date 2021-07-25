@@ -169,15 +169,17 @@ namespace ProductApp.Shared.Services
         ///// <param name="count"> кол-во </param>
         ///// <param name="classType"> тип ClassType => см. в Enum</param>
         /// <returns></returns>
-        public async Task<OperationResponse<UserProductInCart>> BuyProductAsync(UserProductInCart products)
+        public async Task<OperationResponse<UserPurchase>> BuyProductAsync(IList<UserProductInCart> products)
         {
             //var response = await client.GetProtectedAsync<OperationResponse<UserProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
             //  return response.Result;
-            return null;
+
+            var response = await client.PostProtectedAsync<OperationResponse<UserPurchase>>($"{_baseUrl}/api/usercart", products);
+            return response.Result;
         }
 
 
-
+        //TODO: CollectionPagingResponse<UserProduct> переписать вместо UserCart 
         /// <summary>
         /// Получить  корзину с продуктами 
         /// </summary>
@@ -185,6 +187,16 @@ namespace ProductApp.Shared.Services
         public async Task<OperationResponse<UserCart>> GetProductFromCartAsync()
         {
             var response = await client.GetProtectedAsync<OperationResponse<UserCart>>($"{_baseUrl}/api/usercart/GetProductFromCart");
+            return response.Result;
+        }
+
+        /// <summary>
+        /// Получить  заказы и их статус
+        /// </summary>
+        /// <returns></returns>
+        public async Task<CollectionPagingResponse<UserPurchase>> GetPurchasesAsync()
+        {
+            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserPurchase>>($"{_baseUrl}/api/userpurchases");
             return response.Result;
         }
         /// <summary>

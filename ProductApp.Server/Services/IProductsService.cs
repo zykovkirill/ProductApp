@@ -14,6 +14,7 @@ using System.IO;
 
 namespace ProductApp.Server.Services
 {
+    //TODO: Обобщить интерфейс
     public interface IProductsService
     {
         // Сделать region для продуктов, продуктов пользователя и продуктов в корзине
@@ -35,6 +36,8 @@ namespace ProductApp.Server.Services
         IEnumerable<UserProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, out int totalProducts);
         Task<UserProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath);
         Task<UserProduct> GetUserProductById(string id);
+
+        Task<UserPurchase> BuyProductsAsync(IList<UserProductInCart> model);
     }
 
     public class ProductsService : IProductsService
@@ -320,6 +323,38 @@ namespace ProductApp.Server.Services
                 return null;
 
             return product;
+        }
+
+        public async Task<UserPurchase> BuyProductsAsync(IList<UserProductInCart> model)
+        {
+            //TODO: ВСЕ КРИВО!
+            List<UserProductBuy> buy = new List<UserProductBuy>();
+            foreach (var mbox in model)
+            {
+                var b = new UserProductBuy()
+                {
+                    ProductId = mbox.ProductId,
+                    ProductName = mbox.ProductName,
+                    ProductCount = mbox.ProductCount,
+                    ProductCoverPath = mbox.ProductCoverPath,
+                    ProductPrice = mbox.ProductPrice
+                };
+                buy.Add(b);
+            }
+
+            var purchase = new UserPurchase()
+            {
+                UserProductBuy = buy,
+                Satus = ProductApp.Shared.Models.Status.Buy
+
+            };
+
+            
+             _db.UserProductInCarts.RemoveRange(model);
+            await _db.UserProductBuy.AddRangeAsync(buy);
+            await _db.UserPurchases.AddAsync(purchase);
+            await _db.SaveChangesAsync();
+            return purchase;
         }
 
     }

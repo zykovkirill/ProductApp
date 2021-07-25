@@ -16,28 +16,29 @@ else
 
     <hr />
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
-    <div class="row">
-        @foreach (var product in products)
-        {
+<div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
+    @foreach (var product in products)
+    {
 
-            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-                <RadzenImage Path="@product.ProductCoverPath" Style="height:auto; max-width:100%; margin:5px" />
-                <p> @product.ProductName </p>
-                <p>Цена за 1 штуку: @product.ProductPrice</p>
-                <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="product.ProductCount" Style="margin:10px;" />
-                <hr />
-                <div class="row">
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
-                    @if (selectedUserId == product.Id)
-                    {
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync()" />
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
-                    }
-                </div>
-            </RadzenCard>
+        <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+            <RadzenImage Path="@product.ProductCoverPath" Style="height:auto; max-width:100%; margin:5px" />
+            <p> @product.ProductName </p>
+            <p>Цена за 1 штуку: @product.ProductPrice</p>
+            <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="product.ProductCount" Style="margin:10px;" />
+            <hr />
+            <div class="row">
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
+                @if (selectedUserId == product.Id)
+                {
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync()" />
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
+                }
+            </div>
+        </RadzenCard>
 
-        }
-    </div>
+    }
+</div>
     <hr />
     <div class="row">
         <RadzenCard Style=" margin: 15px 15px 15px 15px">
@@ -81,6 +82,9 @@ else
 
     int totalPages = 1;
 
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
     async Task getProductsAsync()
     {
         isBusy = true;
@@ -94,7 +98,7 @@ else
             PageNumber = 1;
 
         OperationResponse<UserCart> result;
-
+        //TODO: CollectionPagingResponse<UserProduct> переписать вместо UserCart ТЫ ЖЕ ИСПОЛЬЗУЕШЬ СТРАНИЦЫ!!!!!!!!!
         result = await productsService.GetProductFromCartAsync();
 
 
@@ -153,16 +157,16 @@ else
     {
         isBusy = true;
         var result = await productsService.BuyProductAsync(products);
-        //if (result.IsSuccess)
-        //{
-        //    var deletedProducts = products.SingleOrDefault(p => p.Id == selectedUserId);
-        //    products.Remove(deletedProducts);
-        //}
-        //else
-        //{
-        //    await getProductsAsync();
-        //}
-        //isBusy = false;
+        if (result.IsSuccess)
+        {
+            navigationManager.NavigateTo("/UserData/Purchases");
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
     }
 
 

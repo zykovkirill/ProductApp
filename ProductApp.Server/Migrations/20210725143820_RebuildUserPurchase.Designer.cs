@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductApp.Server.Models;
 
 namespace ProductApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210725143820_RebuildUserPurchase")]
+    partial class RebuildUserPurchase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -329,45 +331,6 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("UserProducts");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductBuy", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductCoverPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductPrice")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserPurchaseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserPurchaseId");
-
-                    b.ToTable("UserProductBuy");
-                });
-
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductInCart", b =>
                 {
                     b.Property<string>("Id")
@@ -400,9 +363,14 @@ namespace ProductApp.Server.Migrations
                     b.Property<string>("UserCartId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("UserPurchaseId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserCartId");
+
+                    b.HasIndex("UserPurchaseId");
 
                     b.ToTable("UserProductInCarts");
                 });
@@ -512,18 +480,15 @@ namespace ProductApp.Server.Migrations
                         .HasForeignKey("UserProfileId");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductBuy", b =>
-                {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserPurchase", null)
-                        .WithMany("UserProductBuy")
-                        .HasForeignKey("UserPurchaseId");
-                });
-
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductInCart", b =>
                 {
                     b.HasOne("ProductApp.Shared.Models.UserData.UserCart", null)
                         .WithMany("Products")
                         .HasForeignKey("UserCartId");
+
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserPurchase", null)
+                        .WithMany("UserProductInCart")
+                        .HasForeignKey("UserPurchaseId");
                 });
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
@@ -547,7 +512,7 @@ namespace ProductApp.Server.Migrations
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
                 {
-                    b.Navigation("UserProductBuy");
+                    b.Navigation("UserProductInCart");
                 });
 #pragma warning restore 612, 618
         }
