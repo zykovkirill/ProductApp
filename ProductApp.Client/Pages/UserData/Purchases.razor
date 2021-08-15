@@ -31,7 +31,7 @@ else
 
 
     <hr />
-    @*<div class="row">
+    <div class="row">
             @for (int i = 1; i <= totalPages; i++)
             {
                 int page = i;
@@ -45,7 +45,7 @@ else
                 }
             }
 
-        </div>*@
+        </div>
 }
 
 
@@ -84,10 +84,10 @@ else
         // 54 plans | page size = 10 => 5 pages -> page = 4 plans
         if (result.IsSuccess)// Добавить вывод ошибок
         {
-            //if (result.Count % result.PageSize == 0)
-            //    totalPages = result.Count / result.PageSize;
-            //else
-            //    totalPages = (result.Count / result.PageSize) + 1;
+            if (result.Count % result.PageSize == 0)
+                totalPages = result.Count / result.PageSize;
+            else
+                totalPages = (result.Count / result.PageSize) + 1;
 
 
             purchases = result.Records.ToList();

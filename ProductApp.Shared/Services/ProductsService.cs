@@ -196,6 +196,7 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<CollectionPagingResponse<UserPurchase>> GetPurchasesAsync()
         {
+            //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
             var response = await client.GetProtectedAsync<CollectionPagingResponse<UserPurchase>>($"{_baseUrl}/api/userpurchases");
             return response.Result;
         }

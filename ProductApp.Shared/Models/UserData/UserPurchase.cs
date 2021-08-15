@@ -8,10 +8,11 @@ using ProductApp.Shared.Models;
 
 namespace ProductApp.Shared.Models.UserData
 {
+    //Все поля взаимодействующие с бд должны поддерживать тип Nullable
     /// <summary>
     ///Покупка
     /// </summary>
-    public class UserPurchase 
+    public class UserPurchase : Record
     {
         public int Id { get; set; }
         public List <UserProductBuy> UserProductBuy { get; set; }

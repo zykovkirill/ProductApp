@@ -28,7 +28,7 @@ namespace ProductApp.Server.Models
         public DbSet<UserProductBuy> UserProductBuy { get; set; }
 
         public DbSet<UserProductInCart> UserProductInCarts { get; set; }
-        public DbSet<UserProfile> UserDatas { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
         //public UsersContext(DbContextOptions<UsersContext> options)
         //    : base(options)
         //{

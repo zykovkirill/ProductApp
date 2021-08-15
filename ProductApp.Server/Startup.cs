@@ -83,6 +83,7 @@ namespace ProductApp.Server
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddTransient<IProductsService, ProductsService>();
+            services.AddTransient<IPurchasesService, PurchasesService>();
             services.AddControllers();
             services.AddCors(options =>
             {

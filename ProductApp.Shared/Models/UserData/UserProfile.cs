@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProductApp.Shared.Models.UserData
@@ -10,7 +9,7 @@ namespace ProductApp.Shared.Models.UserData
     /// <summary>
     /// Данные пользователя
     /// </summary>
-    public class UserProfile
+    public class UserProfile: Record
     {
         public int Id { get; set; }
 

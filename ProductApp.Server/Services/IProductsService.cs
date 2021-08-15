@@ -172,7 +172,7 @@ namespace ProductApp.Server.Services
             await _db.SaveChangesAsync();
             return prod;
         }
-
+        //TODO :Сделать асинхронно 
         public IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts)
         {
             // total prod 
@@ -185,6 +185,7 @@ namespace ProductApp.Server.Services
             return prod;
         }
 
+        //TODO :Сделать асинхронно 
         public IEnumerable<UserProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, out int totalProducts)
         {
             // total prod 
@@ -276,7 +277,7 @@ namespace ProductApp.Server.Services
         {
             //TODO:сделать отдельный сервис для сохранения изображения
             
-            var profile = await _db.UserDatas.Include(p => p.UserProducts).FirstOrDefaultAsync(pr => pr.UserId == userId);
+            var profile = await _db.UserProfiles.Include(p => p.UserProducts).FirstOrDefaultAsync(pr => pr.UserId == userId);
             profile.UserProducts.Add(model);
             //await _db.UserProducts.AddAsync(model);
             await _db.SaveChangesAsync();
@@ -345,7 +346,8 @@ namespace ProductApp.Server.Services
             var purchase = new UserPurchase()
             {
                 UserProductBuy = buy,
-                Satus = ProductApp.Shared.Models.Status.Buy
+                Satus = ProductApp.Shared.Models.Status.Buy,
+                PurchaseTime = DateTime.UtcNow
 
             };
 

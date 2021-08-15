@@ -100,7 +100,7 @@ namespace ProductApp.Server.Services
                 {
                     UserId = identityUser.Id
                 };
-                await _db.UserDatas.AddAsync(userData);
+                await _db.UserProfiles.AddAsync(userData);
                 await _db.UserCart.AddAsync(userCart);
                 await _db.SaveChangesAsync();
                 // TODO: Переименовать IUserService 
@@ -168,7 +168,7 @@ namespace ProductApp.Server.Services
 
             string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
             //TODO: стоит поправить профиль в разоре и извлекать его не через запрос а из dirictory и убрать или объеденить LocalUserInfo
-            var data = _db.UserDatas.FirstOrDefault(d => d.UserId == user.Id);
+            var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
 
             Dictionary<string, string> userinfo = new Dictionary<string, string>
             {

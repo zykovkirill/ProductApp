@@ -23,6 +23,7 @@ namespace WebAPIApp.Controllers
     // [Authorize(AuthenticationSchemes = { BasicAuthenticationHandler.AuthenticationScheme, BasicAuthenticationHandler.AuthenticationScheme + 2 }, Roles = "admin")]
     public class UserCartController : ControllerBase
     {
+        //TODO: Разделить IProductsService на несколько интерфейсов
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
 
