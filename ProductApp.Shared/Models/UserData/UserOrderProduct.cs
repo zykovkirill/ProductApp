@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace ProductApp.Shared.Models.UserData
 {
     /// <summary>
-    /// Продукт в корзине
+    /// Продукт в заказе
     /// </summary>
-    public class ProductInfo:Record
+    public class UserOrderProduct:Record
     {
 
 

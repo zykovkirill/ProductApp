@@ -30,7 +30,7 @@ namespace ProductApp.Server.Services
         Task<UserProduct> AddUserProductAsync(UserProduct model, string userId);
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
-        Task<ProductInfo> DeleteProductFromCartById(string id);
+        Task<UserOrderProduct> DeleteProductFromCartById(string id);
         Product GetProductByName(string name);
         Task<UserOrder> GetProductsFromCart(string userId);
         IEnumerable<UserProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, out int totalProducts);
@@ -94,7 +94,7 @@ namespace ProductApp.Server.Services
                 prodDB.ProductCount += count;
             else
             {
-                ProductInfo userProductInCart = new ProductInfo()
+                UserOrderProduct userProductInCart = new UserOrderProduct()
                 {
                     ProductId = prod.Id,
                     ProductCount = count,
@@ -147,7 +147,7 @@ namespace ProductApp.Server.Services
                     else
                     {
 
-                        ProductInfo userProductInCart = new ProductInfo()
+                        UserOrderProduct userProductInCart = new UserOrderProduct()
                         {
                             ProductId = prod.Id,
                             ProductCount = count,
@@ -239,13 +239,13 @@ namespace ProductApp.Server.Services
             return product;
         }
 
-        public async Task<ProductInfo> DeleteProductFromCartById(string id)
+        public async Task<UserOrderProduct> DeleteProductFromCartById(string id)
         {
-            ProductInfo product = _db.UserProductInCarts.FirstOrDefault(x => x.Id == id);
+            UserOrderProduct product = _db.UserOrderProducts.FirstOrDefault(x => x.Id == id);
             if (product == null)
                 return null;
             //TODO: Помечать как удаленные
-            _db.UserProductInCarts.Remove(product);
+            _db.UserOrderProducts.Remove(product);
             await _db.SaveChangesAsync();
             return product;
         }
@@ -344,7 +344,7 @@ namespace ProductApp.Server.Services
             if (newImagePath != null)
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
-
+           // _db.UserProducts.Update(prod);
             await _db.SaveChangesAsync();
             return prod;
         }
@@ -360,15 +360,21 @@ namespace ProductApp.Server.Services
 
         public async Task<UserOrder> BuyProductsAsync(UserOrder model)
         {
-            var order = await _db.UserOrders.FirstOrDefaultAsync(o=> o.Id == model.Id);
+            var order = await _db.UserOrders.FindAsync(model.Id);
             order.Status = Status.Buy;
+            //order.ProductCount = model.ProductCount;
+            //order.Products = model.Products;
+            //order.TotalSum = model.TotalSum;
+            //order.UserId = order.UserId;
             var history = new OrderHistory()
             {
                 IdOrder = model.Id,
                 Status = Status.Buy
             };
-            //TODO: Проверить сохраняется ли в БД
+            //TODO: Task завернуть в исключения и логировать
+            //TODO: Использовать Update везде где меняем данные
             await _db.PurchasesHistorys.AddAsync(history);
+           // _db.UserOrders.Update(order);
             await _db.SaveChangesAsync();
             return order;
         }

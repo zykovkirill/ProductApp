@@ -30,6 +30,7 @@ namespace ProductApp.Server.Services
             _db = db;
         }
 
+        //TODO: Удалить может бы 
         public async Task<Product> AddProductToCartAsync(Product prod,  int count)
         {
             //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;

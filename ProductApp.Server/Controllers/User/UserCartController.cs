@@ -110,10 +110,10 @@ namespace WebAPIApp.Controllers
             var userOrder = await _productsService.GetProductsFromCart(userId);
             if (userOrder == null)
                 return
-                    BadRequest(new OperationResponse<UserOrder>
+                     Ok(new OperationResponse<UserOrder>
                     {
                         IsSuccess = false,
-                        Message = $"Errors",
+                        Message = $"Корзина пуста",
                         OperationDate = DateTime.UtcNow,
                         Record = userOrder
                     });
@@ -188,7 +188,7 @@ namespace WebAPIApp.Controllers
 
         #region Delete
 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<ProductInfo>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrderProduct>))]
         [ProducesResponseType(404)]
         [HttpDelete("{Id}")]
         public async Task<IActionResult> Delete(string id)
@@ -204,7 +204,7 @@ namespace WebAPIApp.Controllers
             //System.IO.File.Delete(fullPath);
 
 
-            return Ok(new OperationResponse<ProductInfo>
+            return Ok(new OperationResponse<UserOrderProduct>
             {
                 IsSuccess = true,
                 Message = $"{getOld.ProductName} has been deleted successfully!",

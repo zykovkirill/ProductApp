@@ -14,7 +14,7 @@ namespace ProductApp.Shared.Models.UserData
     {
 
         public string UserId { get; set; }
-        public IList<ProductInfo>  Products { get; set; }
+        public IList<UserOrderProduct>  Products { get; set; }
         /// <summary>
         /// Колличество
         /// </summary>
@@ -32,7 +32,7 @@ namespace ProductApp.Shared.Models.UserData
         public Status Status { get; set; }
         public UserOrder()
         {
-            Products = new List<ProductInfo>();
+            Products = new List<UserOrderProduct>();
         }
     
     }

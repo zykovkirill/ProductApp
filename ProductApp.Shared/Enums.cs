@@ -15,15 +15,15 @@ namespace ProductApp.Shared.Models
         /// <summary>Ошибка</summary>
         Error = 2,
         /// <summary>Продукты в процессе доставки</summary>
-        Delivery = 3,
+        Delivery = 5,
         /// <summary>Продукты в корзине</summary>
         Cart = 3,
         /// <summary>Продукты оплачены</summary>
-        Buy = 3,
+        Buy = 4,
         /// <summary>Продукты возвращены</summary>
-        Return = 3,
+        Return = 6,
         /// <summary>Отмена</summary>
-        Cancel = 3,
+        Cancel = 7,
     }
 
     //TODO: убрать или переделать

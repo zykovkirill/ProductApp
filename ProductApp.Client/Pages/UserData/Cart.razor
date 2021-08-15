@@ -16,37 +16,45 @@ else
 
     <hr />
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
-<div class="row">
-    <AlertMessage Message="@message" MessageType="@messageType" />
-    @foreach (var product in userOrder.Products)
+    @if (userOrder != null)
     {
+        <div class="row">
+            <AlertMessage Message="@message" MessageType="@messageType" />
 
-        <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-            <RadzenImage Path="@product.ProductCoverPath" Style="height:auto; max-width:100%; margin:5px" />
-            <p> @product.ProductName </p>
-            <p>Цена за 1 штуку: @product.ProductPrice</p>
-            <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="product.ProductCount" Style="margin:10px;" />
-            <hr />
-            <div class="row">
-                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
-                @if (selectedUserId == product.Id)
-                {
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync()" />
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
-                }
-            </div>
-        </RadzenCard>
+            @foreach (var product in userOrder.Products)
+            {
 
+                <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                    <RadzenImage Path="@product.ProductCoverPath" Style="height:auto; max-width:100%; margin:5px" />
+                    <p> @product.ProductName </p>
+                    <p>Цена за 1 штуку: @product.ProductPrice</p>
+                    <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="product.ProductCount" Style="margin:10px;" />
+                    <hr />
+                    <div class="row">
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
+                        @if (selectedUserId == product.Id)
+                        {
+                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync()" />
+                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
+                        }
+                    </div>
+                </RadzenCard>
+
+            }
+        </div>
+        <hr />
+        <div class="row">
+            <RadzenCard Style=" margin: 15px 15px 15px 15px">
+                <h2> Общая сумма :</h2>
+                <p> @userOrder.Products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await buyProductAsync()" />
+            </RadzenCard>
+        </div>
     }
-</div>
-    <hr />
-    <div class="row">
-        <RadzenCard Style=" margin: 15px 15px 15px 15px">
-            <h2> Общая сумма :</h2>
-            <p> @userOrder.Products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
-            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await buyProductAsync()" />
-        </RadzenCard>
-    </div>
+    else
+    {
+        <h2> Корзина пуста</h2>
+    }
 
 
     <hr />
@@ -115,7 +123,8 @@ else
 
 
             // products = result.Record.Products;
-            userOrder = result.Record;
+            if (result.Record != null)
+                userOrder = result.Record;
         }
         isBusy = false;
     }

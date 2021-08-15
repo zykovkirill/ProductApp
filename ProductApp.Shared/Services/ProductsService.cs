@@ -205,9 +205,9 @@ namespace ProductApp.Shared.Services
         /// </summary>
         /// <param name="id"> Обьект для добавления представляющий продукт </param>
         /// <returns></returns>
-        public async Task<OperationResponse<ProductInfo>> DeleteProductFromCartAsync(string id)
+        public async Task<OperationResponse<UserOrderProduct>> DeleteProductFromCartAsync(string id)
         {
-            var response = await client.DeleteProtectedAsync<OperationResponse<ProductInfo>>($"{_baseUrl}/api/usercart/{id}");
+            var response = await client.DeleteProtectedAsync<OperationResponse<UserOrderProduct>>($"{_baseUrl}/api/usercart/{id}");
             return response.Result;
         }
         ///// <summary>
