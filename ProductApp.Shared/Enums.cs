@@ -10,14 +10,20 @@ namespace ProductApp.Shared.Models
     {
         /// <summary>Неизвестно что</summary>
         None = 0,
-        /// <summary>Доставлено</summary>
+        /// <summary>Продукты у покупателя</summary>
         Ok = 1,
         /// <summary>Ошибка</summary>
         Error = 2,
-        /// <summary>Доставка</summary>
+        /// <summary>Продукты в процессе доставки</summary>
         Delivery = 3,
-        /// <summary>Оплачено</summary>
-        Buy = 4
+        /// <summary>Продукты в корзине</summary>
+        Cart = 3,
+        /// <summary>Продукты оплачены</summary>
+        Buy = 3,
+        /// <summary>Продукты возвращены</summary>
+        Return = 3,
+        /// <summary>Отмена</summary>
+        Cancel = 3,
     }
 
     //TODO: убрать или переделать

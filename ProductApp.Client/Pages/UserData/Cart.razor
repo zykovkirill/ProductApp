@@ -18,7 +18,7 @@ else
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
 <div class="row">
     <AlertMessage Message="@message" MessageType="@messageType" />
-    @foreach (var product in products)
+    @foreach (var product in userOrder.Products)
     {
 
         <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
@@ -43,7 +43,7 @@ else
     <div class="row">
         <RadzenCard Style=" margin: 15px 15px 15px 15px">
             <h2> Общая сумма :</h2>
-            <p> @products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
+            <p> @userOrder.Products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
             <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await buyProductAsync()" />
         </RadzenCard>
     </div>
@@ -78,7 +78,9 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     bool isBusy = false;
-    IList<UserProductInCart> products = new List<UserProductInCart>();
+    //IList<ProductInfo> products = new List<ProductInfo>();
+
+    UserOrder userOrder;
 
     int totalPages = 1;
 
@@ -97,7 +99,7 @@ else
         if (PageNumber == null)
             PageNumber = 1;
 
-        OperationResponse<UserCart> result;
+        OperationResponse<UserOrder> result;
         //TODO: CollectionPagingResponse<UserProduct> переписать вместо UserCart ТЫ ЖЕ ИСПОЛЬЗУЕШЬ СТРАНИЦЫ!!!!!!!!!
         result = await productsService.GetProductFromCartAsync();
 
@@ -112,7 +114,8 @@ else
             //    totalPages = (result.Count / result.PageSize) + 1;
 
 
-            products = result.Record.Products;
+            // products = result.Record.Products;
+            userOrder = result.Record;
         }
         isBusy = false;
     }
@@ -143,8 +146,8 @@ else
         var result = await productsService.DeleteProductFromCartAsync(selectedUserId);
         if (result.IsSuccess)
         {
-            var deletedProducts = products.SingleOrDefault(p => p.Id == selectedUserId);
-            products.Remove(deletedProducts);
+            var deletedProducts = userOrder.Products.SingleOrDefault(p => p.Id == selectedUserId);
+            userOrder.Products.Remove(deletedProducts);
         }
         else
         {
@@ -156,7 +159,7 @@ else
     async Task buyProductAsync()
     {
         isBusy = true;
-        var result = await productsService.BuyProductAsync(products);
+        var result = await productsService.BuyProductAsync(userOrder);
         if (result.IsSuccess)
         {
             navigationManager.NavigateTo("/UserData/Purchases");

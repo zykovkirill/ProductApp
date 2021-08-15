@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductApp.Server.Models;
 
 namespace ProductApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210815120408_UpdateShema")]
+    partial class UpdateShema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -401,6 +403,45 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("UserProducts");
                 });
 
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductBuy", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductCoverPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductPrice")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserPurchaseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserPurchaseId");
+
+                    b.ToTable("UserProductBuy");
+                });
+
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -432,6 +473,33 @@ namespace ProductApp.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PurchaseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Satus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPurchases");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -506,6 +574,13 @@ namespace ProductApp.Server.Migrations
                         .HasForeignKey("UserProfileId");
                 });
 
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductBuy", b =>
+                {
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserPurchase", null)
+                        .WithMany("UserProductBuy")
+                        .HasForeignKey("UserPurchaseId");
+                });
+
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
                 {
                     b.Navigation("Products");
@@ -516,6 +591,11 @@ namespace ProductApp.Server.Migrations
                     b.Navigation("UserOrder");
 
                     b.Navigation("UserProducts");
+                });
+
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
+                {
+                    b.Navigation("UserProductBuy");
                 });
 #pragma warning restore 612, 618
         }

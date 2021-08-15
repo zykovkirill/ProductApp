@@ -10,7 +10,7 @@ namespace ProductApp.Shared.Models.UserData
     /// <summary>
     /// Продукт в корзине
     /// </summary>
-    public class UserProductInCart:Record
+    public class ProductInfo:Record
     {
 
 

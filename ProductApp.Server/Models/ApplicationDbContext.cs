@@ -19,15 +19,13 @@ namespace ProductApp.Server.Models
 
         public DbSet<UserProduct> UserProducts { get; set; }
 
-        public DbSet<UserPurchase> UserPurchases { get; set; }
+        public DbSet<UserOrder> UserOrders  { get; set; }
 
-        public DbSet<UserCart> UserCart  { get; set; }
+        public DbSet<OrderHistory> PurchasesHistorys { get; set; }
 
         public DbSet<Product> Products { get; set; }
 
-        public DbSet<UserProductBuy> UserProductBuy { get; set; }
-
-        public DbSet<UserProductInCart> UserProductInCarts { get; set; }
+        public DbSet<ProductInfo> UserProductInCarts { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         //public UsersContext(DbContextOptions<UsersContext> options)
         //    : base(options)

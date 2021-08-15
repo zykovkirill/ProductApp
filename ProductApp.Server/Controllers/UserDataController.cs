@@ -39,7 +39,7 @@ namespace WebAPIApp.Controllers
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value; // will give the user's userId
             //TODO: нужно ли тут подключать корзину, продукты,покупки??
-            UserProfile dbUserData = await _db.UserProfiles.Include(p => p.UserProducts).Include(b => b.UserPurchases).FirstOrDefaultAsync(i => i.UserId == userId);// Include(p=> p.Products) подключает продукты из БД!!!
+            UserProfile dbUserData = await _db.UserProfiles.Include(p => p.UserProducts).Include(b => b.UserOrder).FirstOrDefaultAsync(i => i.UserId == userId);// Include(p=> p.Products) подключает продукты из БД!!!
             if (dbUserData == null)
                 return BadRequest(new OperationResponse<UserProfile>
                 {

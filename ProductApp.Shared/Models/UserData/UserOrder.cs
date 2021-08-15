@@ -8,15 +8,13 @@ using System.Threading.Tasks;
 namespace ProductApp.Shared.Models.UserData
 {
     /// <summary>
-    /// Корзина
+    /// Заказ пользователя
     /// </summary>
-    //TODO: Может переименовать в UserOrder?
-    public class UserCart : Record
+    public class UserOrder : Record
     {
 
-       // public int Id { get; set; }
         public string UserId { get; set; }
-        public IList<UserProductInCart>  Products { get; set; }
+        public IList<ProductInfo>  Products { get; set; }
         /// <summary>
         /// Колличество
         /// </summary>
@@ -28,10 +26,13 @@ namespace ProductApp.Shared.Models.UserData
 
         //public int UserDataId { get; set; }      // внешний ключ
         //public UserProfile UserData { get; set; }    // навигационное свойство
-
-        public UserCart()
+        /// <summary>
+        /// Статус
+        /// </summary>
+        public Status Status { get; set; }
+        public UserOrder()
         {
-            Products = new List<UserProductInCart>();
+            Products = new List<ProductInfo>();
         }
     
     }

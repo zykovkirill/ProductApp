@@ -101,28 +101,28 @@ namespace WebAPIApp.Controllers
         }
 
 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserCart>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpGet("GetProductFromCart")]
         public async Task<IActionResult> Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var userCart = await _productsService.GetProductsFromCart(userId);
-            if (userCart == null)
+            var userOrder = await _productsService.GetProductsFromCart(userId);
+            if (userOrder == null)
                 return
-                    BadRequest(new OperationResponse<UserCart>
+                    BadRequest(new OperationResponse<UserOrder>
                     {
                         IsSuccess = false,
                         Message = $"Errors",
                         OperationDate = DateTime.UtcNow,
-                        Record = userCart
+                        Record = userOrder
                     });
-            return Ok(new OperationResponse<UserCart>
+            return Ok(new OperationResponse<UserOrder>
             {
                 IsSuccess = true,
                 Message = $"Products of  received successfully!",
                 OperationDate = DateTime.UtcNow,
-                Record = userCart
+                Record = userOrder
             });
         }
 
@@ -156,23 +156,23 @@ namespace WebAPIApp.Controllers
         //    });
         //}
 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserPurchase>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] IList<UserProductInCart> model)
+        public async Task<IActionResult> Post([FromBody] UserOrder model)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var purchase = await _productsService.BuyProductsAsync(model);
             if (purchase == null)
                 return
-                    BadRequest(new OperationResponse<Product>
+                    BadRequest(new OperationResponse<UserOrder>
                     {
                         IsSuccess = false,
                         Message = $"Errors",
                         OperationDate = DateTime.UtcNow,
                        
                     });
-            return Ok(new OperationResponse<UserPurchase>
+            return Ok(new OperationResponse<UserOrder>
             {
                 IsSuccess = true,
                 Message = $"Products of  received successfully!",
@@ -188,7 +188,7 @@ namespace WebAPIApp.Controllers
 
         #region Delete
 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserProductInCart>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<ProductInfo>))]
         [ProducesResponseType(404)]
         [HttpDelete("{Id}")]
         public async Task<IActionResult> Delete(string id)
@@ -204,7 +204,7 @@ namespace WebAPIApp.Controllers
             //System.IO.File.Delete(fullPath);
 
 
-            return Ok(new OperationResponse<UserProductInCart>
+            return Ok(new OperationResponse<ProductInfo>
             {
                 IsSuccess = true,
                 Message = $"{getOld.ProductName} has been deleted successfully!",

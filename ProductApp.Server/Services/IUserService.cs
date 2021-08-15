@@ -90,18 +90,19 @@ namespace ProductApp.Server.Services
 
 
                 // TODO: Может создать метод? Переименовать таблицу USERDATA в UserProfile
-                UserProfile userData = new UserProfile
+                UserProfile userProfile = new UserProfile
                 {
                     UserId = identityUser.Id,
                     FirstName = model.FirstName, 
                     LastName = model.LastName
                 };
-                UserCart userCart = new UserCart
-                {
-                    UserId = identityUser.Id
-                };
-                await _db.UserProfiles.AddAsync(userData);
-                await _db.UserCart.AddAsync(userCart);
+                //TODO: Надо убрать это
+                //UserOrder userCart = new UserOrder
+                //{
+                //    UserId = identityUser.Id
+                //};
+                await _db.UserProfiles.AddAsync(userProfile);
+               // await _db.UserOrders.AddAsync(userCart);
                 await _db.SaveChangesAsync();
                 // TODO: Переименовать IUserService 
                 // TODO: Отправлять подтверждение Email

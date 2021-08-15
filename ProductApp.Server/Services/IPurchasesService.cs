@@ -18,7 +18,7 @@ namespace ProductApp.Server.Services
    public interface IPurchasesService
     {
 
-      IEnumerable<UserPurchase> GetPurchase(int pageSize, int pageNumber, out int totalProducts);
+      IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, out int totalProducts);
 
     }
 
@@ -35,10 +35,10 @@ namespace ProductApp.Server.Services
 
 
         //TODO :Сделать асинхронно 
-        public IEnumerable<UserPurchase> GetPurchase(int pageSize, int pageNumber, out int totalProducts)
+        public IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, out int totalProducts)
         {
             //TODO: IsDeleted - Нужно добавить? смотри GetAllUserProductsAsync
-            var allProducts = _db.UserPurchases;
+            var allProducts = _db.UserOrders.Where(o => o.Status == Status.Buy);
 
             totalProducts = allProducts.Count();
 

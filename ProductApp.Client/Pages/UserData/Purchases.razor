@@ -21,8 +21,8 @@ else
         {
 
             <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-                <RadzenImage Path="@purchase.PurchaseTime.ToString()" Style="height:auto; max-width:100%; margin:5px" />
-                <p> @purchase.Satus </p>
+                <RadzenImage Path="@purchase.CreatedDate.ToString()" Style="height:auto; max-width:100%; margin:5px" />
+                <p> @purchase.Status </p>
             </RadzenCard>
 
         }
@@ -59,7 +59,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     bool isBusy = false;
-    List<UserPurchase> purchases = new List<UserPurchase>();
+    List<UserOrder> purchases = new List<UserOrder>();
 
     int totalPages = 1;
 
@@ -75,7 +75,7 @@ else
         if (PageNumber == null)
             PageNumber = 1;
 
-        CollectionPagingResponse<UserPurchase> result;
+        CollectionPagingResponse<UserOrder> result;
 
         result = await productsService.GetPurchasesAsync();
 

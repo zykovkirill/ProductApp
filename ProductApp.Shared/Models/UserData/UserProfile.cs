@@ -27,9 +27,9 @@ namespace ProductApp.Shared.Models.UserData
         //public UserCart UserCart { get; set; }
         public ICollection <UserProduct> UserProducts { get; set; }
         /// <summary>
-        /// Покупки
+        /// Заказы
         /// </summary>
-        public ICollection<UserPurchase> UserPurchases { get; set; }
+        public ICollection<UserOrder> UserOrder { get; set; }
 
         ///// <summary>
         ///// Путь к файлу изображения
@@ -41,7 +41,7 @@ namespace ProductApp.Shared.Models.UserData
         public UserProfile()
         {
             UserProducts = new List<UserProduct>();
-            UserPurchases = new List<UserPurchase>();
+            UserOrder = new List<UserOrder>();
           //  UserCart = new UserCart();
         }
     }

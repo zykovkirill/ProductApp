@@ -169,12 +169,12 @@ namespace ProductApp.Shared.Services
         ///// <param name="count"> кол-во </param>
         ///// <param name="classType"> тип ClassType => см. в Enum</param>
         /// <returns></returns>
-        public async Task<OperationResponse<UserPurchase>> BuyProductAsync(IList<UserProductInCart> products)
+        public async Task<OperationResponse<UserOrder>> BuyProductAsync(UserOrder userOrder)
         {
             //var response = await client.GetProtectedAsync<OperationResponse<UserProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
             //  return response.Result;
-
-            var response = await client.PostProtectedAsync<OperationResponse<UserPurchase>>($"{_baseUrl}/api/usercart", products);
+            //TODO: отправлять UserOrder
+            var response = await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
             return response.Result;
         }
 
@@ -184,9 +184,9 @@ namespace ProductApp.Shared.Services
         /// Получить  корзину с продуктами 
         /// </summary>
         /// <returns></returns>
-        public async Task<OperationResponse<UserCart>> GetProductFromCartAsync()
+        public async Task<OperationResponse<UserOrder>> GetProductFromCartAsync()
         {
-            var response = await client.GetProtectedAsync<OperationResponse<UserCart>>($"{_baseUrl}/api/usercart/GetProductFromCart");
+            var response = await client.GetProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart/GetProductFromCart");
             return response.Result;
         }
 
@@ -194,10 +194,10 @@ namespace ProductApp.Shared.Services
         /// Получить  заказы и их статус
         /// </summary>
         /// <returns></returns>
-        public async Task<CollectionPagingResponse<UserPurchase>> GetPurchasesAsync()
+        public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync()
         {
             //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
-            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserPurchase>>($"{_baseUrl}/api/userpurchases");
+            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/userpurchases");
             return response.Result;
         }
         /// <summary>
@@ -205,9 +205,9 @@ namespace ProductApp.Shared.Services
         /// </summary>
         /// <param name="id"> Обьект для добавления представляющий продукт </param>
         /// <returns></returns>
-        public async Task<OperationResponse<UserProductInCart>> DeleteProductFromCartAsync(string id)
+        public async Task<OperationResponse<ProductInfo>> DeleteProductFromCartAsync(string id)
         {
-            var response = await client.DeleteProtectedAsync<OperationResponse<UserProductInCart>>($"{_baseUrl}/api/usercart/{id}");
+            var response = await client.DeleteProtectedAsync<OperationResponse<ProductInfo>>($"{_baseUrl}/api/usercart/{id}");
             return response.Result;
         }
         ///// <summary>

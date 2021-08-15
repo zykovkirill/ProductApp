@@ -29,7 +29,7 @@ namespace ProductApp.Server.Controllers.User
         }
 
         #region Get
-        [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<UserPurchase>))]
+        [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<UserOrder>))]
         [HttpGet]
         public IActionResult Get(int page)
         {
@@ -45,7 +45,7 @@ namespace ProductApp.Server.Controllers.User
             else
                 totalPages = (totalProducts / PAGE_SIZE) + 1;
 
-            return Ok(new CollectionPagingResponse<UserPurchase>
+            return Ok(new CollectionPagingResponse<UserOrder>
             {
                 Count = totalProducts,
                 IsSuccess = true,
