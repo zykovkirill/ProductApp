@@ -7,6 +7,7 @@ using ProductApp.Shared.Models.UserData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ProductApp.Server.Controllers.User
@@ -33,11 +34,11 @@ namespace ProductApp.Server.Controllers.User
         [HttpGet]
         public IActionResult Get(int page)
         {
-            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var purchase = _purchasesService.GetPurchase(PAGE_SIZE, page, out totalProducts);
+            var purchase = _purchasesService.GetPurchase(PAGE_SIZE, page, userId, out totalProducts);
 
             int totalPages = 0;
             if (totalProducts % PAGE_SIZE == 0)

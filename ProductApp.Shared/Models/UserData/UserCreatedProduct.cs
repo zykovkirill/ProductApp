@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProductApp.Shared.Models.UserData
 {
-    //TODO: Переименоватиь в CreatedProduct
-    public class UserProduct : Record
+    public class UserCreatedProduct : Record
     {
         /// <summary>
         /// Название

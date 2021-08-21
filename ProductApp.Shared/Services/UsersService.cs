@@ -34,8 +34,6 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<CollectionPagingResponse<EditUserViewModel>> GetAllUsersByPageAsync(int page =1 )
         {
-            // var str = page.ToString();
-            //TODO: ИСПРАВИТЬ в продуктах PRODUCTCollectionPagingResponse
             var response = await client.GetProtectedAsync<CollectionPagingResponse<EditUserViewModel>>($"{_baseUrl}/api/users?page={page}");
             return response.Result;
         }
@@ -67,7 +65,6 @@ namespace ProductApp.Shared.Services
         /// </summary>
         /// <param name="model"> Обьект для добавления представляющий пользователя </param>
         /// <returns></returns>
-        //TODO: Убрать CreateUserViewModel ?
         public async Task<UserManagerResponse> PostUserAsync(CreateUserViewModel model)
         {
 

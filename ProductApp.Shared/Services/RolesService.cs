@@ -32,8 +32,6 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<CollectionResponse<RoleViewModel>> GetAllRolesByPageAsync()
         {
-            // var str = page.ToString();
-            //TODO: ИСПРАВИТЬ в продуктах PRODUCTCollectionPagingResponse
             var response = await client.GetProtectedAsync<CollectionResponse<RoleViewModel>>($"{_baseUrl}/api/roles");
             return response.Result;
         }

@@ -82,7 +82,6 @@ namespace CustomIdentityApp.Controllers
                     });
                 }
             }
-            //TODO: мб ОК?
             return BadRequest(new BaseAPIResponse
             {
                 IsSuccess = false,

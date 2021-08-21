@@ -42,7 +42,7 @@ namespace WebAPIApp.Controllers
         #region Get    
         //TODO: НАДО  сделать POST - данный вариант не безопасен
         [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserProduct>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserCreatedProduct>))]
         [HttpGet("addprod")]
         ///<summary>
         ///Добавляет продукты в корзину
@@ -77,14 +77,14 @@ namespace WebAPIApp.Controllers
                 var product = await _productsService.AddUserProdToCartAsync(count, id, userId);
                 if (product == null)
                     return
-                        BadRequest(new OperationResponse<UserProduct>
+                        BadRequest(new OperationResponse<UserCreatedProduct>
                         {
                             IsSuccess = false,
                             Message = $"Errors",
                             OperationDate = DateTime.UtcNow,
                             Record = product
                         });
-                return Ok(new OperationResponse<UserProduct>
+                return Ok(new OperationResponse<UserCreatedProduct>
                 {
                     IsSuccess = true,
                     Message = $"Products of  received successfully!",

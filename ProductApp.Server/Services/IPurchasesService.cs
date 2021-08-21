@@ -18,7 +18,7 @@ namespace ProductApp.Server.Services
    public interface IPurchasesService
     {
 
-      IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, out int totalProducts);
+      IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, string userId, out int totalProducts);
 
     }
 
@@ -35,15 +35,14 @@ namespace ProductApp.Server.Services
 
 
         //TODO :Сделать асинхронно 
-        public IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, out int totalProducts)
+        public IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, string userId, out int totalProducts)
         {
-            //TODO: IsDeleted - Нужно добавить? смотри GetAllUserProductsAsync
-            var allProducts = _db.UserOrders.Where(o => o.Status == Status.Buy);
+            //TODO: IsDeleted - Нужно добавить? смотри GetAllUserProductsAsync УБРАТЬ USERPROFILE или ПРОВОДИТЬ СРАВНЕНИЕ ПО НЕМУ А НЕ ПО o.UserId == userId
+            var allProducts = _db.UserOrders.Where(o => o.Status == Status.Buy && o.UserId == userId);
 
             totalProducts = allProducts.Count();
-
+         
             var prod = allProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray();
-
             return prod;
         }
 

@@ -39,7 +39,7 @@ namespace ProductApp.Server.Services
         private IMailService _mailService;
         private ApplicationDbContext _db;
 
-        public UserService(UserManager<IdentityUser> userManager,/* RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
+        public UserService(UserManager<IdentityUser> userManager, /*RoleManager<IdentityRole> roleManager, */IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
         {
             _db = db;
             _userManager = userManager;
@@ -57,7 +57,7 @@ namespace ProductApp.Server.Services
             if (model.Password != model.ConfirmPassword)
                 return new UserManagerResponse
                 {
-                    Message = "Пароли не совподают",
+                    Message = "Пароли не совпадают",
                     IsSuccess = false,
                 };
 
@@ -83,26 +83,19 @@ namespace ProductApp.Server.Services
                 {
                     await _mailService.SendEmailAsync(identityUser.Email, "Подтвердите свой email", "<h1>Добро пожаловать</h1>" + $"<p>Пожалуйста подтвердите свою электронную почту <a href = '{url}'>Нажмите сюда</a></p>");
                 }
-                catch
+                catch(Exception ex)
                 {
-                    Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !");
+                    Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !" + ex.Message);
                 }
 
-
-                // TODO: Может создать метод? Переименовать таблицу USERDATA в UserProfile
                 UserProfile userProfile = new UserProfile
                 {
                     UserId = identityUser.Id,
                     FirstName = model.FirstName, 
                     LastName = model.LastName
                 };
-                //TODO: Надо убрать это
-                //UserOrder userCart = new UserOrder
-                //{
-                //    UserId = identityUser.Id
-                //};
+
                 await _db.UserProfiles.AddAsync(userProfile);
-               // await _db.UserOrders.AddAsync(userCart);
                 await _db.SaveChangesAsync();
                 // TODO: Переименовать IUserService 
                 // TODO: Отправлять подтверждение Email
@@ -144,8 +137,8 @@ namespace ProductApp.Server.Services
                     Message = "Неправильный пароль",
                     IsSuccess = false,
                 };
-            // TODO: добавить инициализация ролей при создании БД мкрипт создающий пользователя и роль 
-            //await _roleManager.CreateAsync(new IdentityRole("Admin"));            
+            // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль 
+            //await _roleManager.CreateAsync(new IdentityRole("Admin"));
             //await _userManager.AddToRoleAsync(user, "Admin");
             var role = _userManager.GetRolesAsync(user).Result.FirstOrDefault();
             if (role == null)

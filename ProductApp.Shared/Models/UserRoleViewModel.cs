@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ProductApp.Shared.Models
 {
-    public class UserRoleViewModel
+    public class UserRoleViewModel 
     {
 
         public UserRoleViewModel(bool isOn, string name)

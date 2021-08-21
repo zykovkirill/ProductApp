@@ -11,8 +11,6 @@ namespace ProductApp.Shared.Models.UserData
     /// </summary>
     public class UserProfile: Record
     {
-        public int Id { get; set; }
-
         public string UserId { get; set; }
         public string FirstName { get; set; }
 
@@ -25,7 +23,7 @@ namespace ProductApp.Shared.Models.UserData
         ///// Корзина
         ///// </summary>
         //public UserCart UserCart { get; set; }
-        public ICollection <UserProduct> UserProducts { get; set; }
+        public ICollection <UserCreatedProduct> UserCreatedProducts { get; set; }
         /// <summary>
         /// Заказы
         /// </summary>
@@ -40,7 +38,7 @@ namespace ProductApp.Shared.Models.UserData
 
         public UserProfile()
         {
-            UserProducts = new List<UserProduct>();
+            UserCreatedProducts = new List<UserCreatedProduct>();
             UserOrder = new List<UserOrder>();
           //  UserCart = new UserCart();
         }

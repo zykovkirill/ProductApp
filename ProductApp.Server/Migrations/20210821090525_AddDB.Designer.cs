@@ -10,8 +10,8 @@ using ProductApp.Server.Models;
 namespace ProductApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210815074127_UpdateClass")]
-    partial class UpdateClass
+    [Migration("20210821090525_AddDB")]
+    partial class AddDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -217,6 +217,31 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ProductApp.Shared.Models.OrderHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdOrder")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchasesHistorys");
+                });
+
             modelBuilder.Entity("ProductApp.Shared.Models.Product", b =>
                 {
                     b.Property<string>("Id")
@@ -256,35 +281,7 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCart", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalSum")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserCart");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProduct", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -315,8 +312,8 @@ namespace ProductApp.Server.Migrations
                     b.Property<string>("ToyProductId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserProfileId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserProfileId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<float>("X")
                         .HasColumnType("real");
@@ -328,10 +325,46 @@ namespace ProductApp.Server.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("UserProducts");
+                    b.ToTable("UserCreatedProducts");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductBuy", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalSum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserProfileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.ToTable("UserOrders");
+                });
+
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrderProduct", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -360,61 +393,20 @@ namespace ProductApp.Server.Migrations
                     b.Property<int>("ProductPrice")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserPurchaseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserPurchaseId");
-
-                    b.ToTable("UserProductBuy");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductInCart", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductCoverPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductPrice")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserCartId")
+                    b.Property<string>("UserOrderId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserCartId");
+                    b.HasIndex("UserOrderId");
 
-                    b.ToTable("UserProductInCarts");
+                    b.ToTable("UserOrderProducts");
                 });
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("CommonSum")
                         .HasColumnType("int");
@@ -439,39 +431,7 @@ namespace ProductApp.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserDatas");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PurchaseTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Satus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserProfileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserProfileId");
-
-                    b.ToTable("UserPurchases");
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -525,49 +485,37 @@ namespace ProductApp.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProduct", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
                 {
                     b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
-                        .WithMany("UserProducts")
+                        .WithMany("UserCreatedProducts")
                         .HasForeignKey("UserProfileId");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductBuy", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
                 {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserPurchase", null)
-                        .WithMany("UserProductBuy")
-                        .HasForeignKey("UserPurchaseId");
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
+                        .WithMany("UserOrder")
+                        .HasForeignKey("UserProfileId");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProductInCart", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrderProduct", b =>
                 {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserCart", null)
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserOrder", null)
                         .WithMany("Products")
-                        .HasForeignKey("UserCartId");
+                        .HasForeignKey("UserOrderId");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
-                {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
-                        .WithMany("UserPurchases")
-                        .HasForeignKey("UserProfileId");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCart", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
                 {
                     b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
                 {
-                    b.Navigation("UserProducts");
+                    b.Navigation("UserCreatedProducts");
 
-                    b.Navigation("UserPurchases");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserPurchase", b =>
-                {
-                    b.Navigation("UserProductBuy");
+                    b.Navigation("UserOrder");
                 });
 #pragma warning restore 612, 618
         }

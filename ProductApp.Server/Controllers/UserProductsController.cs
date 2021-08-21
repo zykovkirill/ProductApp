@@ -12,6 +12,7 @@ using ProductApp.Shared.Models;
 using ProductApp.Server.Services;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace WebAPIApp.Controllers
 {
@@ -34,15 +35,15 @@ namespace WebAPIApp.Controllers
             _configuration = configuration;
         }
         #region Get
-        [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<UserProduct>))]
+        [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<UserCreatedProduct>))]
         [HttpGet]
         public IActionResult Get(int page)
         {
-            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.GetAllUserProductsAsync(PAGE_SIZE, page, out totalProducts);
+            var products = _productsService.GetAllUserProductsAsync(PAGE_SIZE, page, userId, out totalProducts);
 
             int totalPages = 0;
             if (totalProducts % PAGE_SIZE == 0)
@@ -50,7 +51,7 @@ namespace WebAPIApp.Controllers
             else
                 totalPages = (totalProducts / PAGE_SIZE) + 1;
 
-            return Ok(new CollectionPagingResponse<UserProduct>
+            return Ok(new CollectionPagingResponse<UserCreatedProduct>
             {
                 Count = totalProducts,
                 IsSuccess = true,
@@ -79,8 +80,8 @@ namespace WebAPIApp.Controllers
         #endregion
 
         #region Post 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserProduct>))]
-        [ProducesResponseType(400, Type = typeof(OperationResponse<UserProduct>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserCreatedProduct>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<UserCreatedProduct>))]
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] UserProductRequest model)
         {
@@ -92,17 +93,16 @@ namespace WebAPIApp.Controllers
                 string extension = Path.GetExtension(model.CoverFile.FileName);
 
                 if (!allowedExtensions.Contains(extension))
-                    return BadRequest(new OperationResponse<UserProduct>
+                    return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
                         Message = "Данный тип изображения не поддерживается",
                         IsSuccess = false,
                     });
 
-                if (model.CoverFile.Length > 500000)
-                    return BadRequest(new OperationResponse<UserProduct>
+                if (model.CoverFile.Length > 1000000)
+                    return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
-                        // TODO: Поменять на русский
-                        Message = "Изображение не должно быть больше  5 мб",
+                        Message = "Изображение не должно быть больше  10 мб",
                         IsSuccess = false,
                     });
 
@@ -110,15 +110,15 @@ namespace WebAPIApp.Controllers
                 fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", newFileName);
                 url = $"{_configuration["AppUrl"]}{newFileName}";
             }
-            // TODO: Сделать три класса - пользователь, продукт, заказ
-            var userProd = new UserProduct
+
+            var userProd = new UserCreatedProduct
             {
                 ChevronProductId = model.ChevronProductId,
                 ToyProductId = model.ToyProductId,
                 CoverPath = url,
-                Size = float.Parse(model.Size),
-                X = float.Parse(model.X),
-                Y = float.Parse(model.Y),
+                Size = float.Parse(model.Size, CultureInfo.InvariantCulture.NumberFormat),
+                X = float.Parse(model.X, CultureInfo.InvariantCulture.NumberFormat),
+                Y = float.Parse(model.Y, CultureInfo.InvariantCulture.NumberFormat),
                 Name = model.FileName
                 
             };
@@ -134,7 +134,7 @@ namespace WebAPIApp.Controllers
                     }
                 }
 
-                return Ok(new OperationResponse<UserProduct>
+                return Ok(new OperationResponse<UserCreatedProduct>
                 {
                     IsSuccess = true,
                     Message = $"{addedProduct.Id} продукт успешно добавлен!",
@@ -142,7 +142,7 @@ namespace WebAPIApp.Controllers
                 });
 
             }
-            return BadRequest(new OperationResponse<UserProduct>
+            return BadRequest(new OperationResponse<UserCreatedProduct>
             {
                 Message = "Что-то пошло не так",
                 IsSuccess = false
@@ -151,8 +151,8 @@ namespace WebAPIApp.Controllers
         #endregion
 
         #region Put 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserProduct>))]
-        [ProducesResponseType(400, Type = typeof(OperationResponse<UserProduct>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<UserCreatedProduct>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<UserCreatedProduct>))]
         [HttpPut]
         //TODO: попробовать типизировать все в единый запрос Put Post Get Delete <Product> <UserProduct> 
         public async Task<IActionResult> Put([FromForm] UserProductRequest model)
@@ -162,7 +162,7 @@ namespace WebAPIApp.Controllers
             string url = $"{_configuration["AppUrl"]}Images/default.jpg";
             string fullPath = null;
             if (model.Id == null)
-                return BadRequest(new OperationResponse<UserProduct>
+                return BadRequest(new OperationResponse<UserCreatedProduct>
                 {
                     Message = "Не найден продукт",
                     IsSuccess = false,
@@ -173,14 +173,14 @@ namespace WebAPIApp.Controllers
                 string extension = Path.GetExtension(model.CoverFile.FileName);
 
                 if (!allowedExtensions.Contains(extension))
-                    return BadRequest(new OperationResponse<UserProduct>
+                    return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
                         Message = "Данный тип изображения не поддерживается",
                         IsSuccess = false,
                     });
 
                 if (model.CoverFile.Length > 500000)
-                    return BadRequest(new OperationResponse<UserProduct>
+                    return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
                         Message = "Изображение не должно быть больше  5 мб",
                         IsSuccess = false,
@@ -206,7 +206,7 @@ namespace WebAPIApp.Controllers
                     }
                 }
 
-                return Ok(new OperationResponse<UserProduct>
+                return Ok(new OperationResponse<UserCreatedProduct>
                 {
                     IsSuccess = true,
                     Message = $"{editedProduct.Name} продукт успешно отредактирован!",
@@ -215,7 +215,7 @@ namespace WebAPIApp.Controllers
             }
 
 
-            return BadRequest(new OperationResponse<UserProduct>
+            return BadRequest(new OperationResponse<UserCreatedProduct>
             {
                 Message = "Что-то пошло не так",
                 IsSuccess = false

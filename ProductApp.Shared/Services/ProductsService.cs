@@ -154,9 +154,9 @@ namespace ProductApp.Shared.Services
         /// <param name="count"> кол-во </param>
         /// <param name="classType"> тип ClassType => см. в Enum</param>
         /// <returns></returns>
-        public async Task<OperationResponse<UserProduct>> AddUserProductToCartAsync(int count, string id, int classType)
+        public async Task<OperationResponse<UserCreatedProduct>> AddUserProductToCartAsync(int count, string id, int classType)
         {          
-                var response = await client.GetProtectedAsync<OperationResponse<UserProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
+                var response = await client.GetProtectedAsync<OperationResponse<UserCreatedProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
                 return response.Result;
 
         }
@@ -171,15 +171,10 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<OperationResponse<UserOrder>> BuyProductAsync(UserOrder userOrder)
         {
-            //var response = await client.GetProtectedAsync<OperationResponse<UserProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
-            //  return response.Result;
-            //TODO: отправлять UserOrder
             var response = await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
             return response.Result;
         }
 
-
-        //TODO: CollectionPagingResponse<UserProduct> переписать вместо UserCart 
         /// <summary>
         /// Получить  корзину с продуктами 
         /// </summary>
@@ -197,6 +192,7 @@ namespace ProductApp.Shared.Services
         public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync()
         {
             //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
+            //TODO: Изображение сохраняется не стем размеров в ПРОДУКТАХ ПОЛЬЗОВАТЕЛЯ!!!!! КРИТТТТТ!!!!
             var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/userpurchases");
             return response.Result;
         }
@@ -222,10 +218,10 @@ namespace ProductApp.Shared.Services
         //    return null;
         //}
 
-        public async Task<CollectionPagingResponse<UserProduct>> GetAllUserProductsByPageAsync(int page = 1)
+        public async Task<CollectionPagingResponse<UserCreatedProduct>> GetAllUserProductsByPageAsync(int page = 1)
         {
             // var str = page.ToString();
-            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserProduct>>($"{_baseUrl}/api/userproducts?page={page}");
+            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserCreatedProduct>>($"{_baseUrl}/api/userproducts?page={page}");
             return response.Result;
         }
         public async Task<FileStreamResult> GetStreamImage(string imgID)
@@ -233,7 +229,7 @@ namespace ProductApp.Shared.Services
             
             var response = await client.GetProtectedAsync<object>($"{_baseUrl}/api/userproducts/img?imgID={imgID}");
             Stream test = await response.HttpResponse.Content.ReadAsStreamAsync();
-            
+            //TODO: Почему null возвращает
             //   Stream test1 = await response.HttpResponse.Content.ReadAsStreamAsync();
             return null;
         //    return response.Result;

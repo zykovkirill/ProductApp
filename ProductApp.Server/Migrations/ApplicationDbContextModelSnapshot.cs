@@ -279,6 +279,53 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ChevronProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverPath")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Size")
+                        .HasColumnType("real");
+
+                    b.Property<string>("ToyProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserProfileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<float>("X")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Y")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.ToTable("UserCreatedProducts");
+                });
+
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
                 {
                     b.Property<string>("Id")
@@ -305,8 +352,8 @@ namespace ProductApp.Server.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserProfileId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserProfileId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -354,59 +401,10 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("UserOrderProducts");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProduct", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ChevronProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CoverPath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Size")
-                        .HasColumnType("real");
-
-                    b.Property<string>("ToyProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UserProfileId")
-                        .HasColumnType("int");
-
-                    b.Property<float>("X")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Y")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserProfileId");
-
-                    b.ToTable("UserProducts");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
 
                     b.Property<int>("CommonSum")
                         .HasColumnType("int");
@@ -485,6 +483,13 @@ namespace ProductApp.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
+                {
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
+                        .WithMany("UserCreatedProducts")
+                        .HasForeignKey("UserProfileId");
+                });
+
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
                 {
                     b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
@@ -499,13 +504,6 @@ namespace ProductApp.Server.Migrations
                         .HasForeignKey("UserOrderId");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProduct", b =>
-                {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
-                        .WithMany("UserProducts")
-                        .HasForeignKey("UserProfileId");
-                });
-
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
                 {
                     b.Navigation("Products");
@@ -513,9 +511,9 @@ namespace ProductApp.Server.Migrations
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
                 {
-                    b.Navigation("UserOrder");
+                    b.Navigation("UserCreatedProducts");
 
-                    b.Navigation("UserProducts");
+                    b.Navigation("UserOrder");
                 });
 #pragma warning restore 612, 618
         }

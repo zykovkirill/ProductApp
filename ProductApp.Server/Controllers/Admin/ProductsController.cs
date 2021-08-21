@@ -175,7 +175,6 @@ namespace WebAPIApp.Controllers
                 if (model.CoverFile.Length > 5000000)
                     return BadRequest(new OperationResponse<Product>
                     {
-                        // TODO: Поменять на русский
                         Message = "Изображение не должно быть больше  5 мб",
                         IsSuccess = false,
                     });

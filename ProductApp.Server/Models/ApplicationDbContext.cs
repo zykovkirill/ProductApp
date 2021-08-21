@@ -11,13 +11,12 @@ namespace ProductApp.Server.Models
 {
     public class ApplicationDbContext :IdentityDbContext
     {
-
+        //TODO: Записи в БД НАСЛЕДУЙ от RECORD
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 
         }
-
-        public DbSet<UserProduct> UserProducts { get; set; }
+        public DbSet<UserCreatedProduct> UserCreatedProducts { get; set; }
 
         public DbSet<UserOrder> UserOrders  { get; set; }
 
@@ -27,10 +26,5 @@ namespace ProductApp.Server.Models
 
         public DbSet<UserOrderProduct> UserOrderProducts { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
-        //public UsersContext(DbContextOptions<UsersContext> options)
-        //    : base(options)
-        //{
-        //    Database.EnsureCreated();
-        //}
     }
 }

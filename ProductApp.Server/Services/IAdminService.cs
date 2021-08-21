@@ -60,14 +60,10 @@ namespace ProductApp.Server.Services
 
         public async Task<UserManagerResponse> CreateUserAsync(RegisterRequest model)
         {
-
-
-            //TODO: Добавить проверку на пароли и существующих пользователей
             var allUsers = _db.Users;
             var user = new IdentityUser { Email = model.Email, UserName = model.FirstName };
             var result = await _userManager.CreateAsync(user, model.Password);
-
-          
+     
             if (result.Succeeded)
             {
                 return new UserManagerResponse

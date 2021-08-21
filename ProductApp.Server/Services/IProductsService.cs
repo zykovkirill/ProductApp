@@ -26,16 +26,16 @@ namespace ProductApp.Server.Services
         Task<Product> AddProductAsync(string name, string description, int price, int type, string imagePath);
         Task<Product> EditProductAsync(string id, string newName, string description, int price, int type, string newImagePath);
         Task<Product> AddProdToCartAsync(int count, string Prodid, string userId);
-        Task<UserProduct> AddUserProdToCartAsync(int count, string Prodid, string userId);
-        Task<UserProduct> AddUserProductAsync(UserProduct model, string userId);
+        Task<UserCreatedProduct> AddUserProdToCartAsync(int count, string Prodid, string userId);
+        Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId);
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
         Task<UserOrderProduct> DeleteProductFromCartById(string id);
         Product GetProductByName(string name);
         Task<UserOrder> GetProductsFromCart(string userId);
-        IEnumerable<UserProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, out int totalProducts);
-        Task<UserProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath);
-        Task<UserProduct> GetUserProductById(string id);
+        IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts);
+        Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath);
+        Task<UserCreatedProduct> GetUserProductById(string id);
 
         Task<UserOrder> BuyProductsAsync(UserOrder model);
     }
@@ -65,7 +65,7 @@ namespace ProductApp.Server.Services
 
             return product;
         }
-        //TODO: МОЖЕТ СДЕЛАТЬ  ВСЕХ НАСЛЕДНИКАМИ RECORD
+
         public async Task<Product> AddProdToCartAsync(int count, string prodId, string userId)
         {
             var prod = await _db.Products.FindAsync(prodId);
@@ -111,10 +111,9 @@ namespace ProductApp.Server.Services
             return prod;
         }
         //TODO: Настройки выносить в файл конфигурации для того чтобы не пересобирать
-        //TODO: МОЖЕТ СДЕЛАТЬ  ВСЕХ НАСЛЕДНИКАМИ RECORD
-        public async Task<UserProduct> AddUserProdToCartAsync(int count, string prodId, string userId)
+        public async Task<UserCreatedProduct> AddUserProdToCartAsync(int count, string prodId, string userId)
         {
-            var prod = await _db.UserProducts.FindAsync(prodId);
+            var prod = await _db.UserCreatedProducts.FindAsync(prodId);
             if (prod != null)
             {
                 var toy = await _db.Products.FindAsync(prod.ToyProductId);
@@ -218,15 +217,14 @@ namespace ProductApp.Server.Services
         }
 
         //TODO :Сделать асинхронно 
-        public IEnumerable<UserProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, out int totalProducts)
+        public IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts)
         {
-            // total prod 
-            var allProducts = _db.UserProducts.Where(p => !p.IsDeleted);
+            var profile =  _db.UserProfiles.Include(p => p.UserCreatedProducts).FirstOrDefault(pr => pr.UserId == userId);
+            var allProducts = profile.UserCreatedProducts.Where(p => !p.IsDeleted);
 
             totalProducts = allProducts.Count();
 
             var prod = allProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray();
-
             return prod;
         }
 
@@ -244,7 +242,7 @@ namespace ProductApp.Server.Services
             UserOrderProduct product = _db.UserOrderProducts.FirstOrDefault(x => x.Id == id);
             if (product == null)
                 return null;
-            //TODO: Помечать как удаленные
+            //TODO: Помечать как удаленные только Продукты, продукты пользователя, пользователей
             _db.UserOrderProducts.Remove(product);
             await _db.SaveChangesAsync();
             return product;
@@ -305,12 +303,12 @@ namespace ProductApp.Server.Services
         /// </summary>
         /// <param name="model">Продукт пользователя</param>
         /// <returns></returns>
-        public async Task<UserProduct> AddUserProductAsync(UserProduct model, string userId)
+        public async Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId)
         {
             //TODO:сделать отдельный сервис для сохранения изображения
             
-            var profile = await _db.UserProfiles.Include(p => p.UserProducts).FirstOrDefaultAsync(pr => pr.UserId == userId);
-            profile.UserProducts.Add(model);
+            var profile = await _db.UserProfiles.Include(p => p.UserCreatedProducts).FirstOrDefaultAsync(pr => pr.UserId == userId);
+            profile.UserCreatedProducts.Add(model);
             //await _db.UserProducts.AddAsync(model);
             await _db.SaveChangesAsync();
 
@@ -319,7 +317,7 @@ namespace ProductApp.Server.Services
 
         public UserImageRequest GetImageAsync(string imgID)
         {
-            var prod = _db.UserProducts.FirstOrDefault(p => p.Id == imgID);
+            var prod = _db.UserCreatedProducts.FirstOrDefault(p => p.Id == imgID);
             MemoryStream destination = new MemoryStream();
             using (var file = File.OpenRead(@"c:\3.png"))
             {
@@ -329,9 +327,9 @@ namespace ProductApp.Server.Services
             return model;
         }
 
-        public async Task<UserProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath)
+        public async Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath)
         {
-            var prod = await _db.UserProducts.FindAsync(id);
+            var prod = await _db.UserCreatedProducts.FindAsync(id);
             if (prod.IsDeleted)
                 return null;
 
@@ -349,9 +347,9 @@ namespace ProductApp.Server.Services
             return prod;
         }
 
-        public async Task<UserProduct> GetUserProductById(string id)
+        public async Task<UserCreatedProduct> GetUserProductById(string id)
         {
-            var product = await _db.UserProducts.FindAsync(id);
+            var product = await _db.UserCreatedProducts.FindAsync(id);
             if (product == null || product.IsDeleted)
                 return null;
 

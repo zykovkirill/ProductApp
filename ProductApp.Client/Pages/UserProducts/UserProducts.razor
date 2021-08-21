@@ -89,7 +89,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     bool isBusy = false;
-    List<UserProduct> products = new List<UserProduct>();
+    List<UserCreatedProduct> products = new List<UserCreatedProduct>();
     int count;
 
     int totalPages = 1;
@@ -116,7 +116,7 @@ else
         if (PageNumber == null)
             PageNumber = 1;
 
-        CollectionPagingResponse<UserProduct> result;
+        CollectionPagingResponse<UserCreatedProduct> result;
         //if (string.IsNullOrWhiteSpace(Query))
         //  if (filterType != String.Empty)
         //    result = await productsService.GetFilterProductsByPageAsync(PageNumber.Value, filterType);
@@ -159,7 +159,7 @@ else
     async Task addProductToCartAsync()
     {
         isBusy = true;
-        //var result = await productsService.AddUserProductToCartAsync(count, selectedUserId);
+
         var result = await productsService.AddUserProductToCartAsync(count, selectedUserId, (int)ClassType.UserProduct);
         if (result.IsSuccess)
         {

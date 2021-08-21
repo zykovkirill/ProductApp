@@ -34,8 +34,6 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<OperationResponse<UserProfile>> GetUserDataAsync()
         {
-            // var str = page.ToString();
-            //TODO: ИСПРАВИТЬ в продуктах PRODUCTCollectionPagingResponse
             var response = await client.GetProtectedAsync<OperationResponse<UserProfile>>($"{_baseUrl}/api/userdata");
             return response.Result;
         }
@@ -47,8 +45,6 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<OperationResponse<UserProfile>> GetUserCartAsync()
         {
-            // var str = page.ToString();
-            //TODO: ИСПРАВИТЬ в продуктах PRODUCTCollectionPagingResponse
             var response = await client.GetProtectedAsync<OperationResponse<UserProfile>>($"{_baseUrl}/api/userdata");
             return response.Result;
         }
@@ -83,8 +79,6 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<UserManagerResponse> PostUserAsync(CreateUserViewModel model)
         {
-
-
             var formKeyValues = new List<FormKeyValue>()
             {    
                 new StringFormKeyValue("Email", model.Email),            
@@ -94,10 +88,7 @@ namespace ProductApp.Shared.Services
             };
 
             var response = await client.SendFormProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", ActionType.POST, formKeyValues.ToArray());
-
             return response.Result;
-
-
         }
 
 

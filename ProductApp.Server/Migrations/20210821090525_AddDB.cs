@@ -66,36 +66,37 @@ namespace ProductApp.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserCart",
+                name: "PurchasesHistorys",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProductCount = table.Column<int>(type: "int", nullable: false),
-                    TotalSum = table.Column<int>(type: "int", nullable: false),
+                    IdOrder = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserCart", x => x.Id);
+                    table.PrimaryKey("PK_PurchasesHistorys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserDatas",
+                name: "UserProfiles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CommonSum = table.Column<int>(type: "int", nullable: false)
+                    CommonSum = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserDatas", x => x.Id);
+                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -205,7 +206,60 @@ namespace ProductApp.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserProductInCarts",
+                name: "UserCreatedProducts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ToyProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ChevronProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Size = table.Column<float>(type: "real", nullable: false),
+                    X = table.Column<float>(type: "real", nullable: false),
+                    Y = table.Column<float>(type: "real", nullable: false),
+                    CoverPath = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCreatedProducts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserCreatedProducts_UserProfiles_UserProfileId",
+                        column: x => x.UserProfileId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserOrders",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProductCount = table.Column<int>(type: "int", nullable: false),
+                    TotalSum = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserOrders_UserProfiles_UserProfileId",
+                        column: x => x.UserProfileId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserOrderProducts",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -214,72 +268,18 @@ namespace ProductApp.Server.Migrations
                     ProductCoverPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductCount = table.Column<int>(type: "int", nullable: false),
-                    UserCartId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserOrderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserProductInCarts", x => x.Id);
+                    table.PrimaryKey("PK_UserOrderProducts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserProductInCarts_UserCart_UserCartId",
-                        column: x => x.UserCartId,
-                        principalTable: "UserCart",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserProducts",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ToyProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ChevronProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Size = table.Column<int>(type: "int", nullable: false),
-                    X = table.Column<int>(type: "int", nullable: false),
-                    Y = table.Column<int>(type: "int", nullable: false),
-                    UserProfileId = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserProducts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserProducts_UserDatas_UserProfileId",
-                        column: x => x.UserProfileId,
-                        principalTable: "UserDatas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserPurchases",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserCartId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    PurchaseTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Satus = table.Column<int>(type: "int", nullable: false),
-                    UserProfileId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPurchases", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserPurchases_UserCart_UserCartId",
-                        column: x => x.UserCartId,
-                        principalTable: "UserCart",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserPurchases_UserDatas_UserProfileId",
-                        column: x => x.UserProfileId,
-                        principalTable: "UserDatas",
+                        name: "FK_UserOrderProducts_UserOrders_UserOrderId",
+                        column: x => x.UserOrderId,
+                        principalTable: "UserOrders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -324,23 +324,18 @@ namespace ProductApp.Server.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserProductInCarts_UserCartId",
-                table: "UserProductInCarts",
-                column: "UserCartId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserProducts_UserProfileId",
-                table: "UserProducts",
+                name: "IX_UserCreatedProducts_UserProfileId",
+                table: "UserCreatedProducts",
                 column: "UserProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPurchases_UserCartId",
-                table: "UserPurchases",
-                column: "UserCartId");
+                name: "IX_UserOrderProducts_UserOrderId",
+                table: "UserOrderProducts",
+                column: "UserOrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPurchases_UserProfileId",
-                table: "UserPurchases",
+                name: "IX_UserOrders_UserProfileId",
+                table: "UserOrders",
                 column: "UserProfileId");
         }
 
@@ -365,13 +360,13 @@ namespace ProductApp.Server.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "UserProductInCarts");
+                name: "PurchasesHistorys");
 
             migrationBuilder.DropTable(
-                name: "UserProducts");
+                name: "UserCreatedProducts");
 
             migrationBuilder.DropTable(
-                name: "UserPurchases");
+                name: "UserOrderProducts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -380,10 +375,10 @@ namespace ProductApp.Server.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "UserCart");
+                name: "UserOrders");
 
             migrationBuilder.DropTable(
-                name: "UserDatas");
+                name: "UserProfiles");
         }
     }
 }
