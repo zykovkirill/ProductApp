@@ -13,6 +13,7 @@ using ProductApp.Server.Services;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 
 namespace WebAPIApp.Controllers
 {
@@ -24,15 +25,17 @@ namespace WebAPIApp.Controllers
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
         private const int PAGE_SIZE = 10;
+        private readonly ILogger<UserProductsController> _logger;
 
         private readonly List<string> allowedExtensions = new List<string>
         {
             ".jpg", ".bmp", ".png"
         };
-        public UserProductsController(IProductsService productsService, IConfiguration configuration)
+        public UserProductsController(IProductsService productsService, IConfiguration configuration, ILogger<UserProductsController> logger)
         {
             _productsService = productsService;
             _configuration = configuration;
+            _logger = logger;
         }
         #region Get
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<UserCreatedProduct>))]
@@ -50,7 +53,8 @@ namespace WebAPIApp.Controllers
                 totalPages = totalProducts / PAGE_SIZE;
             else
                 totalPages = (totalProducts / PAGE_SIZE) + 1;
-
+            //TODO: Протестировать логи заключить их в try
+            _logger.LogInformation("Продукты переданы");
             return Ok(new CollectionPagingResponse<UserCreatedProduct>
             {
                 Count = totalProducts,
@@ -60,7 +64,7 @@ namespace WebAPIApp.Controllers
                 PageSize = PAGE_SIZE,
                 Page = page,
                 Records = products
-            });
+            });        
         }
 
         //TODO:Этот метод используется?
