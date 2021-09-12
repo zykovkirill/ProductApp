@@ -64,19 +64,19 @@ namespace WebAPIApp.Controllers
         }
 
         //TODO:Этот метод используется?
-        [ProducesResponseType(200, Type = typeof(FileStreamResult))]
-        [HttpGet("img")]
-        public IActionResult Get(string imgID)
-        {
-            var imgStream = _productsService.GetImageAsync(imgID);
-            var image = System.IO.File.OpenRead("C:\\3.png");
-            var model =  File(image, "image/png");
-            return model;
-            return Ok(new OperationResponse<FileStreamResult>
-            {
-                Record = model
-            });
-        }
+        //[ProducesResponseType(200, Type = typeof(FileStreamResult))]
+        //[HttpGet("img")]
+        //public IActionResult Get(string imgID)
+        //{
+        //    var imgStream = _productsService.GetImageAsync(imgID);
+        //    var image = System.IO.File.OpenRead("C:\\3.png");
+        //    var model =  File(image, "image/png");
+        //    return model;
+        //    return Ok(new OperationResponse<FileStreamResult>
+        //    {
+        //        Record = model
+        //    });
+        //}
         #endregion
 
         #region Post 

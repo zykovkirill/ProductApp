@@ -39,11 +39,4 @@
     <ProjectReference Include="..\ProductApp.Shared\ProductApp.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\unity\P00340\web\Build\web.data" />
-    <None Include="wwwroot\unity\P00340\web\Build\web.framework.js" />
-    <None Include="wwwroot\unity\P00340\web\Build\web.loader.js" />
-    <None Include="wwwroot\unity\P00340\web\Build\web.wasm" />
-  </ItemGroup>
-
 </Project>

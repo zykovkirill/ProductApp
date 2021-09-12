@@ -152,7 +152,7 @@ namespace ProductApp.Server.Services
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
-
+            var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
             var token = new JwtSecurityToken(
                 issuer: _configuration["AuthSettings:Issuer"],
                 audience: _configuration["AuthSettings:Audience"],
@@ -162,7 +162,7 @@ namespace ProductApp.Server.Services
 
             string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
             //TODO: стоит поправить профиль в разоре и извлекать его не через запрос а из dirictory и убрать или объеденить LocalUserInfo
-            var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
+          //  var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
 
             Dictionary<string, string> userinfo = new Dictionary<string, string>
             {
