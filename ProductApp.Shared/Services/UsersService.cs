@@ -65,7 +65,7 @@ namespace ProductApp.Shared.Services
         /// </summary>
         /// <param name="model"> Обьект для добавления представляющий пользователя </param>
         /// <returns></returns>
-        public async Task<UserManagerResponse> PostUserAsync(CreateUserViewModel model)
+        public async Task<UserManagerResponse> PostUserAsync(RegisterRequest model)
         {
 
 
@@ -73,7 +73,9 @@ namespace ProductApp.Shared.Services
             {    
                 new StringFormKeyValue("Email", model.Email),            
                 new StringFormKeyValue("Password", model.Password),
-                new StringFormKeyValue("ConfirmPassword", model.Password)
+                new StringFormKeyValue("ConfirmPassword", model.ConfirmPassword),
+                new StringFormKeyValue("FirstName", model.FirstName),
+                new StringFormKeyValue("LastName", model.LastName)
 
             };
 

@@ -15,9 +15,11 @@
                 <AlertMessage Message="@message" MessageType="@messageType" />
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-
+                <RadzenTextBox Placeholder="Имя" @bind-Value="model.FirstName" Style="margin:10px;" />
+                <RadzenTextBox Placeholder="Фамилия" @bind-Value="model.LastName" Style="margin:10px;" />
                 <RadzenTextBox Placeholder="Электронная почта" @bind-Value="model.Email" Style="margin:10px;" />
-                <Radzen.Blazor.RadzenTextArea Placeholder="Пароль" @bind-Value="model.Password" Style="margin:10px;" />
+                <RadzenPassword Placeholder="Пароль" @bind-Value="model.Password" Style="margin:10px;" />
+                <RadzenPassword Placeholder="Повторите пароль" @bind-Value="model.ConfirmPassword" Style="margin:10px;" />
                 <hr />
                 <RadzenButton ButtonType="Radzen.ButtonType.Submit" ButtonStyle="Radzen.ButtonStyle.Success" Disabled="isBusy" Style="margin:5px" class="btn-block" Text="Отправить" />
             </RadzenCard>
@@ -30,7 +32,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    CreateUserViewModel model = new CreateUserViewModel();
+    RegisterRequest model = new RegisterRequest();
     //System.IO.Stream fileStream = null;
     //string imageContent = string.Empty;
     //string fileName = string.Empty;

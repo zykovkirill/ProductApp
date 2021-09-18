@@ -44,7 +44,7 @@ namespace ProductApp.Server
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequiredLength = 5;
-                //options.User.AllowedUserNameCharacters = null;
+                options.User.AllowedUserNameCharacters = null;
                 options.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddRoles<IdentityRole>();
 

@@ -183,7 +183,7 @@ namespace ProductApp.Server.Services
                     Message = "Пользователь не найден",
                     IsSuccess = false,
                 };
-
+            //TODO : ROLE и USER удаляются надо их блокировать
             var result = await _userManager.DeleteAsync(user);
             if (result.Succeeded)
             {
