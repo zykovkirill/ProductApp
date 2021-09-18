@@ -20,6 +20,7 @@ else
 
     <hr />
     <div class="row">
+        <AlertMessage Message="@message" MessageType="@messageType" />
         <RadzenCard Style="margin:10px;height:auto; max-width:100%; resize: both;">
             <p>Имя: @userData.FirstName</p>
             <p>Фамилия: @userData.LastName</p>
@@ -45,6 +46,9 @@ else
     bool isBusy = false;
     UserProfile userData = new UserProfile();
 
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
     int totalPages = 1;
 
     async Task getUserDataAsync()
@@ -63,10 +67,13 @@ else
 
         result = await userDataService.GetUserDataAsync();
 
-        if (result.IsSuccess)// Добавить вывод ошибок
-
-
+        if (result.IsSuccess)
             userData = result.Record;
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
 
         isBusy = false;
     }

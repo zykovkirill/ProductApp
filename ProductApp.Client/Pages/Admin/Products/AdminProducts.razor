@@ -22,6 +22,7 @@ else
 else
 {
 <div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
     <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
     <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
     <RadzenDropDown AllowClear="true"
@@ -122,6 +123,9 @@ else
     IEnumerable<string> multipleValues;
     List<Utils.ProductType> prod = new List<Utils.ProductType>();
 
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
     async Task getProductsAsync()
     {
         isBusy = true;
@@ -155,6 +159,11 @@ else
 
 
             products = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }

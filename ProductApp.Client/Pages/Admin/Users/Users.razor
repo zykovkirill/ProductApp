@@ -22,6 +22,7 @@ else
 else
 {
 <div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
     <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
     <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getUsersAsync()" />
     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="person_add_alt_1" Text="Добавить пользователя" Click=' () => navigationManager.NavigateTo($"/admin/users/create")' class="btn-block" />
@@ -83,6 +84,9 @@ else
 
     int totalPages = 1;
 
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
     async Task getUsersAsync()
     {
         isBusy = true;
@@ -110,8 +114,12 @@ else
             else
                 totalPages = (result.Count / result.PageSize) + 1;
 
-
             users = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }

@@ -7,8 +7,6 @@
 
 <h2>Роли</h2>
 
-
-
 @if (isBusy)
 {
     <h2>Загрузка...</h2>
@@ -16,11 +14,12 @@
 else
 {
 
-    <div class="row">
-        <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
-        <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getRolesAsync()" />
-        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="library_add" Text="Добавить роль" Click=' () => navigationManager.NavigateTo($"/admin/roles/create")' class="btn-block" />
-    </div>
+<div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
+    <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
+    <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getRolesAsync()" />
+    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="library_add" Text="Добавить роль" Click=' () => navigationManager.NavigateTo($"/admin/roles/create")' class="btn-block" />
+</div>
     <hr />
 
 
@@ -65,6 +64,9 @@ else
 
     int totalPages = 1;
 
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
     async Task getRolesAsync()
     {
         isBusy = true;
@@ -84,6 +86,11 @@ else
         if (result.IsSuccess)// Добавить вывод ошибок
         {
             roles = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }

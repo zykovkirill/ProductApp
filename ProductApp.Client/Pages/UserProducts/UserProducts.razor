@@ -134,8 +134,12 @@ else
             else
                 totalPages = (result.Count / result.PageSize) + 1;
 
-
             products = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }
@@ -153,7 +157,6 @@ else
         selectedUserId = id;
 
     }
-
 
 
     async Task addProductToCartAsync()

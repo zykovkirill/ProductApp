@@ -16,20 +16,17 @@ else
 
     <hr />
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
-    <div class="row">
-        @foreach (var purchase in purchases)
-        {
+<div class="row">
+    @foreach (var purchase in purchases)
+    {
+        <AlertMessage Message="@message" MessageType="@messageType" />
+        <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+            <RadzenImage Path="@purchase.CreatedDate.ToString()" Style="height:auto; max-width:100%; margin:5px" />
+            <p> @purchase.Status </p>
+        </RadzenCard>
 
-            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-                <RadzenImage Path="@purchase.CreatedDate.ToString()" Style="height:auto; max-width:100%; margin:5px" />
-                <p> @purchase.Status </p>
-            </RadzenCard>
-
-        }
-    </div>
-  
-
-
+    }
+</div>
     <hr />
     <div class="row">
             @for (int i = 1; i <= totalPages; i++)
@@ -63,6 +60,9 @@ else
 
     int totalPages = 1;
 
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
     async Task getPurchasesAsync()
     {
         isBusy = true;
@@ -70,15 +70,12 @@ else
         var userState = authenticationState.Result;
         productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
-
-
         if (PageNumber == null)
             PageNumber = 1;
 
         CollectionPagingResponse<UserOrder> result;
 
         result = await productsService.GetPurchasesAsync();
-
 
         // 50 plans | page size = 10 => 5 pages
         // 54 plans | page size = 10 => 5 pages -> page = 4 plans
@@ -89,8 +86,12 @@ else
             else
                 totalPages = (result.Count / result.PageSize) + 1;
 
-
             purchases = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }
