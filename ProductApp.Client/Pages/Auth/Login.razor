@@ -71,17 +71,7 @@
         if (result.IsSuccess)
         {
 
-            var userInfo = new ProductApp.Client.Models.LocalUserInfo()
-            {
-                AccessToken = result.Message,
-                Email = result.UserInfo["Email"],
-                FirstName = result.UserInfo["FirstName"],
-                LastName = result.UserInfo["LastName"],
-                Id = result.UserInfo[System.Security.Claims.ClaimTypes.NameIdentifier],
-                Role = result.UserInfo[System.Security.Claims.ClaimTypes.Role],
-            };
-
-            await storegeService.SetItemAsync("User", userInfo);
+            await storegeService.SetItemAsync("User", result.UserInfo);
             await authenticationStateProvider.GetAuthenticationStateAsync();
             navigationManager.NavigateTo("/");
         }

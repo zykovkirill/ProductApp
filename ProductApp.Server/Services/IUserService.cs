@@ -38,6 +38,7 @@ namespace ProductApp.Server.Services
         private IConfiguration _configuration;
         private IMailService _mailService;
         private ApplicationDbContext _db;
+        private const string _roleUser = "User";
 
         public UserService(UserManager<IdentityUser> userManager, /*RoleManager<IdentityRole> roleManager, */IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
         {
@@ -64,11 +65,11 @@ namespace ProductApp.Server.Services
             var identityUser = new IdentityUser
             {
                 Email = model.Email,
-                UserName = model.Email,
+                UserName = model.FirstName
             };
 
             var result = await _userManager.CreateAsync(identityUser, model.Password);
-
+            await _userManager.AddToRoleAsync(identityUser, _roleUser);
             if (result.Succeeded)
             {
 
@@ -85,6 +86,7 @@ namespace ProductApp.Server.Services
                 }
                 catch(Exception ex)
                 {
+                    //TODO: Добавить в бд записи об ошибках
                     Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !" + ex.Message);
                 }
 
@@ -137,19 +139,21 @@ namespace ProductApp.Server.Services
                     Message = "Неправильный пароль",
                     IsSuccess = false,
                 };
-            // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль 
-            //await _roleManager.CreateAsync(new IdentityRole("Admin"));
-            //await _userManager.AddToRoleAsync(user, "Admin");
-            var role = _userManager.GetRolesAsync(user).Result.FirstOrDefault();
-            if (role == null)
-                role = "user";
-           
-            var claims = new[]
+            // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль ;
+            var roles = _userManager.GetRolesAsync(user).Result;
+
+            List<Claim> claimsRoleList = new List<Claim>();     
+            foreach (var item in roles)
             {
-                new Claim("Email",model.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Role, role),
-            };
+                claimsRoleList.Add(new Claim(ClaimTypes.Role, item));
+            }
+            
+            List<Claim> claimsList = new List<Claim>();
+            claimsList.Add(new Claim("Email", model.Email));
+            claimsList.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+            claimsList.Add(new Claim(ClaimTypes.Name, user.UserName));
+            claimsList.AddRange(claimsRoleList);
+            var claims = claimsList.ToArray();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
             var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
@@ -161,17 +165,15 @@ namespace ProductApp.Server.Services
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
-            //TODO: стоит поправить профиль в разоре и извлекать его не через запрос а из dirictory и убрать или объеденить LocalUserInfo
-          //  var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
 
-            Dictionary<string, string> userinfo = new Dictionary<string, string>
+            LocalUserInfo localUserInfo = new LocalUserInfo()
             {
-                { "Email", user.Email },
-                { "FirstName", data.FirstName },
-                { "LastName", data.LastName },
-                { ClaimTypes.NameIdentifier, user.Id },
-                //TODO:  { ClaimTypes.Role, role} - правильно ли передавать в таком виде лучше парсить из token
-                { ClaimTypes.Role, role}
+                Email = user.Email,
+                FirstName = data.FirstName,
+                LastName = data.LastName,
+                Id = user.Id,
+                AccessToken = tokenAsString,
+                Roles = claimsRoleList.Select(c => c.Value).ToList()
             };
 
             return new UserManagerResponse
@@ -179,12 +181,10 @@ namespace ProductApp.Server.Services
                 Message = tokenAsString,
                 IsSuccess = true,
                 ExpireDate = token.ValidTo,
-                UserInfo = userinfo        
+                UserInfo = localUserInfo
             };
 
         }
-
-
 
         public async Task<UserManagerResponse> ConfirmEmailAsync(string userId, string token)
         {

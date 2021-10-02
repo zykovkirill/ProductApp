@@ -4,7 +4,6 @@ namespace ProductApp.Shared.Models
 {
     public class Product : Record
     {
-
         /// <summary>
         /// Наименование
         /// </summary>
@@ -17,7 +16,6 @@ namespace ProductApp.Shared.Models
         /// </summary>
         [StringLength(200)]
         public string Description { get; set; }
-
 
         //TODO: сделать set privat и колличество
         /// <summary>

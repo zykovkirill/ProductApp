@@ -1,0 +1,73 @@
+ТЕСТЫ
+ДОКУМЕНТИРОВАНИЕ
+ЛОГИРОВАНИЕ
+
+
+1) Необходимо отслеживать выполнение кода программы осуществлять запись ошибок и время их возникновения, данные о пользователях взаимодействующих с системой.
+2) Необходимо создать подписи к каждой функции внутри кода
+3) Создать резервное копирование базы данных
+4) Создать защищенное соединение между пользователем и сервером 
+5) Создать хранилище данных в различных форматах
+6) Создать привелегии пользователя
+7) Адаптировать к англоговорящей аудитории 
+8) Лицензировать програмное обеспечение
+9) Предусмотреть обновления внутри приложения 
+10) Анализ и запись используемых библиотек и лицензий к ним
+11) Согласие на обработку персональных данных https://tilda.cc/ru/privacy-generator/
+12) Передача и хранение бинарных файлов( фото, видео, 3d модели и другое)
+13) Разобраться с токенами
+14) Добавить карту
+15) IsDeleted добавить вместо удаления
+16) оставить только get
+17) КАПЧА https://developers.google.com/recaptcha/docs/display https://www.google.com/recaptcha/admin/create
+18) Сделать возможность писать комментарии
+19) https://www.radzen.com/documentation/numeric/ - редактор?
+20) Политика конфеденциальности
+21) Создать логотип
+22) Анимированные иконки
+23) Добавить рейтинг https://blazor.radzen.com/rating
+24) Система оплаты http://www.cyberguru.ru/microsoft-net/asp-net/aspnet-intro-to-paypal.html?showall=1&start=0 
+25) События изменение на 0 в корзине удаляется продукт автоматически https://forum.radzen.com/t/binding-oninput-event/1951/3
+26) Произвести тесты на уязвимость в SQL и очистку кода в VisualStudio
+27) .csproj //TODO: убрать нижнюю строку https://docs.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?view=aspnetcore-5.0#resolve-integrity-check-failures
+    <BlazorCacheBootResources>false</BlazorCacheBootResources>
+28) Проверить взаимодействие с Unity https://developer.microsoft.com/en-us/games/blog/build-for-the-web-with-aspnet-for-unity-developers/
+29)https://docs.unity3d.com/Manual/webgl-deploying.html
+https://docs.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?view=aspnetcore-3.1
+//TODO:Включить шифрование
+      <BlazorEnableCompression>false</BlazorEnableCompression>
+30) Взаимодействие JS c BLAZOR передача токена в Unity https://www.youtube.com/watch?v=3g0N__K7Wlo
+31) Очистить не нужные ссылки на сборки
+
+ ПРИ СБОРКИ КОПИРУЕМ СКРИП из INDEX в папку TAMPLATEDATA под названием base.js, а также меняем стили комментируем /*#unity-container { position: absolute }
+#unity-container.unity-desktop { left: 50%; top: 50%; transform: translate(-50%, -50%) }*/
+ПРИМЕР Base.js находится в папке "файлы для сборки"
+ ЕСЛИ НУЖНО ЗАПУСТИТЬ JS ИЩИ ТУТ EditUserProducts: ComponentBase
+!!! https://answers.unity.com/questions/1181369/uncaught-rangeerror-maximum-call-stack-size-exceed.html - ПРИ ПЕРЕПОЛНЕНИИ СТЕКА ОЧИСТЬ КЕШ
+
+
+
+CORS - необходимо настроить 
+https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino?hl=ru https://metanit.com/sharp/articles/mvc/14.php
+
+
+
+Миграция 
+1)Add-Migration AddDB
+2)Update-Database
+3)remove-migration
+
+
+Иногда не обновляются стили для этого необходимо удалить и восстоновить index в wwwroot
+В случае если не меняются CSS то чистим историю
+
+
+Развертывание на IIS https://docs.microsoft.com/en-gb/aspnet/core/host-and-deploy/iis/?view=aspnetcore-3.1
+0) Поменять строку подключения к БД
+1) В VisualStudio нажать кнопку опубликовать 
+2) В Включение и отключение компонентов Windows в разделе "Службы IIS - службы интернета - компоненты разработки приложений"  включить все необходимое
+3) При добавление сайта в IIS внимательно проверить местоположение каталога wwwroot
+4) В случае динамического ip На роутере со статикой  необходимо пробросить 433 и 80 порт
+5) DNS записи можено настроить на стороне провайдера доменного имени https://www.reg.ru/support/ssl-sertifikaty/aktivatsiya-ssl-sertifikata/kak-dobavit-zapis-txt-dlya-besplatnogo-ssl-sertifikata#1
+6) Сертификат ssl https://enterprise.arcgis.com/ru/web-adaptor/latest/install/iis/enable-https-on-your-web-server-server-.htm  https://www.reg.ru/support/ssl-sertifikaty/aktivatsiya-ssl-sertifikata/kak-dobavit-zapis-txt-dlya-besplatnogo-ssl-sertifikata#1 https://www.reg.ru/support/ssl-sertifikaty/ustanovka-ssl-sertifikata/ustanovka-SSL-sertifikata-na-Microsoft-IIS-7 
+https://ru.godaddy.com/help/kak-vruchnuyu-ustanovit-ssl-sertifikat-na-server-iis-7-4801 https://qna.habr.com/q/262264 https://www.sslshopper.com/ssl-converter.html

@@ -8,27 +8,7 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Домой
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="products">
-                <span class="oi oi-list" aria-hidden="true"></span> Продукты
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="UserData/Purchases">
-                <span class="oi oi-flag" aria-hidden="true"></span> Заказы
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="UserData/Cart">
-                <span class="oi oi-cart" aria-hidden="true"></span> Корзина
-            </NavLink>
-        </li>
-        <AuthorizeView Roles="Admin">
+        <AuthorizeView Roles="Admin, User">
             <li class="nav-item px-3">
                 <NavLink class="nav-link" href="userproducts">
                     <span class="oi oi-box" aria-hidden="true"></span> Мои продукты
@@ -39,6 +19,18 @@
                     <span class="oi oi-brush" aria-hidden="true"></span> Редактор
                 </NavLink>
             </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="UserData/Purchases">
+                    <span class="oi oi-flag" aria-hidden="true"></span> Заказы
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="UserData/Cart">
+                    <span class="oi oi-cart" aria-hidden="true"></span> Корзина
+                </NavLink>
+            </li>
+        </AuthorizeView>
+        <AuthorizeView Roles="Admin">
             <li class="nav-item px-3">
                 <NavLink class="nav-link" href="admin/users">
                     <span class="oi oi-people" aria-hidden="true"></span> Пользователи
@@ -71,6 +63,16 @@
             </li>
         </AuthorizeView>
         <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Домой
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="products">
+                <span class="oi oi-list" aria-hidden="true"></span> Продукты
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
             <NavLink class="nav-link" href="UserData/profile">
                 <span class="oi oi-person" aria-hidden="true"></span> Профиль
             </NavLink>
@@ -90,7 +92,6 @@
 
 @code {
     private bool collapseNavMenu = true;
-    // TODO : сделать для роли USER
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()

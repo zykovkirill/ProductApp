@@ -202,8 +202,7 @@ namespace ProductApp.Server.Services
         //TODO :Сделать асинхронно 
         public IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts)
         {
-            // total prod 
-            var allProducts = _db.Products.Where(p => !p.IsDeleted);
+              var allProducts = _db.Products.Where(p => !p.IsDeleted);
 
             totalProducts = allProducts.Count();
 

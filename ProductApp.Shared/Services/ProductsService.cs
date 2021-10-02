@@ -161,7 +161,6 @@ namespace ProductApp.Shared.Services
 
         }
 
-
         /// <summary>
         /// Покупка всего что в корзине
         /// </summary>
@@ -206,17 +205,6 @@ namespace ProductApp.Shared.Services
             var response = await client.DeleteProtectedAsync<OperationResponse<UserOrderProduct>>($"{_baseUrl}/api/usercart/{id}");
             return response.Result;
         }
-        ///// <summary>
-        ///// Сохранить
-        ///// </summary>
-        ///// <returns></returns>
-        //public async Task<OperationResponse<UserProduct>> SaveUserProductAsync(UserProduct model)
-        //{
-
-        //    //var response = await client.PostProtectedAsync<OperationResponse<UserProduct>>($"{_baseUrl}/api/userproducts", model);
-        //    //return response.Result;
-        //    return null;
-        //}
 
         public async Task<CollectionPagingResponse<UserCreatedProduct>> GetAllUserProductsByPageAsync(int page = 1)
         {
@@ -224,16 +212,5 @@ namespace ProductApp.Shared.Services
             var response = await client.GetProtectedAsync<CollectionPagingResponse<UserCreatedProduct>>($"{_baseUrl}/api/userproducts?page={page}");
             return response.Result;
         }
-        public async Task<FileStreamResult> GetStreamImage(string imgID)
-        {
-            
-            var response = await client.GetProtectedAsync<object>($"{_baseUrl}/api/userproducts/img?imgID={imgID}");
-            Stream test = await response.HttpResponse.Content.ReadAsStreamAsync();
-            //TODO: Почему null возвращает
-            //   Stream test1 = await response.HttpResponse.Content.ReadAsStreamAsync();
-            return null;
-        //    return response.Result;
-        }
-
     }
 }

@@ -22,11 +22,6 @@ namespace ProductApp.Shared.Models
         [JsonIgnore]
         public DateTime ModifiedDate { get; set; }
 
-        //[Required]
-        //[StringLength(40)]
-        //[JsonIgnore]
-        //public string UserId { get; set; }
-
         [JsonIgnore]
         public bool IsDeleted { get; set; }
     }

@@ -34,7 +34,6 @@ namespace ProductApp.Shared.Models.UserData
         /// Координата Y
         /// </summary>
         public float Y { get; set; }
-
         /// <summary>
         /// Путь к файлу
         /// </summary>
@@ -42,35 +41,6 @@ namespace ProductApp.Shared.Models.UserData
         [StringLength(256)]
         public string CoverPath { get; set; }
 
-        // public int UserDataId { get; set; }      // внешний ключ
-        // public UserProfile UserData { get; set; }    // навигационное свойство
 
     }
-    //public class UserProductRequest 
-    //{
-    //    /// <summary>
-    //    /// ID игрушки
-    //    /// </summary>
-    //    public string ToyProductId { get; set; }
-    //    /// <summary>
-    //    /// ID шеврона
-    //    /// </summary>
-    //    public string ChevronProductId { get; set; }
-    //    /// <summary>
-    //    /// Размер
-    //    /// </summary>
-    //    public int Size { get; set; }
-    //    /// <summary>
-    //    /// Координата X
-    //    /// </summary>
-    //    public int X { get; set; }
-    //    /// <summary>
-    //    /// Координата Y
-    //    /// </summary>
-    //    public int Y { get; set; }
-
-    //    // public int UserDataId { get; set; }      // внешний ключ
-    //    // public UserProfile UserData { get; set; }    // навигационное свойство
-
-    //}
 }

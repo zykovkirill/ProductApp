@@ -148,9 +148,7 @@ else
         else
             result = await productsService.SearchProductsByPageAsync(Query, PageNumber.Value);
 
-        // 50 plans | page size = 10 => 5 pages
-        // 54 plans | page size = 10 => 5 pages -> page = 4 plans
-        if (result.IsSuccess)// Добавить вывод ошибок
+        if (result.IsSuccess)
         {
             if (result.Count % result.PageSize == 0)
                 totalPages = result.Count / result.PageSize;

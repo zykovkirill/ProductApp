@@ -35,7 +35,6 @@ namespace CustomIdentityApp.Controllers
             if (page == 0)
                 page = 1;
             var users = _adminService.GetAllUsersAsync(PAGE_SIZE, page, out totalUsers);
-            //TODO:totalPages - почему не используется?
             int totalPages = 0;
             if (totalUsers % PAGE_SIZE == 0)
                 totalPages = totalUsers / PAGE_SIZE;

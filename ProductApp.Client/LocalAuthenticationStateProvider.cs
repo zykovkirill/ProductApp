@@ -6,6 +6,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using ProductApp.Client.Models;
+using ProductApp.Shared.Models;
 
 namespace ProductApp.Client
 {
@@ -25,18 +26,22 @@ namespace ProductApp.Client
             {
                 var userInfo = await _storageService.GetItemAsync<LocalUserInfo>("User");
 
-                var claims = new[]
+                var listRoleClaims = new List<Claim>();
+                foreach (var claimRole in userInfo.Roles)
+                    listRoleClaims.Add(new Claim(ClaimTypes.Role, claimRole));
+
+                var claims = new List<Claim>
                 {
                     new Claim("Email", userInfo.Email),
                     new Claim("FirstName", userInfo.FirstName),
                     new Claim("LastName", userInfo.LastName),
-                    new Claim("AccessToken", userInfo.AccessToken), 
+                    new Claim("AccessToken", userInfo.AccessToken),
                     new Claim(ClaimTypes.NameIdentifier, userInfo.Id),
-                    //TODO: мб парсить напрямую из tokena
-                    new Claim(ClaimTypes.Role, userInfo.Role),
                 };
 
-                var identity = new ClaimsIdentity(claims, "BearerToken");
+                claims.AddRange(listRoleClaims);
+
+                var identity = new ClaimsIdentity(claims.ToArray(), "BearerToken");
                 var user = new ClaimsPrincipal(identity);
                 var state =  new AuthenticationState(user);
                 NotifyAuthenticationStateChanged(Task.FromResult(state));
