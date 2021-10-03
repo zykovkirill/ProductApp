@@ -17,10 +17,6 @@ namespace WebAPIApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-  //  [Authorize]
-    [Authorize(Roles = ("Admin"))]
-   // [Authorize(Policy = "RequireAdministratorRole")]
-    // [Authorize(AuthenticationSchemes = { BasicAuthenticationHandler.AuthenticationScheme, BasicAuthenticationHandler.AuthenticationScheme + 2 }, Roles = "admin")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductsService _productsService;
@@ -40,6 +36,7 @@ namespace WebAPIApp.Controllers
         #region Get
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<Product>))]
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public IActionResult Get(int page)
         {
           //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -69,6 +66,7 @@ namespace WebAPIApp.Controllers
 
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<Product>))]
         [HttpGet("search")]
+        [Authorize(Roles = "Admin, User")]
         public IActionResult Get(string query, int page)
         {
             //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -97,6 +95,7 @@ namespace WebAPIApp.Controllers
 
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<Product>))]
         [HttpGet("filter")]
+        [Authorize(Roles = "Admin, User")]
         public IActionResult Get(int page, string filter)
         {
             //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -127,6 +126,7 @@ namespace WebAPIApp.Controllers
         [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
         [ProducesResponseType(400, Type = typeof(OperationResponse<Product>))]
         [HttpGet("Edit")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(string id)
         {
            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -154,6 +154,7 @@ namespace WebAPIApp.Controllers
         [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
         [ProducesResponseType(400, Type = typeof(OperationResponse<Product>))]
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromForm] ProductRequestServer model)
         {
            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -198,23 +199,12 @@ namespace WebAPIApp.Controllers
                             IsSuccess = false,
                         });
                     }
-
-                   // await model.CoverFile.CopyToAsync(fs);
                 }
                 var addedProduct = await _productsService.AddProductAsync(model.Name, model.Description, model.Price, model.ProductType, url);
 
                 if (addedProduct != null)
                 {
-                   // if (fullPath != null)
-                  //  {
-                        // using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
-                        //    {
-
-
-                         await model.CoverFile.CopyToAsync(fs);
-                        //  }
-                  //  }
-
+                    await model.CoverFile.CopyToAsync(fs);
                     return Ok(new OperationResponse<Product>
                     {
                         IsSuccess = true,
@@ -238,6 +228,7 @@ namespace WebAPIApp.Controllers
         [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
         [ProducesResponseType(400, Type = typeof(OperationResponse<Product>))]
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put([FromForm] ProductRequestServer model)
         {
           //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -305,6 +296,7 @@ namespace WebAPIApp.Controllers
         [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
         [ProducesResponseType(404)]
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -312,10 +304,6 @@ namespace WebAPIApp.Controllers
             var getOld = await _productsService.GetProductById(id);
             if (getOld == null)
                 return NotFound();
-
-            // Remove the file 
-            //string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", getOld.CoverPath.Replace(_configuration["AppUrl"], ""));
-            //System.IO.File.Delete(fullPath);
 
             var deletedProduct = await _productsService.DeleteProductAsync(id);
 
@@ -327,7 +315,6 @@ namespace WebAPIApp.Controllers
             });
         }
 
- 
         #endregion 
 
 

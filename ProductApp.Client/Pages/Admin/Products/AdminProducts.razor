@@ -3,7 +3,6 @@
 @page "/adminproducts/{PageNumber:int}"
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
-@*Добавить роль В ADMIN*@
 @attribute [Authorize(Roles = "Admin")]
 
 @if (string.IsNullOrWhiteSpace(Query))

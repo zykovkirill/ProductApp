@@ -15,7 +15,7 @@ namespace WebAPIApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin, User")]
     public class UserDataController : ControllerBase
     {
         private ApplicationDbContext _db;

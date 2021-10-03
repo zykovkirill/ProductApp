@@ -4,16 +4,7 @@ using System.Text;
 
 namespace ProductApp.Shared.Models
 {
-    //public class ProductsCollectionPagingResponse : BaseAPIResponse
-    //{
-    //    public Product[] Records { get; set; }
-    //    public int Page { get; set; }
-    //    public int PageSize { get; set; }
-    //    public int? NextPage { get; set; }
-    //    public int Count { get; set; }
-
-    //}
-
+ 
     public class CollectionResponse<T> : BaseAPIResponse
     {
         public CollectionResponse()

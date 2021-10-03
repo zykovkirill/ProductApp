@@ -3,7 +3,8 @@
 @page "/UserData/Cart"
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
+
 
 <h2>Корзина</h2>
 
@@ -58,21 +59,6 @@ else
 
 
     <hr />
-    @*<div class="row">
-            @for (int i = 1; i <= totalPages; i++)
-            {
-                int page = i;
-                @if (page == PageNumber)
-                {
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
-                }
-                else
-                {
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
-                }
-            }
-
-        </div>*@
 }
 
 
@@ -108,23 +94,17 @@ else
             PageNumber = 1;
 
         OperationResponse<UserOrder> result;
-        //TODO: CollectionPagingResponse<UserProduct> переписать вместо UserCart ТЫ ЖЕ ИСПОЛЬЗУЕШЬ СТРАНИЦЫ!!!!!!!!!
         result = await productsService.GetProductFromCartAsync();
 
-
-        // 50 plans | page size = 10 => 5 pages
-        // 54 plans | page size = 10 => 5 pages -> page = 4 plans
-        if (result.IsSuccess)// Добавить вывод ошибок
+        if (result.IsSuccess)
         {
-            //if (result.Count % result.PageSize == 0)
-            //    totalPages = result.Count / result.PageSize;
-            //else
-            //    totalPages = (result.Count / result.PageSize) + 1;
-
-
-            // products = result.Record.Products;
             if (result.Record != null)
                 userOrder = result.Record;
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }

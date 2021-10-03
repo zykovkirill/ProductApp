@@ -17,27 +17,18 @@ namespace WebAPIApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //  [Authorize]
-    [Authorize(Roles = ("Admin"))]
-    // [Authorize(Policy = "RequireAdministratorRole")]
-    // [Authorize(AuthenticationSchemes = { BasicAuthenticationHandler.AuthenticationScheme, BasicAuthenticationHandler.AuthenticationScheme + 2 }, Roles = "admin")]
+    [Authorize(Roles = "Admin, User")]
+
     public class UserCartController : ControllerBase
     {
         //TODO: Разделить IProductsService на несколько интерфейсов
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
-
-        private const int PAGE_SIZE = 10;
         public UserCartController(IProductsService productsService, IConfiguration configuration)
         {
             _productsService = productsService;
             _configuration = configuration;
         }
-
-        private readonly List<string> allowedExtensions = new List<string>
-        {
-            ".jpg", ".bmp", ".png"
-        };
 
         #region Get    
         //TODO: НАДО  сделать POST - данный вариант не безопасен
@@ -60,14 +51,14 @@ namespace WebAPIApp.Controllers
                         BadRequest(new OperationResponse<Product>
                         {
                             IsSuccess = false,
-                            Message = $"Errors",
+                            Message = $"Ошибка",
                             OperationDate = DateTime.UtcNow,
                             Record = product
                         });
                 return Ok(new OperationResponse<Product>
                 {
                     IsSuccess = true,
-                    Message = $"Products of  received successfully!",
+                    Message = $"Продукты добавлены в корзину",
                     OperationDate = DateTime.UtcNow,
                     Record = product
                 });
@@ -80,14 +71,14 @@ namespace WebAPIApp.Controllers
                         BadRequest(new OperationResponse<UserCreatedProduct>
                         {
                             IsSuccess = false,
-                            Message = $"Errors",
+                            Message = $"Ошибки",
                             OperationDate = DateTime.UtcNow,
                             Record = product
                         });
                 return Ok(new OperationResponse<UserCreatedProduct>
                 {
                     IsSuccess = true,
-                    Message = $"Products of  received successfully!",
+                    Message = $"Продукты добавлены в корзину",
                     OperationDate = DateTime.UtcNow,
                     Record = product
                 });
@@ -111,21 +102,20 @@ namespace WebAPIApp.Controllers
             if (userOrder == null)
                 return
                      Ok(new OperationResponse<UserOrder>
-                    {
-                        IsSuccess = false,
-                        Message = $"Корзина пуста",
-                        OperationDate = DateTime.UtcNow,
-                        Record = userOrder
-                    });
+                     {
+                         IsSuccess = false,
+                         Message = $"Корзина пуста",
+                         OperationDate = DateTime.UtcNow,
+                         Record = userOrder
+                     });
             return Ok(new OperationResponse<UserOrder>
             {
                 IsSuccess = true,
-                Message = $"Products of  received successfully!",
+                Message = $"Продукты из корзины",
                 OperationDate = DateTime.UtcNow,
                 Record = userOrder
             });
         }
-
 
         #endregion
 

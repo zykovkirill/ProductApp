@@ -84,7 +84,7 @@
 @using System.IO
 @using System.Net.Http
 @inject HttpClient Http
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 @*//TODO: ЧТО ЭТО AuthorizeView как её лучше применить*@
 <AuthorizeView>
     <img src="@ImgSrc" />
@@ -129,7 +129,7 @@
 
     async Task getProductsAsync()
     {
-      
+
     }
 
     async Task moveToPageAsync(int pageNumber)

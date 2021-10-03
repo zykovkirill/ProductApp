@@ -3,7 +3,7 @@
 @page "/products"
 @page "/products/{PageNumber:int}"
 @inject ProductsService productsService
-@attribute [Authorize (Roles="Admin")]
+@attribute [Authorize (Roles="Admin, User")]
 
 @if (string.IsNullOrWhiteSpace(Query))
 {
@@ -184,7 +184,10 @@ else
 
         filterType =  string.Join(", ", (IEnumerable<object>)value);
         multipleValues = (IEnumerable<string>)value;
-        await getProductsAsync();
+        if (multipleValues.Any())
+            await getProductsAsync();
+        else
+            products.Clear();
     }
 
 }

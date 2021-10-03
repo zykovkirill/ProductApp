@@ -15,7 +15,7 @@ namespace ProductApp.Server.Controllers.User
 
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = ("Admin"))]
+    [Authorize(Roles = "Admin, User")]
     public class UserPurchasesController : Controller
     {
         //TODO: Разделить IProductsService на несколько интерфейсов

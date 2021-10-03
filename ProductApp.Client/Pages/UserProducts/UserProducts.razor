@@ -4,7 +4,7 @@
 @page "/userproducts/{PageNumber:int}"
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize(Roles = "Admin, User")]
 
 @if (string.IsNullOrWhiteSpace(Query))
 {

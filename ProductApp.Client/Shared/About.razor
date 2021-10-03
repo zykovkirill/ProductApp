@@ -1,6 +1,6 @@
 ﻿@page "/about"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 
 <div class="row">
     <div>
@@ -24,4 +24,4 @@
 
 
 
-    @*<SurveyPrompt Title="How is Blazor working for you?" />*@
+@*<SurveyPrompt Title="How is Blazor working for you?" />*@

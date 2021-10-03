@@ -19,7 +19,7 @@ namespace WebAPIApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = ("Admin"))]
+    [Authorize(Roles = "Admin, User")]
     public class UserProductsController : ControllerBase
     {
         private readonly IProductsService _productsService;

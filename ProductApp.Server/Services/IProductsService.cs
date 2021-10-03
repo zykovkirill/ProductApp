@@ -147,7 +147,7 @@ namespace ProductApp.Server.Services
                             ProductId = prod.Id,
                             ProductCount = count,
                             ProductName = prod.Name,
-                            //TODO: Добавить коэффициент стоимости зависящий от сложности изготовления и доболнительных рассходов(сделать отдельный класс для рассчета этого коэффициента)
+                            //TODO: Добавить коэффициент стоимости зависящий от сложности изготовления и дополнительных рассходов(сделать отдельный класс для рассчета этого коэффициента)
                             ProductPrice = toy.Price + chevron.Price,
                             ProductCoverPath = prod.CoverPath
                         };

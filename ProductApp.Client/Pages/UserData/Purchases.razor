@@ -3,7 +3,8 @@
 @page "/UserData/Purchases"
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
+
 
 <h2>Заказы</h2>
 
@@ -16,33 +17,33 @@ else
 
     <hr />
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
-<div class="row">
-    @foreach (var purchase in purchases)
-    {
-        <AlertMessage Message="@message" MessageType="@messageType" />
-        <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-            <RadzenImage Path="@purchase.CreatedDate.ToString()" Style="height:auto; max-width:100%; margin:5px" />
-            <p> @purchase.Status </p>
-        </RadzenCard>
+    <div class="row">
+        @foreach (var purchase in purchases)
+        {
+            <AlertMessage Message="@message" MessageType="@messageType" />
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                <RadzenImage Path="@purchase.CreatedDate.ToString()" Style="height:auto; max-width:100%; margin:5px" />
+                <p> @purchase.Status </p>
+            </RadzenCard>
 
-    }
-</div>
+        }
+    </div>
     <hr />
     <div class="row">
-            @for (int i = 1; i <= totalPages; i++)
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            int page = i;
+            @if (page == PageNumber)
             {
-                int page = i;
-                @if (page == PageNumber)
-                {
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
-                }
-                else
-                {
-                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
-                }
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
             }
+            else
+            {
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
+            }
+        }
 
-        </div>
+    </div>
 }
 
 
