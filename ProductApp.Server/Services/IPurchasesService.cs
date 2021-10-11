@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ProductApp.Shared.Models.UserData;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductApp.Server.Services
 {
@@ -38,7 +39,7 @@ namespace ProductApp.Server.Services
         public IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, string userId, out int totalProducts)
         {
             //TODO: IsDeleted - Нужно добавить? смотри GetAllUserProductsAsync УБРАТЬ USERPROFILE или ПРОВОДИТЬ СРАВНЕНИЕ ПО НЕМУ А НЕ ПО o.UserId == userId
-            var allProducts = _db.UserOrders.Where(o => o.Status == Status.Buy && o.UserId == userId);
+            var allProducts = _db.UserOrders.Where(o => o.Status == Status.Buy && o.UserId == userId).AsNoTracking();
 
             totalProducts = allProducts.Count();
          

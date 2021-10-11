@@ -14,6 +14,7 @@ namespace ProductApp.Shared.Models.UserData
     {
 
         public string UserId { get; set; }
+        //TODO : Обобщить UserOrderProduct на ProductCountable
         public IList<UserOrderProduct>  Products { get; set; }
         /// <summary>
         /// Колличество

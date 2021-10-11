@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace ProductApp.Shared.Models.UserData
 {
-    public class UserCreatedProduct : Record
+    public class UserCreatedProduct : BaseProduct
     {
-        /// <summary>
-        /// Название
-        /// </summary>
-        public string Name { get; set; }
         /// <summary>
         /// ID игрушки
         /// </summary>
@@ -34,13 +30,5 @@ namespace ProductApp.Shared.Models.UserData
         /// Координата Y
         /// </summary>
         public float Y { get; set; }
-        /// <summary>
-        /// Путь к файлу
-        /// </summary>
-        [Required]
-        [StringLength(256)]
-        public string CoverPath { get; set; }
-
-
     }
 }

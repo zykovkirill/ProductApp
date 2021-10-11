@@ -27,8 +27,5 @@ namespace ProductApp.Shared.Models.UserData
         /// Колличество
         /// </summary>
         public int ProductCount { get; set; }
-
-
-
     }
 }

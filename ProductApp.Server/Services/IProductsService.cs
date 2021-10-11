@@ -68,6 +68,7 @@ namespace ProductApp.Server.Services
             if (prod == null || prod.IsDeleted)
                 return null;
             UserOrder userOrder;
+            //TODO: Сравнить JOIN c INCLUDE
             userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == Status.Cart);
             if (userOrder == null)
             {
@@ -163,8 +164,8 @@ namespace ProductApp.Server.Services
 
         public async Task<UserOrder> GetProductsFromCart(string userId)
         {
-
-            var cart = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(c => c.UserId == userId && c.Status == Status.Cart);
+            //TODO: AsNoTracking добавить туда где данные не изменяются
+            var cart = await _db.UserOrders.Include(p => p.Products).AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.Status == Status.Cart);
             return cart;
         }
 
@@ -202,7 +203,7 @@ namespace ProductApp.Server.Services
         //TODO :Сделать асинхронно 
         public IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts)
         {
-              var allProducts = _db.Products.Where(p => !p.IsDeleted);
+              var allProducts = _db.Products.Where(p => !p.IsDeleted).AsNoTracking();
 
             totalProducts = allProducts.Count();
 
@@ -214,7 +215,7 @@ namespace ProductApp.Server.Services
         //TODO :Сделать асинхронно 
         public IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts)
         {
-            var profile =  _db.UserProfiles.Include(p => p.UserCreatedProducts).FirstOrDefault(pr => pr.UserId == userId);
+            var profile =  _db.UserProfiles.Include(p => p.UserCreatedProducts).AsNoTracking().FirstOrDefault(pr => pr.UserId == userId);
             var allProducts = profile.UserCreatedProducts.Where(p => !p.IsDeleted);
 
             totalProducts = allProducts.Count();
@@ -255,7 +256,7 @@ namespace ProductApp.Server.Services
         public IEnumerable<Product> SearchProductsAsync(string query, int pageSize, int pageNumber, out int totalProducts)
         {
             //total products 
-            var allProducts = _db.Products.Where(p => !p.IsDeleted && (p.Description.Contains(query) || p.Name.Contains(query)));
+            var allProducts = _db.Products.Where(p => !p.IsDeleted && (p.Description.Contains(query) || p.Name.Contains(query))).AsNoTracking();
 
             totalProducts = allProducts.Count();
 
@@ -280,7 +281,7 @@ namespace ProductApp.Server.Services
                 string[] words = filter.Split(',');
                 foreach (var i in words)
                 {
-                    allProducts.AddRange((_db.Products.Where(p => !p.IsDeleted && p.ProductType == Int32.Parse(i))).ToList());
+                    allProducts.AddRange(_db.Products.Where(p => !p.IsDeleted && p.ProductType == Int32.Parse(i)).AsNoTracking().ToList());
                 
                 };
             }
@@ -310,16 +311,17 @@ namespace ProductApp.Server.Services
             return model;
         }
 
+        //TODO: Удалить
         public UserImageRequest GetImageAsync(string imgID)
         {
-            var prod = _db.UserCreatedProducts.FirstOrDefault(p => p.Id == imgID);
-            MemoryStream destination = new MemoryStream();
-            using (var file = File.OpenRead(@"c:\3.png"))
-            {
-                file.CopyTo(destination);
-            };
-            var model = new UserImageRequest() { Data = destination };
-            return model;
+            //var prod = _db.UserCreatedProducts.FirstOrDefault(p => p.Id == imgID);
+            //MemoryStream destination = new MemoryStream();
+            //using (var file = File.OpenRead(@"c:\3.png"))
+            //{
+            //    file.CopyTo(destination);
+            //};
+            //var model = new UserImageRequest() { Data = destination };
+            return null;
         }
 
         public async Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath)

@@ -11,6 +11,7 @@ using ProductApp.Shared.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tewr.Blazor.FileReader;
+using Blazored.SessionStorage;
 
 
 namespace ProductApp.Client
@@ -48,6 +49,7 @@ namespace ProductApp.Client
             {
                 options.UseWasmSharedBuffer = true;
             });
+            builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddOptions();
             builder.Services.AddAuthorizationCore();

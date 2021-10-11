@@ -1,12 +1,15 @@
 ﻿@if (!string.IsNullOrWhiteSpace(Message))
 {
-<div class="alert @alertClass">@Message<button style="position: absolute; top: 10px; right: 10px;"  type="button" class="close" aria-label="Close">
-    <span @onclick="HideMessage" aria-hidden="true">&times;</span>
-</button></div> 
+<div class="alert @alertClass">
+    @Message 	&nbsp; <button style="position: absolute; top: 10px; right: 10px; " type="button" class="close" aria-label="Close">
+        <span @onclick="HideMessage" aria-hidden="true">&times;</span>
+    </button>
+</div>
 }
 @code {
     [Parameter]
     public string Message { get; set; }
+    //TODO: Изменить стили в CSS нужен отступ
 
     private Models.AlertMessageType messageType;
 
@@ -17,7 +20,7 @@
         set
         {
             messageType = value;
-            switch(messageType)
+            switch (messageType)
             {
                 case Models.AlertMessageType.Error:
                     alertClass = "alert-danger";

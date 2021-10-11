@@ -1,9 +1,8 @@
-﻿
-
-@page "/products"
+﻿@page "/products"
 @page "/products/{PageNumber:int}"
 @inject ProductsService productsService
-@attribute [Authorize (Roles="Admin, User")]
+@attribute [Authorize(Roles = "Admin, User")]
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @if (string.IsNullOrWhiteSpace(Query))
 {
@@ -11,7 +10,7 @@
 }
 else
 {
-<h2>Продукты - Результат поиска: '@Query' - Страница: @PageNumber</h2>
+    <h2>Продукты - Результат поиска: '@Query' - Страница: @PageNumber</h2>
 }
 
 @if (isBusy)
@@ -20,38 +19,38 @@ else
 }
 else
 {
-<div class="row">
-    <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
-    <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
-    <RadzenDropDown AllowClear="true"
-                    @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
-                    Change=@(args => OnChange(args))
-                    Style=" margin: 15px 15px 15px 15px" />
-    <AlertMessage Message="@message" MessageType="@messageType" />
-</div>
+    <div class="row">
+        <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
+        <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
+        <RadzenDropDown AllowClear="true"
+                        @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
+                        Change=@(args => OnChange(args))
+                        Style=" margin: 15px 15px 15px 15px" />
+        <AlertMessage Message="@message" MessageType="@messageType" />
+    </div>
     <hr />
 
     <div class="row">
         @foreach (var product in products)
         {
-                <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px" >                 
-                    <div class="row">
-                        <RadzenImage Path="@product.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
-                        <div class="col-md-6">
-                            <h3> @product.Name </h3>
-                            <h3>Цена: @product.Price</h3>
-                            <h3>Тип продукта: @Utils.GetNameProductType(product.ProductType)</h3>
-                            <hr />
-                        </div>
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Добавить" Icon="add_shopping_cart" class="btn-block" Click="() => selectProduct(product.Id)" />
-                        @if (selectedUserId == product.Id)
-                        {
-                            <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="count" Style="margin:10px;" />
-                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Подтвердить" Icon="done" class="btn-block" Click="async () => await addProductToCartAsync()" />
-
-                        }
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                <div class="row">
+                    <RadzenImage Path="@product.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
+                    <div class="col-md-6">
+                        <h3> @product.Name </h3>
+                        <h3>Цена: @product.Price</h3>
+                        <h3>Тип продукта: @Utils.GetNameProductType(product.ProductType)</h3>
+                        <hr />
                     </div>
-                </RadzenCard>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Добавить" Icon="add_shopping_cart" class="btn-block" Click="() => selectProduct(product)" />
+                    @if (selectedProduct == product)
+                    {
+                        <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="count" Style="margin:10px;" />
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Подтвердить" Icon="done" class="btn-block" Click="async () => await addProductToCartAsync()" />
+
+                    }
+                </div>
+            </RadzenCard>
         }
 
     </div>
@@ -96,6 +95,7 @@ else
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
 
+    private const string _cartSessionStorage = "CartSessionStorage";
 
     async Task getProductsAsync()
     {
@@ -140,30 +140,55 @@ else
         await getProductsAsync();
     }
 
-    string selectedUserId = string.Empty;
+    Product selectedProduct;
 
-    void selectProduct(string id)
+    void selectProduct(Product product)
     {
-        selectedUserId = id;
-
+        selectedProduct = product;
+        message = String.Empty;
     }
 
 
-
+    //TODO: Обобщить данный метод, существует такой же в UserProduct
+    //TODO: Кешировать продукты в запросе
     async Task addProductToCartAsync()
     {
         isBusy = true;
-        var result = await productsService.AddProductToCartAsync(count, selectedUserId, (int)ClassType.Product);
-        if (result.IsSuccess)
+        if (count != 0)
         {
-            message = result.Message;
-            messageType = Models.AlertMessageType.Success;
+            //TODO : СОЗДАТЬ "CartSessionStorage" при инициализации программы
+            var isSessionExists = await sessionStorage.ContainKeyAsync(_cartSessionStorage);
+            if (!isSessionExists)
+                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, new List<ProductCountable<BaseProduct>>());
+
+            var cartSessionStorage = await sessionStorage.GetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage);
+            var isProductExists = cartSessionStorage.Any(c => c.Product.Id == selectedProduct.Id);
+            if (!isProductExists)
+            {
+                cartSessionStorage.Add(new ProductCountable<BaseProduct> { Product = selectedProduct, Count = count });
+                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
+            }
+            else
+            {
+
+                var oldProduct = cartSessionStorage.FirstOrDefault(c => c.Product.Id == selectedProduct.Id);
+                oldProduct.Count = oldProduct.Count + count;
+                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
+            }
         }
-        else
-        {
-            message = result.Message;
-            messageType = Models.AlertMessageType.Error;
-        }
+        message = "Продукты добавлены в корзину";
+        messageType = Models.AlertMessageType.Success;
+        //var result = await productsService.AddProductToCartAsync(count, selectedProductId, (int)ClassType.Product);
+        //if (result.IsSuccess)
+        //{
+        //    message = result.Message;
+        //    messageType = Models.AlertMessageType.Success;
+        //}
+        //else
+        //{
+        //    message = result.Message;
+        //    messageType = Models.AlertMessageType.Error;
+        //}
         isBusy = false;
     }
 
@@ -177,15 +202,20 @@ else
         }
         multipleValues = multiple;
         await getProductsAsync();
+        cartSessionStorage
     }
 
     async Task OnChange(object value)
     {
-
-        filterType =  string.Join(", ", (IEnumerable<object>)value);
-        multipleValues = (IEnumerable<string>)value;
-        if (multipleValues.Any())
-            await getProductsAsync();
+        if (value != null)
+        {
+            filterType = string.Join(", ", (IEnumerable<object>)value);
+            multipleValues = (IEnumerable<string>)value;
+            if (multipleValues.Any())
+                await getProductsAsync();
+            else
+                products.Clear();
+        }
         else
             products.Clear();
     }

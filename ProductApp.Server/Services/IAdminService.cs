@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProductApp.Server.Services
 {
@@ -46,11 +47,8 @@ namespace ProductApp.Server.Services
         //TODO: сделать асинхронно
         public  IEnumerable<IdentityUser> GetAllUsersAsync(int pageSize, int pageNumber, out int totalUsers)
         {
-            // total prod 
-            var allUsers =  _db.Users;
-
+            var allUsers = _db.Users.AsNoTracking();
             totalUsers = allUsers.Count();
-
             var users = allUsers.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray();
 
             return users;
@@ -204,8 +202,6 @@ namespace ProductApp.Server.Services
             }
 
         }
-
-
     }
-    }
+}
 

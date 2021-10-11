@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductApp.Server.Models;
 
 namespace ProductApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211003160334_AddProductKind")]
+    partial class AddProductKind
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,9 +273,10 @@ namespace ProductApp.Server.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductKind")
+                    b.Property<string>("ProductKind")
+                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<int>("ProductType")
                         .HasColumnType("int");
@@ -313,9 +316,10 @@ namespace ProductApp.Server.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductKind")
+                    b.Property<string>("ProductKind")
+                        .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<float>("Size")
                         .HasColumnType("real");
