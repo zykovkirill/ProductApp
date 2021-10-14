@@ -32,6 +32,7 @@ namespace WebAPIApp.Controllers
 
         #region Get    
         //TODO: НАДО  сделать POST - данный вариант не безопасен
+        //TODO: Удалить данный метод
         [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserCreatedProduct>))]
         [HttpGet("addprod")]
@@ -150,25 +151,38 @@ namespace WebAPIApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserOrder model)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var purchase = await _productsService.BuyProductsAsync(model);
-            if (purchase == null)
-                return
-                    BadRequest(new OperationResponse<UserOrder>
-                    {
-                        IsSuccess = false,
-                        Message = $"Errors",
-                        OperationDate = DateTime.UtcNow,
-                       
-                    });
-            return Ok(new OperationResponse<UserOrder>
+            if (model.Products.Any())
             {
-                IsSuccess = true,
-                Message = $"Products of  received successfully!",
-                OperationDate = DateTime.UtcNow,
-                Record = purchase
-            });
+                if (string.IsNullOrEmpty(model.UserId))
+                    model.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var purchase = await _productsService.AddOrderAsync(model);
+                if (purchase == null)
+                    return
+                        BadRequest(new OperationResponse<UserOrder>
+                        {
+                            IsSuccess = false,
+                            Message = $"Ошибка при формирование заказа",
+                            OperationDate = DateTime.UtcNow,
+
+                        });
+                return Ok(new OperationResponse<UserOrder>
+                {
+                    IsSuccess = true,
+                    Message = $"Products of  received successfully!",
+                    OperationDate = DateTime.UtcNow,
+                    Record = purchase
+                });
+            }
+            else
+            {
+               return  BadRequest(new OperationResponse<UserOrder>
+                {
+                    IsSuccess = false,
+                    Message = $"Отсутствуют продукты",
+                    OperationDate = DateTime.UtcNow,
+
+                });
+            }
         }
 
         #endregion
@@ -197,7 +211,7 @@ namespace WebAPIApp.Controllers
             return Ok(new OperationResponse<UserOrderProduct>
             {
                 IsSuccess = true,
-                Message = $"{getOld.ProductName} has been deleted successfully!",
+                //Message = $"{getOld.ProductName} has been deleted successfully!",
                 Record = getOld
             });
         }

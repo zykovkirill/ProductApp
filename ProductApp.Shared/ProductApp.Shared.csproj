@@ -6,10 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="AKSoftware.WebApi" Version="3.0.1" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Text.Json" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>

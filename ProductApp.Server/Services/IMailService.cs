@@ -28,6 +28,7 @@ namespace ProductApp.Server.Services
 
             using (var client = new SmtpClient())
             {
+                //TODO: настроить подтверждение электронной почты
                 //TODO: сделать ssl
                 await client.ConnectAsync("smtp.mail.ru", 25, false);// что за почта и настройки ?
                 await client.AuthenticateAsync("info@trustsoft.site", "Mail12");// что за почта и настройки ?

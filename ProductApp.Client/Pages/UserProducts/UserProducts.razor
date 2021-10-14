@@ -100,7 +100,7 @@ else
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
 
-    private const string _cartSessionStorage = "CartSessionStorage";
+   // private const string _cartSessionStorage = "CartSessionStorage";
 
     async Task getProductsAsync()
     {
@@ -163,39 +163,11 @@ else
         isBusy = true;
         if (count != 0)
         {
-            //TODO : СОЗДАТЬ "CartSessionStorage" при инициализации программы
-            var isSessionExists = await sessionStorage.ContainKeyAsync(_cartSessionStorage);
-            if (!isSessionExists)
-                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, new List<ProductCountable<BaseProduct>>());
-
-            var cartSessionStorage = await sessionStorage.GetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage);
-            var isProductExists = cartSessionStorage.Any(c => c.Product.Id == selectedUserProduct.Id);
-            if (!isProductExists)
-            {
-                cartSessionStorage.Add(new ProductCountable<BaseProduct> { Product = selectedUserProduct, Count = count });
-                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
-            }
-            else
-            {
-
-                var oldProduct = cartSessionStorage.FirstOrDefault(c => c.Product.Id == selectedUserProduct.Id);
-                oldProduct.Count = oldProduct.Count + count;
-                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
-            }
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedUserProduct, count);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
-        //var result = await productsService.AddUserProductToCartAsync(count, selectedUserProduct, (int)ClassType.UserProduct);
-        //if (result.IsSuccess)
-        //{
-        //    message = result.Message;
-        //    messageType = Models.AlertMessageType.Success;
-        //}
-        //else
-        //{
-        //    message = result.Message;
-        //    messageType = Models.AlertMessageType.Error;
-        //}
+
         isBusy = false;
     }
 
@@ -209,16 +181,8 @@ else
         }
         multipleValues = multiple;
         await getProductsAsync();
-        cartSessionStorage
     }
 
-    //async Task OnChange(object value)
-    //{
-
-    //   // filterType = string.Join(", ", (IEnumerable<object>)value);
-    //    multipleValues = (IEnumerable<string>)value;
-    //    await getProductsAsync();
-    //}
     void moveToEditProductAsync()
     {
         navigationManager.NavigateTo("/EditUserProducts");

@@ -5,7 +5,10 @@ using System.Text;
 
 namespace ProductApp.Shared.Models
 {
-   public class BaseProduct: Record
+    /// <summary>
+    /// Базовый класс для продукта
+    /// </summary>
+    public class BaseProduct: Record
     {
         /// <summary>
         /// Наименование

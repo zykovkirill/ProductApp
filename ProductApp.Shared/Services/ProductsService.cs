@@ -7,6 +7,8 @@ using ProductApp.Shared.Models;
 using ProductApp.Shared.Models.UserData;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 
 namespace ProductApp.Shared.Services
 {
@@ -143,47 +145,54 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<OperationResponse<Product>> AddProductToCartAsync(int count, string id, int classType)
         {
+            //TODO: Почему Get
                 var response = await client.GetProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
                 return response.Result;
 
         }
-        /// <summary>
-        /// Добавить в корзину продукт пользователя
-        /// </summary>
-        /// <param name="id"> Обьект для добавления представляющий продукт </param>
-        /// <param name="count"> кол-во </param>
-        /// <param name="classType"> тип ClassType => см. в Enum</param>
-        /// <returns></returns>
-        public async Task<OperationResponse<UserCreatedProduct>> AddUserProductToCartAsync(int count, string id, int classType)
-        {          
-                var response = await client.GetProtectedAsync<OperationResponse<UserCreatedProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
-                return response.Result;
-
-        }
-
-        /// <summary>
-        /// Покупка всего что в корзине
-        /// </summary>
+        ///// <summary>
+        ///// Добавить в корзину продукт пользователя
+        ///// </summary>
         ///// <param name="id"> Обьект для добавления представляющий продукт </param>
         ///// <param name="count"> кол-во </param>
         ///// <param name="classType"> тип ClassType => см. в Enum</param>
-        /// <returns></returns>
-        public async Task<OperationResponse<UserOrder>> BuyProductAsync(UserOrder userOrder)
+        ///// <returns></returns>
+        //public async Task<OperationResponse<UserCreatedProduct>> AddUserProductToCartAsync(int count, string id, int classType)
+        //{          
+        //        var response = await client.GetProtectedAsync<OperationResponse<UserCreatedProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
+        //        return response.Result;
+
+        //}
+
+        /// <summary>
+        /// Добавление заказа
+        /// </summary>
+        public async Task<OperationResponse<UserOrder>> AddOrderAsync(UserOrder userOrder)
         {
-            var response = await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
-            return response.Result;
+
+            using (var client1 = new HttpClient())
+            {
+                client1.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",client.AccessToken); 
+                var response1 = await client1.PostAsJsonAsync($"{_baseUrl}/api/usercart", userOrder);
+                response1.EnsureSuccessStatusCode();
+                return await response1.Content.ReadAsAsync<OperationResponse<UserOrder>>();
+            }
+
+           // var response = await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
+          //  return response.Result;
         }
 
         /// <summary>
         /// Получить  корзину с продуктами 
         /// </summary>
         /// <returns></returns>
-        public async Task<OperationResponse<UserOrder>> GetProductFromCartAsync()
+        public async Task<OperationResponse<UserOrder>> GetUserOrderAsync()
         {
             var response = await client.GetProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart/GetProductFromCart");
             return response.Result;
         }
 
+        //TODO : Объеденить запросы GetUserOrderAsync и GetPurchasesAsync добавить в параметр тип статус
         /// <summary>
         /// Получить  заказы и их статус
         /// </summary>
@@ -191,7 +200,7 @@ namespace ProductApp.Shared.Services
         public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync()
         {
             //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
-            //TODO: Изображение сохраняется не стем размеров в ПРОДУКТАХ ПОЛЬЗОВАТЕЛЯ!!!!! КРИТТТТТ!!!!
+            //TODO: Изображение сохраняется не с тем размеров в ПРОДУКТАХ ПОЛЬЗОВАТЕЛЯ!!!!! КРИТТТТТ!!!!
             var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/userpurchases");
             return response.Result;
         }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductApp.Server.Models;
 
 namespace ProductApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211013081413_AddDB2")]
+    partial class AddDB2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,14 +382,6 @@ namespace ProductApp.Server.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CoverPath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -397,19 +391,19 @@ namespace ProductApp.Server.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Price")
+                    b.Property<int>("ProductCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("ProductCoverPath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductKind")
-                        .HasMaxLength(256)
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductPrice")
                         .HasColumnType("int");
 
                     b.Property<string>("UserOrderId")

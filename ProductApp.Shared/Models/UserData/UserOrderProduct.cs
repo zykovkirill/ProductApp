@@ -10,22 +10,28 @@ namespace ProductApp.Shared.Models.UserData
     /// <summary>
     /// Продукт в заказе
     /// </summary>
-    public class UserOrderProduct:Record
+    public class UserOrderProduct:BaseProduct, ICountable
     {
-
-
-        public string  ProductId { get; set; }
-        /// <summary>
-        /// Цена
-        /// </summary>
-        public int ProductPrice { get; set; }
-
-        public string ProductCoverPath { get; set; }
-
-        public string ProductName { get; set; }
+        public UserOrderProduct()
+        {
+            
+        }
+        public UserOrderProduct(BaseProduct baseProduct, int count)
+        {
+            this.Count = count;
+            this.CoverPath = baseProduct.CoverPath;
+            this.Name = baseProduct.Name;
+            this.Price = baseProduct.Price;
+            this.ProductKind = baseProduct.ProductKind;
+            this.ProductId = baseProduct.Id;
+        }
         /// <summary>
         /// Колличество
         /// </summary>
-        public int ProductCount { get; set; }
+        public int Count { get; set; }
+        /// <summary>
+        /// Идентификатор продукта
+        /// </summary>
+        public string ProductId { get; set; }
     }
 }

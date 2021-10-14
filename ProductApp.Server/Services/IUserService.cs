@@ -38,9 +38,9 @@ namespace ProductApp.Server.Services
         private IConfiguration _configuration;
         private IMailService _mailService;
         private ApplicationDbContext _db;
-        private const string _roleUser = "User";
+        private const string _roleUser = /*"Admin";*/"User";
 
-        public UserService(UserManager<IdentityUser> userManager, /*RoleManager<IdentityRole> roleManager, */IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
+        public UserService(UserManager<IdentityUser> userManager, /*RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
         {
             _db = db;
             _userManager = userManager;
@@ -52,69 +52,90 @@ namespace ProductApp.Server.Services
 
         public async Task<UserManagerResponse> RegisterUserAsync(RegisterRequest model)
         {
-            if (model == null)
-                throw new NullReferenceException("Модель регистрации не должна быть равна нулю");
+            try
+            {
+                if (model == null)
+                    throw new NullReferenceException("Модель регистрации не должна быть равна нулю");
 
-            if (model.Password != model.ConfirmPassword)
+                if (model.Password != model.ConfirmPassword)
+                    return new UserManagerResponse
+                    {
+                        Message = "Пароли не совпадают",
+                        IsSuccess = false,
+                    };
+
+                var identityUser = new IdentityUser
+                {
+                    Email = model.Email,
+                    UserName = model.FirstName
+                };
+
+
+                //await _roleManager.CreateAsync(new IdentityRole(_roleUser));
+                var result = await _userManager.CreateAsync(identityUser, model.Password);
+                await _userManager.AddToRoleAsync(identityUser, _roleUser);
+                if (result.Succeeded)
+                {
+
+                    var confirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
+                    var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
+                    var validEmailToken = WebEncoders.Base64UrlEncode(encodedEmailToken);
+
+                    string url = $"{_configuration["AppUrl"]}/api/auth/confirmemail?userid={identityUser.Id}&token={validEmailToken}";
+
+                    // TODO: Иногда возникает ошибка с подтверждением 
+                    try
+                    {
+                        await _mailService.SendEmailAsync(identityUser.Email, "Подтвердите свой email", "<h1>Добро пожаловать</h1>" + $"<p>Пожалуйста подтвердите свою электронную почту <a href = '{url}'>Нажмите сюда</a></p>");
+                    }
+                    catch (Exception ex)
+                    {
+                        //TODO: Добавить в бд записи об ошибках
+                        //Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !" + ex.Message);
+                        return new UserManagerResponse
+                        {
+                            Message = "Возникло исключение при отправки сообщения  подтверждения электронной почты, обратитесь в службу поддержки",
+                            IsSuccess = false,
+                            Errors = result.Errors.Select(e => e.Description).ToArray()
+
+                        };
+                    }
+
+                    UserProfile userProfile = new UserProfile
+                    {
+                        UserId = identityUser.Id,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName
+                    };
+
+                    await _db.UserProfiles.AddAsync(userProfile);
+                    await _db.SaveChangesAsync();
+                    // TODO: Переименовать IUserService 
+                    // TODO: Отправлять подтверждение Email
+                    return new UserManagerResponse
+                    {
+                        Message = "Пользователь успешно создан",
+                        IsSuccess = true,
+                    };
+                }
+
                 return new UserManagerResponse
                 {
-                    Message = "Пароли не совпадают",
+                    Message = "Пользователь не был создан",
                     IsSuccess = false,
-                };
+                    Errors = result.Errors.Select(e => e.Description).ToArray()
 
-            var identityUser = new IdentityUser
-            {
-                Email = model.Email,
-                UserName = model.FirstName
-            };
-
-            var result = await _userManager.CreateAsync(identityUser, model.Password);
-            await _userManager.AddToRoleAsync(identityUser, _roleUser);
-            if (result.Succeeded)
-            {
-
-                var confirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
-                var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
-                var validEmailToken = WebEncoders.Base64UrlEncode(encodedEmailToken);
- 
-                string url = $"{_configuration["AppUrl"]}/api/auth/confirmemail?userid={identityUser.Id}&token={validEmailToken}";
-
-                // TODO: Иногда возникает ошибка с подтверждением 
-                try
-                {
-                    await _mailService.SendEmailAsync(identityUser.Email, "Подтвердите свой email", "<h1>Добро пожаловать</h1>" + $"<p>Пожалуйста подтвердите свою электронную почту <a href = '{url}'>Нажмите сюда</a></p>");
-                }
-                catch(Exception ex)
-                {
-                    //TODO: Добавить в бд записи об ошибках
-                    Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !" + ex.Message);
-                }
-
-                UserProfile userProfile = new UserProfile
-                {
-                    UserId = identityUser.Id,
-                    FirstName = model.FirstName, 
-                    LastName = model.LastName
-                };
-
-                await _db.UserProfiles.AddAsync(userProfile);
-                await _db.SaveChangesAsync();
-                // TODO: Переименовать IUserService 
-                // TODO: Отправлять подтверждение Email
-                return new UserManagerResponse
-                {
-                    Message = "Пользователь успешно создан",
-                    IsSuccess = true,
                 };
             }
-
-            return new UserManagerResponse
+            catch (Exception ex)
             {
-                Message = "Пользователь не был создан",
-                IsSuccess = false,
-                Errors = result.Errors.Select(e => e.Description).ToArray()
-
-            };
+                Console.WriteLine("Произошла ошибка" + ex.Message);
+                return new UserManagerResponse
+                {
+                    Message = "Пользователь не был создан",
+                    IsSuccess = false,
+                };
+            }
         }
 
 

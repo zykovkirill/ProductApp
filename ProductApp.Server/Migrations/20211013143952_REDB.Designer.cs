@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductApp.Server.Models;
 
 namespace ProductApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211013143952_REDB")]
+    partial class REDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,6 +217,48 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ProductApp.Shared.Models.BaseProduct", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CoverPath")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductKind")
+                        .HasMaxLength(256)
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BaseProduct");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("BaseProduct");
+                });
+
             modelBuilder.Entity("ProductApp.Shared.Models.OrderHistory", b =>
                 {
                     b.Property<string>("Id")
@@ -240,61 +284,13 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("PurchasesHistorys");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.Product", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.ProductCountable<ProductApp.Shared.Models.BaseProduct>", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CoverPath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Price")
+                    b.Property<int>("Count")
                         .HasColumnType("int");
-
-                    b.Property<int>("ProductKind")
-                        .HasMaxLength(256)
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ChevronProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CoverPath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -305,38 +301,19 @@ namespace ProductApp.Server.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductKind")
-                        .HasMaxLength(256)
-                        .HasColumnType("int");
-
-                    b.Property<float>("Size")
-                        .HasColumnType("real");
-
-                    b.Property<string>("ToyProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserProfileId")
+                    b.Property<string>("ProductId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<float>("X")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Y")
-                        .HasColumnType("real");
+                    b.Property<string>("UserOrderId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserProfileId");
+                    b.HasIndex("ProductId");
 
-                    b.ToTable("UserCreatedProducts");
+                    b.HasIndex("UserOrderId");
+
+                    b.ToTable("UserOrderProducts");
                 });
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
@@ -375,53 +352,6 @@ namespace ProductApp.Server.Migrations
                     b.ToTable("UserOrders");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrderProduct", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CoverPath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductKind")
-                        .HasMaxLength(256)
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserOrderId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserOrderId");
-
-                    b.ToTable("UserOrderProducts");
-                });
-
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserProfile", b =>
                 {
                     b.Property<string>("Id")
@@ -451,6 +381,47 @@ namespace ProductApp.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("ProductApp.Shared.Models.Product", b =>
+                {
+                    b.HasBaseType("ProductApp.Shared.Models.BaseProduct");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ProductType")
+                        .HasColumnType("int");
+
+                    b.HasDiscriminator().HasValue("Product");
+                });
+
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
+                {
+                    b.HasBaseType("ProductApp.Shared.Models.BaseProduct");
+
+                    b.Property<string>("ChevronProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Size")
+                        .HasColumnType("real");
+
+                    b.Property<string>("ToyProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserProfileId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<float>("X")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Y")
+                        .HasColumnType("real");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.HasDiscriminator().HasValue("UserCreatedProduct");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -504,11 +475,17 @@ namespace ProductApp.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.ProductCountable<ProductApp.Shared.Models.BaseProduct>", b =>
                 {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
-                        .WithMany("UserCreatedProducts")
-                        .HasForeignKey("UserProfileId");
+                    b.HasOne("ProductApp.Shared.Models.BaseProduct", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId");
+
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserOrder", null)
+                        .WithMany("Products")
+                        .HasForeignKey("UserOrderId");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>
@@ -518,11 +495,11 @@ namespace ProductApp.Server.Migrations
                         .HasForeignKey("UserProfileId");
                 });
 
-            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrderProduct", b =>
+            modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserCreatedProduct", b =>
                 {
-                    b.HasOne("ProductApp.Shared.Models.UserData.UserOrder", null)
-                        .WithMany("Products")
-                        .HasForeignKey("UserOrderId");
+                    b.HasOne("ProductApp.Shared.Models.UserData.UserProfile", null)
+                        .WithMany("UserCreatedProducts")
+                        .HasForeignKey("UserProfileId");
                 });
 
             modelBuilder.Entity("ProductApp.Shared.Models.UserData.UserOrder", b =>

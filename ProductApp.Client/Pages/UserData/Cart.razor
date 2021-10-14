@@ -21,23 +21,23 @@ else
         <div class="row">
             <AlertMessage Message="@message" MessageType="@messageType" />
             <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
-            <RadzenButton Text="Сохранить корзину" Icon="save" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
-            <RadzenButton Text="Загрузить корзину" Icon="save_alt" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
+            <RadzenButton Text="Сохранить корзину" Icon="save" Style=" margin: 15px 15px 15px 15px" Click="async () => await saveCartAsync()" />
+            <RadzenButton Text="Загрузить корзину" Icon="save_alt" Style=" margin: 15px 15px 15px 15px" Click="async () => await loadCartAsync()" />
         </div>
         <hr />
         <div class="row">
-            @foreach (var product in cart)
+            @foreach (var product in userOrder.Products)
             {
 
                 <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
-                    <RadzenImage Path="@product.Product.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
-                    <p> @product.Product.Name </p>
-                    <p>Цена за 1 штуку: @product.Product.Price</p>
-                    <RadzenNumeric Placeholder="Колличество" Min="0" TValue="int" @bind-Value="product.Count" Style="margin:10px;" Change=@(async args => await OnChange(args, product.Product.Id)) />
+                    <RadzenImage Path="@product.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
+                    <p> @product.Name </p>
+                    <p>Цена за 1 штуку: @product.Price</p>
+                    <RadzenNumeric Placeholder="Колличество" Min="0" TValue="int" @bind-Value="product.Count" Style="margin:10px;" Change=@(async args => await OnChange(args, product.Id)) />
                     <hr />
                     <div class="row">
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Product.Id)" />
-                        @if (selectedUserId == product.Product.Id)
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Text="Удалить" class="btn-block" Click="() => selectProduct(product.Id)" />
+                        @if (selectedUserId == product.Id)
                         {
                             <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteProductAsync(product)" />
                             <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectProduct()" />
@@ -48,13 +48,16 @@ else
             }
         </div>
         <hr />
-        <div class="row">
-            <RadzenCard Style=" margin: 15px 15px 15px 15px">
-                <h2> Общая сумма :</h2>
-                <p> @userOrder.Products.Select(p => p.ProductPrice * p.ProductCount).Sum()</p>
-                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await buyProductAsync()" />
-            </RadzenCard>
-        </div>
+        @if (userOrder.Products.Any())
+        {
+            <div class="row">
+                <RadzenCard Style=" margin: 15px 15px 15px 15px">
+                    <h2> Общая сумма :</h2>
+                    <p> @userOrder.Products.Select(p => p.Count * p.Price).Sum()</p>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="check_circle_outline" Text="Купить" class="btn-block" Click="async () => await buyProductAsync()" />
+                </RadzenCard>
+            </div>
+        }
     }
     else
     {
@@ -76,51 +79,19 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     bool isBusy = false;
-    //IList<ProductInfo> products = new List<ProductInfo>();
 
     UserOrder userOrder = new UserOrder();
-    List<ProductCountable<BaseProduct>> cart = new List<ProductCountable<BaseProduct>>();
-
-    // int totalPages = 1;
 
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
-    private const string _cartSessionStorage = "CartSessionStorage";
+
 
     async Task getProductsAsync()
     {
         isBusy = true;
 
-        var isSessionExists = await sessionStorage.ContainKeyAsync(_cartSessionStorage);
-        if (isSessionExists)
-        {
+        userOrder.Products = await SessionUtils.InitOrGetCartSessionStorageAsync(sessionStorage);
 
-            //TODO: Уствнавливать прайс в редакторе
-            cart = await sessionStorage.GetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage);
-            //  if (cart.Any())
-            //  foreach (var prod in cart)
-            //     userOrder.Products.Add(new UserOrderProduct { ProductId = prod.Product.Id, ProductName = prod.Product.Name, ProductCount = prod.Count, ProductCoverPath = prod.Product.CoverPath });
-        }
-
-        //var userState = authenticationState.Result;
-        //productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
-
-        //if (PageNumber == null)
-        //    PageNumber = 1;
-
-        //OperationResponse<UserOrder> result;
-        //result = await productsService.GetProductFromCartAsync();
-
-        //if (result.IsSuccess)
-        //{
-        //    if (result.Record != null)
-        //        userOrder = result.Record;
-        //}
-        //else
-        //{
-        //    message = result.Message;
-        //    messageType = Models.AlertMessageType.Error;
-        //}
         isBusy = false;
     }
 
@@ -144,30 +115,16 @@ else
 
     }
 
-    async Task deleteProductAsync(ProductCountable<BaseProduct> baseProduct)
+    async Task deleteProductAsync(UserOrderProduct productCountable)
     {
-        //isBusy = true;
-        //var result = await productsService.DeleteProductFromCartAsync(selectedUserId);
-        //if (result.IsSuccess)
-        //{
-        //    var deletedProducts = userOrder.Products.SingleOrDefault(p => p.Id == selectedUserId);
-        //    userOrder.Products.Remove(deletedProducts);
-        //}
-        //else
-        //{
-        //    await getProductsAsync();
-        //}
-        //isBusy = false;
-        var cartSessionStorage = await sessionStorage.GetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage);
-        cart.Remove(cart.FirstOrDefault(c => c.Product.Id == baseProduct.Product.Id));
-        cartSessionStorage.Remove(cartSessionStorage.FirstOrDefault(c => c.Product.Id ==  baseProduct.Product.Id));
-        await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
+        userOrder.Products = await SessionUtils.DeleteProductFromCartSessionStorageAsync(sessionStorage, productCountable);
     }
 
     async Task buyProductAsync()
     {
         isBusy = true;
-        var result = await productsService.BuyProductAsync(userOrder);
+        userOrder.Status = Status.Buy;
+        var result = await productsService.AddOrderAsync(userOrder);
         if (result.IsSuccess)
         {
             navigationManager.NavigateTo("/UserData/Purchases");
@@ -182,32 +139,44 @@ else
 
     async Task OnChange(dynamic value, string id)
     {
-        var cartSessionStorage = await sessionStorage.GetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage);
-        var isProductExists = cartSessionStorage.Any(c => c.Product.Id == id);
-        if (isProductExists)
-        {
-            var product = cartSessionStorage.FirstOrDefault(c => c.Product.Id == id);
-            if (value != 0)
-            {
-                product.Count = value;
-                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
-            }
-            else
-            {
-                //TODO : Как работать без обновления сессии ( удаляешь сначала из  cart потом из cartSessionStorage зачем это?
-                //TODO : Вызывать метод deleteProductAsync
-                cart.Remove(cart.FirstOrDefault(c => c.Product.Id == id));
-                cartSessionStorage.Remove(product);
-                await sessionStorage.SetItemAsync<List<ProductCountable<BaseProduct>>>(_cartSessionStorage, cartSessionStorage);
-                await deleteProductAsync(product);
-            }
-        }
+        userOrder.Products = await SessionUtils.ChangeProductFromCartSessionStorageAsync(sessionStorage, value, id);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        cartSessionStorage
         await getProductsAsync();
     }
+    async Task saveCartAsync()
+    {
+        isBusy = true;
+        userOrder.Status = Status.Cart;
+        var result = await productsService.AddOrderAsync(userOrder);
+        if (result.IsSuccess)
+        {
+            message = result.Message;
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+    async Task loadCartAsync()
+    {
+        OperationResponse<UserOrder> result;
+        //TODO: ПЕРЕИМЕНОВАТЬ В GETORDER
+        result = await productsService.GetUserOrderAsync();
 
+        if (result.IsSuccess)
+        {
+            if (result.Record != null)
+                userOrder = result.Record;
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+    }
 }
