@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ProductApp.Shared.Models
 {
-    /// <summary>Статус</summary>
-    public enum Status
+    /// <summary>Статус заказа</summary>
+    public enum OrderStatus
     {
         /// <summary>Неизвестно что</summary>
         None = 0,

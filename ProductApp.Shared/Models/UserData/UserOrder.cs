@@ -30,7 +30,7 @@ namespace ProductApp.Shared.Models.UserData
         /// <summary>
         /// Статус
         /// </summary>
-        public Status Status { get; set; }
+        public OrderStatus Status { get; set; }
         public UserOrder()
         {
             Products = new List<UserOrderProduct>();

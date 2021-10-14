@@ -73,18 +73,18 @@ namespace ProductApp.Server.Services
                 return null;
             UserOrder userOrder;
             //TODO: Сравнить JOIN c INCLUDE
-            userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == Status.Cart);
+            userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == OrderStatus.Cart);
             if (userOrder == null)
             {
                 userOrder = new UserOrder()
                 {
                     UserId = userId,
-                    Status = Status.Cart
+                    Status = OrderStatus.Cart
                 };
                 await _db.UserOrders.AddAsync(userOrder);
                 var history = new OrderHistory()
                 {
-                    Status = Status.Cart,
+                    Status = OrderStatus.Cart,
                     IdOrder = userOrder.Id
                 };
                 await _db.PurchasesHistorys.AddAsync(history);
@@ -125,18 +125,18 @@ namespace ProductApp.Server.Services
                     if (prod == null || prod.IsDeleted)
                         return null;
                     UserOrder userOrder;
-                    userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == Status.Cart);
+                    userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == OrderStatus.Cart);
                     if (userOrder == null)
                     {
                         userOrder = new UserOrder()
                         {
                             UserId = userId,
-                            Status = Status.Cart
+                            Status = OrderStatus.Cart
                         };
                         await _db.UserOrders.AddAsync(userOrder);
                         var history = new OrderHistory()
                         {
-                            Status = Status.Cart,
+                            Status = OrderStatus.Cart,
                             IdOrder = userOrder.Id
                         };
                         await _db.PurchasesHistorys.AddAsync(history);
@@ -170,7 +170,7 @@ namespace ProductApp.Server.Services
         public async Task<UserOrder> GetProductsFromCart(string userId)
         {
             //TODO: AsNoTracking добавить туда где данные не изменяются
-            var cart = await _db.UserOrders.Include(p => p.Products).AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.Status == Status.Cart);
+            var cart = await _db.UserOrders.Include(p => p.Products).AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.Status == OrderStatus.Cart);
             return cart;
         }
 
@@ -201,7 +201,8 @@ namespace ProductApp.Server.Services
             if (newImagePath != null)
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
-
+            //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
+           // _db.Products.Update(prod);
             await _db.SaveChangesAsync();
             return prod;
         }
@@ -346,7 +347,9 @@ namespace ProductApp.Server.Services
             if (newImagePath != null)
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
-           // _db.UserProducts.Update(prod);
+            //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
+            // _db.UserCreatedProducts.Update(prod);
+
             await _db.SaveChangesAsync();
             return prod;
         }
@@ -403,32 +406,48 @@ namespace ProductApp.Server.Services
         //}
         public async Task<UserOrder> AddOrderAsync(UserOrder model)
         {
-            //TODO: Логика с присваиванием модели не самый лучший вариант, мб очтавить несколько ордеров со статусом корзина
-            var order = await _db.UserOrders.FindAsync(model.Id);
-            if (order != null)
-                order = model;
-            else
+            //TODO: Логика с присваиванием модели не самый лучший вариант, мб оcтавить несколько ордеров со статусом корзина
+            try
             {
-                if (model.Status == Status.Buy)
-                    await _db.UserOrders.AddAsync(model);
-                else if (model.Status == Status.Cart)
+                if (model.Status == OrderStatus.Cart)
                 {
-                    var cart = await _db.UserOrders.FirstOrDefaultAsync(o => o.Status == Status.Cart && o.UserId == model.UserId);
-                    if (cart != null)
-                        cart = model;
+                    var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == model.UserId && u.Status == OrderStatus.Cart);
+                    if (order != null)
+                    {
+                        order.TotalSum = model.TotalSum;
+                        order.Products = model.Products;
+                        order.ProductCount = model.ProductCount;
+                        _db.UserOrders.Update(order);
+                    }
+                    else
+                        await _db.UserOrders.AddAsync(model);
                 }
+                else if (model.Status == OrderStatus.Buy)
+                {
+                    var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.Id == model.Id);
+                    if (order != null)
+                        _db.UserOrders.Update(model);
+                    else
+                        await _db.UserOrders.AddAsync(model);
+
+                  
+                    //TODO: Может быть возвращать статусы ок или не ок
+                    //TODO: Task завернуть в исключения и логировать
+                    //TODO: Использовать Update везде где меняем данные
+                }
+                var history = new OrderHistory()
+                {
+                    IdOrder = model.Id,
+                    Status = model.Status
+                };
+                await _db.PurchasesHistorys.AddAsync(history);
+                await _db.SaveChangesAsync();
             }
-            var history = new OrderHistory()
+            catch
             {
-                IdOrder = model.Id,
-                Status = model.Status
-            };
-            //TODO: Task завернуть в исключения и логировать
-            //TODO: Использовать Update везде где меняем данные
-            await _db.PurchasesHistorys.AddAsync(history);
-            // _db.UserOrders.Update(order);
-            await _db.SaveChangesAsync();
-            return order;
+                return null;
+            }
+            return model;
         }
     }
 

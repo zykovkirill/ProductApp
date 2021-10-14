@@ -12,6 +12,6 @@ namespace ProductApp.Shared.Models
 
         public string IdOrder { get; set; }
 
-        public Status Status { get; set; }
+        public OrderStatus Status { get; set; }
     }
 }

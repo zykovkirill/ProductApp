@@ -18,12 +18,16 @@ else
     // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
     @if (userOrder != null)
     {
-        <div class="row">
-            <AlertMessage Message="@message" MessageType="@messageType" />
-            <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
-            <RadzenButton Text="Сохранить корзину" Icon="save" Style=" margin: 15px 15px 15px 15px" Click="async () => await saveCartAsync()" />
-            <RadzenButton Text="Загрузить корзину" Icon="save_alt" Style=" margin: 15px 15px 15px 15px" Click="async () => await loadCartAsync()" />
-        </div>
+<div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
+    <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
+    <RadzenButton Text="Загрузить корзину" Icon="save_alt" Style=" margin: 15px 15px 15px 15px" Click="async () => await loadCartAsync()" />
+    @if (userOrder.Products.Any())
+    {
+        <RadzenButton Text="Сохранить корзину" Icon="save" Style=" margin: 15px 15px 15px 15px" Click="async () => await saveCartAsync()" />
+        <RadzenButton Text="Очистить корзину" Icon="clear" Style=" margin: 15px 15px 15px 15px" Click="async () => await ClearCart()" />
+    }
+</div>
         <hr />
         <div class="row">
             @foreach (var product in userOrder.Products)
@@ -123,10 +127,13 @@ else
     async Task buyProductAsync()
     {
         isBusy = true;
-        userOrder.Status = Status.Buy;
+        userOrder.Status = OrderStatus.Buy;
+        userOrder.ProductCount = userOrder.Products.Select(p => p.Count).Sum();
+        userOrder.TotalSum = userOrder.Products.Select(p => p.Count * p.Price).Sum();
         var result = await productsService.AddOrderAsync(userOrder);
         if (result.IsSuccess)
         {
+            await ClearCart();
             navigationManager.NavigateTo("/UserData/Purchases");
         }
         else
@@ -142,14 +149,25 @@ else
         userOrder.Products = await SessionUtils.ChangeProductFromCartSessionStorageAsync(sessionStorage, value, id);
     }
 
+    async Task ClearCart()
+    {
+        userOrder = new UserOrder();
+        await SessionUtils.ClearCartSessionStorageAsync(sessionStorage);
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        //TODO - Добавить туда где есть запросы!!!!!!! ИЛИ Хранить в сессии!!! при запуске приложения ИЛИ проверять есть ли там токен??
+        var userState = authenticationState.Result;
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
         await getProductsAsync();
     }
     async Task saveCartAsync()
     {
         isBusy = true;
-        userOrder.Status = Status.Cart;
+        userOrder.Status = OrderStatus.Cart;
+        userOrder.ProductCount = userOrder.Products.Select(p => p.Count).Sum();
+        userOrder.TotalSum = userOrder.Products.Select(p => p.Count * p.Price).Sum();
         var result = await productsService.AddOrderAsync(userOrder);
         if (result.IsSuccess)
         {
@@ -166,12 +184,17 @@ else
     {
         OperationResponse<UserOrder> result;
         //TODO: ПЕРЕИМЕНОВАТЬ В GETORDER
+
         result = await productsService.GetUserOrderAsync();
 
         if (result.IsSuccess)
         {
             if (result.Record != null)
+            {
                 userOrder = result.Record;
+                await SessionUtils.InitOrGetCartSessionStorageAsync(sessionStorage, result.Record.Products.ToList());
+                message = result.Message;
+            }
         }
         else
         {

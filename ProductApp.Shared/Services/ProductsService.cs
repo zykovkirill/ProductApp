@@ -169,7 +169,7 @@ namespace ProductApp.Shared.Services
         /// </summary>
         public async Task<OperationResponse<UserOrder>> AddOrderAsync(UserOrder userOrder)
         {
-
+            //TODO: Переписать используя этот запрос вместо await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
             using (var client1 = new HttpClient())
             {
                 client1.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",client.AccessToken); 

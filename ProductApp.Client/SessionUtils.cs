@@ -16,8 +16,12 @@ namespace ProductApp.Client
         private static bool _isCartSessionExists = false;
 
         #region Работа с сессией корзины
-        public async static Task<List<UserOrderProduct>> InitOrGetCartSessionStorageAsync(ISessionStorageService sessionStorage)
+        public async static Task<List<UserOrderProduct>> InitOrGetCartSessionStorageAsync(ISessionStorageService sessionStorage, List<UserOrderProduct> userOrderProducts = null )
         {
+            if(userOrderProducts != null && userOrderProducts.Any())
+            {
+                await sessionStorage.SetItemAsync(_cartSessionStorageName, userOrderProducts);
+            }
             if (!_isCartSessionExists)
             {
                 await sessionStorage.SetItemAsync(_cartSessionStorageName, new List<UserOrderProduct>());
@@ -67,6 +71,11 @@ namespace ProductApp.Client
                 await sessionStorage.SetItemAsync(_cartSessionStorageName, cartSessionStorage);
                 return await DeleteProductFromCartSessionStorageAsync(sessionStorage, product);
             }
+        }
+        public async static Task ClearCartSessionStorageAsync(ISessionStorageService sessionStorage)
+        {
+            await sessionStorage.RemoveItemAsync(_cartSessionStorageName);
+            _isCartSessionExists = false;
         }
         #endregion
     }

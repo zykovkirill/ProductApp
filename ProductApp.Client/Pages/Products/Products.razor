@@ -95,15 +95,12 @@ else
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
 
-    //private const string _cartSessionStorageName = "CartSessionStorage";
-    //private List<ProductCountable<BaseProduct>> _cartSessionStorage;
 
     async Task getProductsAsync()
     {
         isBusy = true;
 
         var userState = authenticationState.Result;
-
         productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
         if (PageNumber == null)

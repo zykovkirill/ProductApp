@@ -12,6 +12,7 @@ using ProductApp.Server.Services;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using ProductApp.Shared.Models.UserData;
+using Newtonsoft.Json.Linq;
 
 namespace WebAPIApp.Controllers
 {
@@ -149,8 +150,10 @@ namespace WebAPIApp.Controllers
 
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] UserOrder model)
+        public async Task<IActionResult> Post([FromBody] JObject json)
         {
+            //TODO: Можно динамически https://stackoverflow.com/questions/54158740/using-inherited-classes-in-net-web-api-post-put-method
+            UserOrder model = json.ToObject<UserOrder>();
             if (model.Products.Any())
             {
                 if (string.IsNullOrEmpty(model.UserId))
@@ -168,7 +171,7 @@ namespace WebAPIApp.Controllers
                 return Ok(new OperationResponse<UserOrder>
                 {
                     IsSuccess = true,
-                    Message = $"Products of  received successfully!",
+                    Message = $"Корзина сохранена!",
                     OperationDate = DateTime.UtcNow,
                     Record = purchase
                 });
