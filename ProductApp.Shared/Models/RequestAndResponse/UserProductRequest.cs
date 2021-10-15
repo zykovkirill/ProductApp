@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http.Internal;
 namespace ProductApp.Shared.Models
 {
 
-    //TODO: сделать через OperationResponse и наследовать от Record
     public class UserProductRequest
     {
         /// <summary>

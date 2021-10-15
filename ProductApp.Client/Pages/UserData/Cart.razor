@@ -15,7 +15,6 @@ else
 {
 
     <hr />
-    // TODO: СДЕЛАТЬ ВСЕ ID строками на подобии dbo.Products и ПРОВЕРКУ НА ОТРИЦАТЕЛЬНОЕ КОЛЛИЧЕСТВО
     @if (userOrder != null)
     {
 <div class="row">
@@ -183,7 +182,6 @@ else
     async Task loadCartAsync()
     {
         OperationResponse<UserOrder> result;
-        //TODO: ПЕРЕИМЕНОВАТЬ В GETORDER
 
         result = await productsService.GetUserOrderAsync();
 

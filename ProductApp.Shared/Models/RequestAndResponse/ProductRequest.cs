@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http.Internal;
 namespace ProductApp.Shared.Models
 {
 
-    //TODO: сделать через OperationResponse
     public class ProductRequest
     {
         /// <summary>

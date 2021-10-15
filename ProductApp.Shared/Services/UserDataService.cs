@@ -39,37 +39,37 @@ namespace ProductApp.Shared.Services
         }
 
 
-        /// <summary>
-        /// Получить профиль пользователя
-        /// </summary>
-        /// <returns></returns>
-        public async Task<OperationResponse<UserProfile>> GetUserCartAsync()
-        {
-            var response = await client.GetProtectedAsync<OperationResponse<UserProfile>>($"{_baseUrl}/api/userdata");
-            return response.Result;
-        }
+        ///// <summary>
+        ///// Получить профиль пользователя
+        ///// </summary>
+        ///// <returns></returns>
+        //public async Task<OperationResponse<UserProfile>> GetUserCartAsync()
+        //{
+        //    var response = await client.GetProtectedAsync<OperationResponse<UserProfile>>($"{_baseUrl}/api/userdata");
+        //    return response.Result;
+        //}
 
 
-        /// <summary>
-        /// Получить все продукты по id
-        /// </summary>
-        /// <param name="id"> ID продукта </param>
-        /// <returns></returns>
-        public async Task<OperationResponse<ChangeRoleViewModel>> GetUsersByIdAsync(string id)
-        {
-            var response = await client.GetProtectedAsync<OperationResponse<ChangeRoleViewModel>>($"{_baseUrl}/api/users/edit?id={id}");
-            return response.Result;
-        }
+        ///// <summary>
+        ///// Получить все продукты по id
+        ///// </summary>
+        ///// <param name="id"> ID продукта </param>
+        ///// <returns></returns>
+        //public async Task<OperationResponse<ChangeRoleViewModel>> GetUsersByIdAsync(string id)
+        //{
+        //    var response = await client.GetProtectedAsync<OperationResponse<ChangeRoleViewModel>>($"{_baseUrl}/api/users/edit?id={id}");
+        //    return response.Result;
+        //}
 
-        /// <summary>
-        /// Редактировать пользователя  с помощью API
-        /// </summary>
-        /// <param name="model"> Обьект для добавления представляющий продукт </param>
-        /// <returns></returns>
-        public async Task<UserManagerResponse> EditUserAsync(ChangeRoleViewModel model)
-        {
-            var response = await client.PutProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", model);
-            return response.Result;
-        }
+        ///// <summary>
+        ///// Редактировать пользователя  с помощью API
+        ///// </summary>
+        ///// <param name="model"> Обьект для добавления представляющий продукт </param>
+        ///// <returns></returns>
+        //public async Task<UserManagerResponse> EditUserAsync(ChangeRoleViewModel model)
+        //{
+        //    var response = await client.PutProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", model);
+        //    return response.Result;
+        //}
     }
 }

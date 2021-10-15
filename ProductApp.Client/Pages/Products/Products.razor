@@ -144,9 +144,6 @@ else
         message = String.Empty;
     }
 
-
-    //TODO: Обобщить данный метод, существует такой же в UserProduct
-    //TODO: Кешировать продукты в запросе
     async Task addProductToCartAsync()
     {
         isBusy = true;
@@ -156,17 +153,6 @@ else
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
-        //var result = await productsService.AddProductToCartAsync(count, selectedProductId, (int)ClassType.Product);
-        //if (result.IsSuccess)
-        //{
-        //    message = result.Message;
-        //    messageType = Models.AlertMessageType.Success;
-        //}
-        //else
-        //{
-        //    message = result.Message;
-        //    messageType = Models.AlertMessageType.Error;
-        //}
         isBusy = false;
     }
 
@@ -181,8 +167,6 @@ else
         multipleValues = multiple;
         await getProductsAsync();
 
-        /* _cartSessionStorage = */
-        // await SessionUtils.InitOrGetCartSessionStorageAsync(sessionStorage);
     }
 
     async Task OnChange(object value)

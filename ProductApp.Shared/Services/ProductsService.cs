@@ -89,7 +89,6 @@ namespace ProductApp.Shared.Services
             {
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
-                //TODO: правильно ли преобразовывать в int в string
                 new StringFormKeyValue("Price", model.Price.ToString()),
                 new StringFormKeyValue("ProductType", model.ProductType.ToString())
             };
@@ -114,7 +113,6 @@ namespace ProductApp.Shared.Services
                 new StringFormKeyValue("Id", model.Id), 
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
-                     //TODO: правильно ли преобразовывать в int в string
                 new StringFormKeyValue("Price", model.Price.ToString()),
                 new StringFormKeyValue("ProductType", model.ProductType.ToString())
             };
@@ -135,34 +133,6 @@ namespace ProductApp.Shared.Services
             var response = await client.DeleteProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products/{id}");
             return response.Result;
         }
-
-        /// <summary>
-        /// Добавить в корзину продукт
-        /// </summary>
-        /// <param name="id"> Обьект для добавления представляющий продукт </param>
-        /// <param name="count"> кол-во </param>
-        /// <param name="classType"> тип ClassType => см. в Enum</param>
-        /// <returns></returns>
-        public async Task<OperationResponse<Product>> AddProductToCartAsync(int count, string id, int classType)
-        {
-            //TODO: Почему Get
-                var response = await client.GetProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
-                return response.Result;
-
-        }
-        ///// <summary>
-        ///// Добавить в корзину продукт пользователя
-        ///// </summary>
-        ///// <param name="id"> Обьект для добавления представляющий продукт </param>
-        ///// <param name="count"> кол-во </param>
-        ///// <param name="classType"> тип ClassType => см. в Enum</param>
-        ///// <returns></returns>
-        //public async Task<OperationResponse<UserCreatedProduct>> AddUserProductToCartAsync(int count, string id, int classType)
-        //{          
-        //        var response = await client.GetProtectedAsync<OperationResponse<UserCreatedProduct>>($"{_baseUrl}/api/usercart/addprod?count={count}&id={id}&classType={classType}");
-        //        return response.Result;
-
-        //}
 
         /// <summary>
         /// Добавление заказа
@@ -188,30 +158,21 @@ namespace ProductApp.Shared.Services
         /// <returns></returns>
         public async Task<OperationResponse<UserOrder>> GetUserOrderAsync()
         {
+            //TODO: Создать единый контроллер UserOrder вместо usercart и userpurchases
             var response = await client.GetProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart/GetProductFromCart");
             return response.Result;
         }
 
-        //TODO : Объеденить запросы GetUserOrderAsync и GetPurchasesAsync добавить в параметр тип статус
+        //TODO : Объеденить запросы GetUserOrderAsync и GetPurchasesAsync добавить в параметр тип статус основная проблемма в CollectionPagingResponse
         /// <summary>
         /// Получить  заказы и их статус
         /// </summary>
         /// <returns></returns>
-        public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync()
+        public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync(int page)
         {
             //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
             //TODO: Изображение сохраняется не с тем размеров в ПРОДУКТАХ ПОЛЬЗОВАТЕЛЯ!!!!! КРИТТТТТ!!!!
-            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/userpurchases");
-            return response.Result;
-        }
-        /// <summary>
-        /// Удалить продукт  с помощью API
-        /// </summary>
-        /// <param name="id"> Обьект для добавления представляющий продукт </param>
-        /// <returns></returns>
-        public async Task<OperationResponse<UserOrderProduct>> DeleteProductFromCartAsync(string id)
-        {
-            var response = await client.DeleteProtectedAsync<OperationResponse<UserOrderProduct>>($"{_baseUrl}/api/usercart/{id}");
+            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/userpurchases?page={page}");
             return response.Result;
         }
 

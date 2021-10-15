@@ -13,6 +13,7 @@ namespace ProductApp.Client
     public static class SessionUtils
     {
         private const string _cartSessionStorageName = "CartSessionStorage";
+        private const string _productSessionStorageName = "ProductSessionStorage";
         private static bool _isCartSessionExists = false;
 
         #region Работа с сессией корзины

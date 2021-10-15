@@ -14,7 +14,6 @@ namespace ProductApp.Shared.Models.UserData
     {
 
         public string UserId { get; set; }
-        //TODO : Обобщить UserOrderProduct на ProductCountable
         public IList<UserOrderProduct>  Products { get; set; }
         /// <summary>
         /// Колличество
@@ -24,9 +23,6 @@ namespace ProductApp.Shared.Models.UserData
         /// Общая цена
         /// </summary>
         public int TotalSum { get; set; }
-
-        //public int UserDataId { get; set; }      // внешний ключ
-        //public UserProfile UserData { get; set; }    // навигационное свойство
         /// <summary>
         /// Статус
         /// </summary>

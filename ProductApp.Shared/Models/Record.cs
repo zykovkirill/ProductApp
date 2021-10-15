@@ -6,7 +6,6 @@ namespace ProductApp.Shared.Models
 {
     public class Record
     {
-        //TODO: Сделать базовый класс для всех записей в БД
         public Record()
         {
             Id = Guid.NewGuid().ToString();

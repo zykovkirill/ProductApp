@@ -29,9 +29,6 @@ namespace WebAPIApp.Controllers
 
 
         #region Get
-
-
-
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserProfile>))]
         [HttpGet]
         public async Task<ActionResult<UserProfile>> Get()
@@ -58,62 +55,5 @@ namespace WebAPIApp.Controllers
         }
         #endregion
 
-        //// GET api/Products/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<UserProduct>> Get(int id)
-        //{
-
-
-        //    UserProduct prod = await _db.UserProducts.FirstOrDefaultAsync(x => x.Id == id);
-        //    if (prod == null)
-        //        return NotFound();
-        //    return new ObjectResult(prod);
-        //}
-
-        // POST api/Products
-        //[HttpPost]
-        //public async Task<ActionResult<UserProduct>> Post(UserProduct product)
-        //{
-        //    if (product == null)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _db.UserProducts.Add(product);
-        //    await _db.SaveChangesAsync();
-        //    return Ok(product);
-        //}
-
-        //// PUT api/Products/
-        //[HttpPut]
-        //public async Task<ActionResult<UserProduct>> Put(UserProduct product)
-        //{
-        //    if (product == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (!_db.UserProducts.Any(x => x.Id == product.Id))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _db.Update(product);
-        //    await _db.SaveChangesAsync();
-        //    return Ok(product);
-        //}
-
-        //// DELETE api/Products/5
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult<UserProduct>> Delete(int id)
-        //{
-        //    UserProduct product = _db.UserProducts.FirstOrDefault(x => x.Id == id);
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    _db.UserProducts.Remove(product);
-        //    await _db.SaveChangesAsync();
-        //    return Ok(product);
-        //}
     }
 }

@@ -100,8 +100,6 @@ else
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
 
-   // private const string _cartSessionStorage = "CartSessionStorage";
-
     async Task getProductsAsync()
     {
         isBusy = true;
@@ -114,6 +112,7 @@ else
             PageNumber = 1;
 
         CollectionPagingResponse<UserCreatedProduct> result;
+        //TODO: доделать
         //if (string.IsNullOrWhiteSpace(Query))
         //  if (filterType != String.Empty)
         //    result = await productsService.GetFilterProductsByPageAsync(PageNumber.Value, filterType);

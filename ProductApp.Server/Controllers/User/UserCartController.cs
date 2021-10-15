@@ -32,67 +32,6 @@ namespace WebAPIApp.Controllers
         }
 
         #region Get    
-        //TODO: НАДО  сделать POST - данный вариант не безопасен
-        //TODO: Удалить данный метод
-        [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserCreatedProduct>))]
-        [HttpGet("addprod")]
-        ///<summary>
-        ///Добавляет продукты в корзину
-        /// </summary>
-        public async Task<IActionResult> Get(int count, string id, int classType)
-        {
-
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (classType == (int)ClassType.Product)
-            {
-                //TODO: Может типизировать запрос????
-                var product = await _productsService.AddProdToCartAsync(count, id, userId);
-                if (product == null)
-                    return
-                        BadRequest(new OperationResponse<Product>
-                        {
-                            IsSuccess = false,
-                            Message = $"Ошибка",
-                            OperationDate = DateTime.UtcNow,
-                            Record = product
-                        });
-                return Ok(new OperationResponse<Product>
-                {
-                    IsSuccess = true,
-                    Message = $"Продукты добавлены в корзину",
-                    OperationDate = DateTime.UtcNow,
-                    Record = product
-                });
-            }
-            if (classType == (int)ClassType.UserProduct)
-            {
-                var product = await _productsService.AddUserProdToCartAsync(count, id, userId);
-                if (product == null)
-                    return
-                        BadRequest(new OperationResponse<UserCreatedProduct>
-                        {
-                            IsSuccess = false,
-                            Message = $"Ошибки",
-                            OperationDate = DateTime.UtcNow,
-                            Record = product
-                        });
-                return Ok(new OperationResponse<UserCreatedProduct>
-                {
-                    IsSuccess = true,
-                    Message = $"Продукты добавлены в корзину",
-                    OperationDate = DateTime.UtcNow,
-                    Record = product
-                });
-            }
-            return
-                   BadRequest(new BaseAPIResponse()
-                   {
-                       IsSuccess = false,
-                       Message = $"Не найден тип"
-                   });
-        }
-
 
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpGet("GetProductFromCart")]
@@ -122,32 +61,7 @@ namespace WebAPIApp.Controllers
         #endregion
 
         #region Post 
-        ////TODO: Лучше сделать POST
-        //[ProducesResponseType(200, Type = typeof(OperationResponse<UserProduct>))]
-        //[HttpPost("adduserprod")]
-        //public async Task<IActionResult> Post(int count, string id)
-        //{
-        //    string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-        //    var product = await _productsService.AddProdToCartAsync(count, id, userId);
-        //    if (product == null)
-        //        return
-        //            BadRequest(new OperationResponse<Product>
-        //            {
-        //                IsSuccess = false,
-        //                Message = $"Errors",
-        //                OperationDate = DateTime.UtcNow,
-        //                Record = product
-        //            });
-        //    return Ok(new OperationResponse<UserProduct>
-        //    {
-        //        IsSuccess = true,
-        //        Message = $"Products of  received successfully!",
-        //        OperationDate = DateTime.UtcNow,
-        //      //  Record = product
-        //    });
-        //}
-
+       
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] JObject json)
@@ -195,29 +109,6 @@ namespace WebAPIApp.Controllers
 
         #region Delete
 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrderProduct>))]
-        [ProducesResponseType(404)]
-        [HttpDelete("{Id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var getOld = await _productsService.DeleteProductFromCartById(id);
-            if (getOld == null)
-                return NotFound();
-
-            // Remove the file 
-            //string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", getOld.CoverPath.Replace(_configuration["AppUrl"], ""));
-            //System.IO.File.Delete(fullPath);
-
-
-            return Ok(new OperationResponse<UserOrderProduct>
-            {
-                IsSuccess = true,
-                //Message = $"{getOld.ProductName} has been deleted successfully!",
-                Record = getOld
-            });
-        }
         #endregion 
 
 
