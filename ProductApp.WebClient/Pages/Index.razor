@@ -1,0 +1,43 @@
+﻿@page "/"
+
+@attribute [Authorize]
+
+@*<AuthorizeView>
+    <Authorized>
+        <h1>Привет @context.User.FindFirst("FirstName").Value</h1>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Вам необходимо войти в учетную запись</h1>
+    </NotAuthorized>
+</AuthorizeView>*@
+
+<div class="row">
+    <div>
+        <h1 class="title-text">
+            ДОБРО ПОЖАЛОВАТЬ<br>
+            СОЗДАЙТЕ СОБСТВЕННЫЙ ПРОДУКТ<br>
+            УДИВИТЕ СВОИХ БЛИЗКИХ
+        </h1>
+    </div>
+    <div>
+        <img src="/images/toy_1.png" alt="Стич" class="rightimg">
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div>
+        <img src="/images/toy_2.png" alt="Акула" class="leftimg">
+    </div>
+    <div>
+        <h1 class="title-text">
+            РАЗРАБОТАЙТЕ ДИЗАЙН<br>
+            ПОДБЕРИТЕ НЕОБХОДИМЫ КОМПОНЕНТЫ<br>
+            ВКЛЮЧИТЕ КРЕАТИВ
+        </h1>
+    </div>
+</div>
+
+
+
+
+    @*<SurveyPrompt Title="How is Blazor working for you?" />*@

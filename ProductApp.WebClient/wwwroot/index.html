@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>TrustSoft</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+    <!--Unity-->
+    <!--TODO:Пути к иконкам -->
+    <link rel="shortcut icon" href="/unity/P00340/web/TemplateData/shark.png">
+    <link rel="stylesheet" href="/unity/P00340/web/TemplateData/style.css">
+    <!--Unity-->
+    <!--<link href="_content/BlazorCaptcha/captcha.css" rel="stylesheet" />-->
+    <script src="scripts/script.js"></script>
+</head>
+
+<body>
+    <app>Загрузка...</app>
+    <!--<div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas" width=960 height=600></canvas>
+        <div id="unity-loading-bar">
+            <div id="unity-logo"></div>
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+        </div>
+        <div id="unity-warning"> </div>
+        <div id="unity-footer">
+            <div id="unity-webgl-logo"></div>
+            <div id="unity-fullscreen-button"></div>
+            <div id="unity-build-title">New Unity Project (2)</div>
+        </div>
+    </div>-->
+    <div id="blazor-error-ui">
+        Произошла ошибка
+        <a href="" class="reload">Перезагрузить</a>
+        <!--//TODO:добавить страницу ссылку на помощь-->
+        |
+        <a href="Help">Служба поддержки</a>
+        <a class="dismiss">🗙</a>
+
+    </div>
+    <!--Unity-->
+    <script src="unity/P00340/web/TemplateData/base.js"></script>
+    <!--Unity-->
+    <!--TODO:УДАЛИТЬ?-->
+    <script src="scripts/decode.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+
+    <script>
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type ===
+                            'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray,
+                            { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
+    <!--TODO:УДАЛИТЬ?-->
+
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+
+</body>
+
+</html >

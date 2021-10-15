@@ -1,0 +1,31 @@
+﻿@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+@using Radzen
+
+<AuthorizeView>
+        <RadzenMenu Click="@(args => Logout(args))">
+            @*<NavLink class="nav-link" href="UserData/profile">
+                <span>@context.User.FindFirst("FirstName").Value</span>  &nbsp;
+            </NavLink>*@
+            <RadzenMenuItem Style="background-color: #ddf3ff;" Text="@context.User.FindFirst("FirstName").Value" Icon="account_box">
+                <RadzenMenuItem Text="Профиль" Path="UserData/Profile" Icon="account_circle"></RadzenMenuItem>
+                <RadzenMenuItem Text="Помощь" Path="Help" Icon="help_outline"></RadzenMenuItem>
+                <RadzenMenuItem Text="Выйти" Icon="highlight_off"></RadzenMenuItem>
+                @*<RadzenButton Style="background-color: transparent; color:black" Icon="highlight_off" Text="Выйти" Click="Logout" />*@      
+            </RadzenMenuItem>
+        </RadzenMenu>
+
+
+</AuthorizeView>
+@code {
+    async Task  Logout(MenuItemEventArgs e)
+    {
+        if (e.Text == "Выйти")
+        {
+            var localStateProvider = (LocalAuthenticationStateProvider)authenticationStateProvider;
+            await localStateProvider.LogoutAsync();
+            navigationManager.NavigateTo("/auth/login");
+        }
+    }
+
+}

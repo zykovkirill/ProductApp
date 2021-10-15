@@ -1,0 +1,188 @@
+﻿@page "/userproducts"
+@page "/userproducts/{PageNumber:int}"
+@inject ProductsService productsService
+@inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin, User")]
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@if (string.IsNullOrWhiteSpace(Query))
+{
+    <h2> Продукты пользователя@*- Страница: @PageNumber*@</h2>
+}
+else
+{
+    <h2>Продукты пользователя - Результат поиска: '@Query' - Страница: @PageNumber</h2>
+}
+
+@if (isBusy)
+{
+    <h2>Загрузка...</h2>
+}
+else
+{
+    <div class="row">
+        @*<RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
+            <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />*@
+        @*<RadzenDropDown AllowClear="true"
+            @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
+            Change=@(args => OnChange(args))
+            Style=" margin: 15px 15px 15px 15px" />*@
+        <AlertMessage Message="@message" MessageType="@messageType" />
+    </div>
+    <hr />
+
+    <div class="row">
+        @foreach (var product in products)
+        {
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                <div class="row">
+                    <RadzenImage Path="@product.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
+                    <div class="col-md-6">
+                        <h3> @product.Name </h3>
+                        @*<h3>Цена: @product.Price</h3>
+                            <h3>Тип продукта: @Utils.GetNameProductType(product.ProductType)</h3>*@
+                        <hr />
+                    </div>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Добавить" Icon="add_shopping_cart" class="btn-block" Click="() => selectProduct(product)" />
+                    @if (selectedUserProduct == product)
+                    {
+                        <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="count" Style="margin:10px;" />
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Подтвердить" Icon="done" class="btn-block" Click="async () => await addProductToCartAsync()" />
+
+                    }
+                    else
+                    {
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Редактировать" Icon="mode_edit" class="btn-block" Click="() => moveToEditProductAsync()" />
+                    }
+                </div>
+            </RadzenCard>
+        }
+
+    </div>
+    <hr />
+    <div class="row">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            int page = i;
+            @if (page == PageNumber)
+            {
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
+            }
+            else
+            {
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
+            }
+        }
+
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    public string Query { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+    List<UserCreatedProduct> products = new List<UserCreatedProduct>();
+    int count;
+
+    int totalPages = 1;
+    //  string filterType = String.Empty;
+
+    IEnumerable<string> multipleValues;
+    List<Utils.ProductType> prod = new List<Utils.ProductType>();
+    //Сообщения об ошибках
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    async Task getProductsAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+        if (PageNumber == null)
+            PageNumber = 1;
+
+        CollectionPagingResponse<UserCreatedProduct> result;
+        //TODO: доделать
+        //if (string.IsNullOrWhiteSpace(Query))
+        //  if (filterType != String.Empty)
+        //    result = await productsService.GetFilterProductsByPageAsync(PageNumber.Value, filterType);
+        //   else
+        result = await productsService.GetAllUserProductsByPageAsync(PageNumber.Value);
+        //else
+        //    result = await productsService.SearchProductsByPageAsync(Query, PageNumber.Value);
+
+        // 50 plans | page size = 10 => 5 pages
+        // 54 plans | page size = 10 => 5 pages -> page = 4 plans
+        if (result.IsSuccess)// Добавить вывод ошибок
+        {
+            if (result.Count % result.PageSize == 0)
+                totalPages = result.Count / result.PageSize;
+            else
+                totalPages = (result.Count / result.PageSize) + 1;
+
+            products = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+
+    async Task moveToPageAsync(int pageNumber)
+    {
+        PageNumber = pageNumber;
+        await getProductsAsync();
+    }
+
+    UserCreatedProduct selectedUserProduct;
+
+    void selectProduct(UserCreatedProduct userCreatedProduct)
+    {
+        selectedUserProduct = userCreatedProduct;
+        message = String.Empty;
+    }
+
+
+    async Task addProductToCartAsync()
+    {
+        isBusy = true;
+        if (count != 0)
+        {
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedUserProduct, count);
+        }
+        message = "Продукты добавлены в корзину";
+        messageType = Models.AlertMessageType.Success;
+
+        isBusy = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<string> multiple = new List<string>();
+        foreach (var k in Utils.ProductTypeDictionary)
+        {
+            prod.Add(new Utils.ProductType() { ProductTypeInt = k.Key.ToString(), ProductTypeName = k.Value });
+            multiple.Add(k.Key.ToString());
+        }
+        multipleValues = multiple;
+        await getProductsAsync();
+    }
+
+    void moveToEditProductAsync()
+    {
+        navigationManager.NavigateTo("/EditUserProducts");
+    }
+
+}

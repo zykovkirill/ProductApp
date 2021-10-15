@@ -1,0 +1,94 @@
+﻿
+
+@page "/UserData/Profile"
+@inject UserDataService userDataService
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
+@attribute [Authorize(Roles = "Admin, User")]
+@using ProductApp.Shared.Models.UserData
+
+
+<h2>Мои профиль</h2>
+
+
+@if (isBusy)
+{
+    <h2>Загрузка...</h2>
+}
+else
+{
+
+    <hr />
+    <div class="row">
+        <AlertMessage Message="@message" MessageType="@messageType" />
+        <RadzenCard Style="margin:10px;height:auto; max-width:100%; resize: both;">
+            <p>Имя: @userData.FirstName</p>
+            <p>Фамилия: @userData.LastName</p>
+        </RadzenCard>
+    </div>
+
+    <hr />
+    <div class="row">
+        <RadzenButton Style="margin-left:auto; margin-right:3em;" Text="Выйти" Click="Logout" class="mr-2" />
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    public string Query { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+    UserProfile userData = new UserProfile();
+
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+ //   int totalPages = 1;
+
+    async Task getUserDataAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        userDataService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+
+
+        if (PageNumber == null)
+            PageNumber = 1;
+
+        OperationResponse<UserProfile> result;
+
+        result = await userDataService.GetUserDataAsync();
+
+        if (result.IsSuccess)
+            userData = result.Record;
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+
+        isBusy = false;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await getUserDataAsync();
+    }
+
+    async Task Logout()
+    {
+        var localStateProvider = (LocalAuthenticationStateProvider)authenticationStateProvider;
+        await localStateProvider.LogoutAsync();
+        navigationManager.NavigateTo("/auth/login");
+    }
+
+}
