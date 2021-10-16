@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\images\1.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\LogoSite.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\logoText.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\logotype.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\toys_background.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\toy_1.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\toy_2.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\свидетельство.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\decode.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\script.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\script.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\script.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.data" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.framework.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.loader.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.wasm" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\index.html" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\base.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\favicon.ico" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\fullscreen-button.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-empty-dark.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-empty-light.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-full-dark.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-full-light.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\shark.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\style.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\unity-logo-dark.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\unity-logo-light.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\webgl-logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.10" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Radzen.Blazor" Version="3.11.6" />
+    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+    <PackageReference Include="Tewr.Blazor.FileReader" Version="3.2.0.21211" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProductApp.Shared\ProductApp.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\favicon.ico">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\index.html">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\shark.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

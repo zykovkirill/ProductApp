@@ -74,8 +74,6 @@ else
         var userState = authenticationState.Result;
         rolesService.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
-
-
         if (PageNumber == null)
             PageNumber = 1;
 

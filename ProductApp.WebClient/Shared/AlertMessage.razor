@@ -1,0 +1,48 @@
+﻿@if (!string.IsNullOrWhiteSpace(Message))
+{
+<div class="alert @alertClass">
+    @Message 	&nbsp; <button style="position: absolute; top: 10px; right: 10px; " type="button" class="close" aria-label="Close">
+        <span @onclick="HideMessage" aria-hidden="true">&times;</span>
+    </button>
+</div>
+}
+@code {
+    [Parameter]
+    public string Message { get; set; }
+    //TODO: Изменить стили в CSS нужен отступ
+
+    private Models.AlertMessageType messageType;
+
+    [Parameter]
+    public Models.AlertMessageType MessageType
+    {
+        get => messageType;
+        set
+        {
+            messageType = value;
+            switch (messageType)
+            {
+                case Models.AlertMessageType.Error:
+                    alertClass = "alert-danger";
+                    break;
+                case Models.AlertMessageType.Warning:
+                    alertClass = "alert-warning";
+                    break;
+                case Models.AlertMessageType.Success:
+                    alertClass = "alert-success";
+                    break;
+                default:
+                    break;
+
+            }
+        }
+    }
+
+    string alertClass = "alert-info";
+
+    void HideMessage()
+    {
+        Message = string.Empty;
+    }
+
+}

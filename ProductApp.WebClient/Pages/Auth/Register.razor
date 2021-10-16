@@ -1,0 +1,112 @@
+﻿@page "/auth/register"
+@layout AuthLayout
+@using ProductApp.Shared.Models
+@using ProductApp.Shared
+
+@inject AuthenticationService authService
+@inject NavigationManager navigationManager
+
+<div class="row">
+    <div class="middle-box-inside">
+        <h2>Создать новый аккаунт</h2>
+        <EditForm Model="model" OnValidSubmit="RegisterUser">
+            <RadzenCard>
+
+                <AlertMessage Message="@message" MessageType="@messageType" />
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <label> Имя </label>
+                <RadzenTextBox @bind-Value="model.FirstName"></RadzenTextBox>
+
+                <label> Фамилия </label>
+                <RadzenTextBox @bind-Value="model.LastName"></RadzenTextBox>
+
+                <label> Электронная почта </label>
+                <RadzenTextBox @bind-Value="model.Email"></RadzenTextBox>
+
+                <label> Пароль </label>
+                <RadzenPassword @bind-Value="model.Password"></RadzenPassword>
+
+                <label> Подтверждение пароля </label>
+                <RadzenPassword @bind-Value="model.ConfirmPassword"></RadzenPassword>
+                <hr />
+                <div class="section">
+                    <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6LeLvoIaAAAAAC9hTspjaZJR2TXbMHCK4xqrzh93" OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                </div>
+                <table>
+                    <tr>
+                        <td><RadzenCheckBox @bind-Value=@checkBox1Value TValue="bool" Style="margin: 5px 5px 5px 5px;" /></td>
+                        <td><RadzenLink Icon="fingerprint" class="nav-link" Path="privacy" Text="Согласен с  политикой по обработке персональных данных" /></td>
+                    </tr>
+                </table>
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Зарегистрироваться"
+                              ButtonStyle="Radzen.ButtonStyle.Primary" class="btn-block mr-2"
+                              Disabled="valid" />
+                <RadzenButton ButtonType="Radzen.ButtonType.Button" Text="Войти"
+                              ButtonStyle="Radzen.ButtonStyle.Secondary" class="btn-block mr-2"
+                              Disabled="isBusy" Click="GoToLogin" />
+            </RadzenCard>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    RegisterRequest model = new RegisterRequest();
+
+    bool isBusy = false;
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    private ReCAPTCHA reCAPTCHAComponent;
+
+    private bool checkBox1Value;
+
+    private bool valid => ValidReCAPTCHA || !checkBox1Value;
+
+    private bool ValidReCAPTCHA = false;//REALESE true
+
+    //void OnChange(bool? value, string name)
+    //{
+    //    console.Log($"{name} value changed to {value}");
+    //}
+
+    private void OnSuccess()
+    {
+        ValidReCAPTCHA = false;
+    }
+
+    private void OnExpired()
+    {
+        ValidReCAPTCHA = true;
+    }
+
+
+
+    public async Task RegisterUser()
+    {
+        isBusy = true;
+        ValidReCAPTCHA = true;
+        var result = await authService.RegisterUserAsync(model);
+        if (result.IsSuccess)
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Success;
+        }
+        else
+        {
+            message = result.Errors?.FirstOrDefault() ?? result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+        ValidReCAPTCHA = false;
+
+    }
+
+
+    void GoToLogin()
+    {
+        navigationManager.NavigateTo("/auth/login");
+    }
+
+}

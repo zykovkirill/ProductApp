@@ -21,6 +21,7 @@ namespace ProductApp.Shared.Models
         /// <summary>
         /// Цена
         /// </summary>
+        [Required]
         public int Price { get; set; }
 
         /// <summary>

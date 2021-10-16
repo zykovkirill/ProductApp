@@ -16,26 +16,18 @@ namespace ProductApp.Server.Services
         // Сделать region для продуктов, продуктов пользователя и продуктов в корзине
         // TODO: Убрать лишнюю реализацию методов или перенести в другой интерфейс
         IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts);
-        //UserImageRequest GetImageAsync(string imgID);
         IEnumerable<Product> SearchProductsAsync(string query, int pageSize, int pageNumber, out int totalProducts);
         IEnumerable<Product> FilterProductsAsync(string filter, int pageSize, int pageNumber, out int totalProducts);
         Task<Product> AddProductAsync(string name, string description, int price, int type, string imagePath);
         Task<Product> EditProductAsync(string id, string newName, string description, int price, int type, string newImagePath);
-        Task<Product> AddProdToCartAsync(int count, string Prodid, string userId);
-        Task<UserCreatedProduct> AddUserProdToCartAsync(int count, string Prodid, string userId);
         Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId);
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
-        Task<UserOrderProduct> DeleteProductFromCartById(string id);
         Product GetProductByName(string name);
         Task<UserOrder> GetProductsFromCart(string userId);
         IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts);
         Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath);
         Task<UserCreatedProduct> GetUserProductById(string id);
-
-        //Task<UserOrder> BuyProductsAsync(UserOrder model);
-
-        //Task<UserOrder> SaveCartAsync(UserOrder model);
         Task<UserOrder> AddOrderAsync(UserOrder model);
     }
 
@@ -65,112 +57,10 @@ namespace ProductApp.Server.Services
             return product;
         }
 
-        //TODO: Удалить или  переименовать, добавлять только из корзины сразу ордер
-        public async Task<Product> AddProdToCartAsync(int count, string prodId, string userId)
-        {
-            var prod = await _db.Products.FindAsync(prodId);
-            if (prod == null || prod.IsDeleted)
-                return null;
-            UserOrder userOrder;
-            //TODO: Сравнить JOIN c INCLUDE
-            userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == Status.Cart);
-            if (userOrder == null)
-            {
-                userOrder = new UserOrder()
-                {
-                    UserId = userId,
-                    Status = Status.Cart
-                };
-                await _db.UserOrders.AddAsync(userOrder);
-                var history = new OrderHistory()
-                {
-                    Status = Status.Cart,
-                    IdOrder = userOrder.Id
-                };
-                await _db.PurchasesHistorys.AddAsync(history);
-            }   
-            var prodDB = userOrder.Products.FirstOrDefault(p => p.Id == prod.Id);
-
-            if (prodDB != null)
-                prodDB.Count += count;
-            else
-            {
-                //UserOrderProduct userProductInCart = new UserOrderProduct()
-                //{
-                //    ProductId = prod.Id,
-                //    ProductCount = count,
-                //    ProductName = prod.Name,
-                //    ProductPrice = prod.Price,
-                //    ProductCoverPath = prod.CoverPath
-
-                //};
-                //userOrder.Products.Add(userProductInCart);
-            }
-
-            await _db.SaveChangesAsync();
-
-            return prod;
-        }
-        //TODO: Объеденить с верхним методом 
-        //TODO: Настройки выносить в файл конфигурации для того чтобы не пересобирать
-        public async Task<UserCreatedProduct> AddUserProdToCartAsync(int count, string prodId, string userId)
-        {
-            var prod = await _db.UserCreatedProducts.FindAsync(prodId);
-            if (prod != null)
-            {
-                var toy = await _db.Products.FindAsync(prod.ToyProductId);
-                var chevron = await _db.Products.FindAsync(prod.ChevronProductId);
-                if (toy != null && chevron != null)
-                {
-                    if (prod == null || prod.IsDeleted)
-                        return null;
-                    UserOrder userOrder;
-                    userOrder = await _db.UserOrders.Include(p => p.Products).FirstOrDefaultAsync(o => o.UserId == userId && o.Status == Status.Cart);
-                    if (userOrder == null)
-                    {
-                        userOrder = new UserOrder()
-                        {
-                            UserId = userId,
-                            Status = Status.Cart
-                        };
-                        await _db.UserOrders.AddAsync(userOrder);
-                        var history = new OrderHistory()
-                        {
-                            Status = Status.Cart,
-                            IdOrder = userOrder.Id
-                        };
-                        await _db.PurchasesHistorys.AddAsync(history);
-                    }
-                    var prodDB = userOrder.Products.FirstOrDefault(p => p.Id == prod.Id);
-
-                    if (prodDB != null)
-                        prodDB.Count += count;
-                    else
-                    {
-
-                        //UserOrderProduct userProductInCart = new UserOrderProduct()
-                        //{
-                        //    ProductId = prod.Id,
-                        //    ProductCount = count,
-                        //    ProductName = prod.Name,
-                        //    //TODO: Добавить коэффициент стоимости зависящий от сложности изготовления и дополнительных рассходов(сделать отдельный класс для рассчета этого коэффициента)
-                        //    ProductPrice = toy.Price + chevron.Price,
-                        //    ProductCoverPath = prod.CoverPath
-                        //};
-                        //userOrder.Products.Add(userProductInCart);
-
-                    }
-
-                    await _db.SaveChangesAsync();
-                }
-            }
-            return prod;
-        }
-
         public async Task<UserOrder> GetProductsFromCart(string userId)
         {
             //TODO: AsNoTracking добавить туда где данные не изменяются
-            var cart = await _db.UserOrders.Include(p => p.Products).AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.Status == Status.Cart);
+            var cart = await _db.UserOrders.Include(p => p.Products).AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.Status == OrderStatus.Cart);
             return cart;
         }
 
@@ -201,7 +91,8 @@ namespace ProductApp.Server.Services
             if (newImagePath != null)
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
-
+            //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
+           // _db.Products.Update(prod);
             await _db.SaveChangesAsync();
             return prod;
         }
@@ -236,19 +127,6 @@ namespace ProductApp.Server.Services
                 return null;
 
             return product;
-        }
-
-        //TODO: Удалить или  переименовать, добавлять только из корзины сразу ордер
-        public async Task<UserOrderProduct> DeleteProductFromCartById(string id)
-        {
-            //UserOrderProduct product = _db.UserOrderProducts.FirstOrDefault(x => x.Id == id);
-            //if (product == null)
-            //    return null;
-            //TODO: Помечать как удаленные только Продукты, продукты пользователя, пользователей
-            // _db.UserOrderProducts.Remove(product);
-            //await _db.SaveChangesAsync();
-            //return product;
-            return null;
         }
 
         public Product GetProductByName(string name)
@@ -318,19 +196,6 @@ namespace ProductApp.Server.Services
             return model;
         }
 
-        //TODO: Удалить
-        //public UserImageRequest GetImageAsync(string imgID)
-        //{
-        //    //var prod = _db.UserCreatedProducts.FirstOrDefault(p => p.Id == imgID);
-        //    //MemoryStream destination = new MemoryStream();
-        //    //using (var file = File.OpenRead(@"c:\3.png"))
-        //    //{
-        //    //    file.CopyTo(destination);
-        //    //};
-        //    //var model = new UserImageRequest() { Data = destination };
-        //    return null;
-        //}
-
         public async Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath)
         {
             var prod = await _db.UserCreatedProducts.FindAsync(id);
@@ -346,7 +211,9 @@ namespace ProductApp.Server.Services
             if (newImagePath != null)
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
-           // _db.UserProducts.Update(prod);
+            //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
+            // _db.UserCreatedProducts.Update(prod);
+
             await _db.SaveChangesAsync();
             return prod;
         }
@@ -360,75 +227,50 @@ namespace ProductApp.Server.Services
             return product;
         }
 
-        //public async Task<UserOrder> BuyProductsAsync(UserOrder model)
-        //{
-        //     var order = await _db.UserOrders.FindAsync(model.Id);
-        //    if (order != null)
-        //        order = model;
-        //    else
-        //        await _db.UserOrders.AddAsync(model);
-
-        //    var history = new OrderHistory()
-        //    {
-        //        IdOrder = model.Id,
-        //        Status = Status.Buy
-        //    };
-        //    //TODO: Task завернуть в исключения и логировать
-        //    //TODO: Использовать Update везде где меняем данные
-        //    await _db.PurchasesHistorys.AddAsync(history);
-        //   // _db.UserOrders.Update(order);
-        //    await _db.SaveChangesAsync();
-        //    return order;
-        //}
-        //TODO : Проверить не используемые методы написать карту запросов
-        //public async Task<UserOrder> SaveCartAsync(UserOrder model)
-        //{
-        //    var order = await _db.UserOrders.FindAsync(model.Id);
-        //    if (order != null)
-        //        order = model;
-        //    else
-        //        await _db.UserOrders.AddAsync(model);
-
-        //    var history = new OrderHistory()
-        //    {
-        //        IdOrder = model.Id,
-        //        Status = Status.Cart
-        //    };
-        //    //TODO: Task завернуть в исключения и логировать
-        //    //TODO: Использовать Update везде где меняем данные
-        //    await _db.PurchasesHistorys.AddAsync(history);
-        //    // _db.UserOrders.Update(order);
-        //    await _db.SaveChangesAsync();
-        //    return order;
-        //}
         public async Task<UserOrder> AddOrderAsync(UserOrder model)
         {
-            //TODO: Логика с присваиванием модели не самый лучший вариант, мб очтавить несколько ордеров со статусом корзина
-            var order = await _db.UserOrders.FindAsync(model.Id);
-            if (order != null)
-                order = model;
-            else
+            //TODO: Логика с присваиванием модели не самый лучший вариант, мб оcтавить несколько ордеров со статусом корзина
+            try
             {
-                if (model.Status == Status.Buy)
-                    await _db.UserOrders.AddAsync(model);
-                else if (model.Status == Status.Cart)
+                if (model.Status == OrderStatus.Cart)
                 {
-                    var cart = await _db.UserOrders.FirstOrDefaultAsync(o => o.Status == Status.Cart && o.UserId == model.UserId);
-                    if (cart != null)
-                        cart = model;
+                    var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == model.UserId && u.Status == OrderStatus.Cart);
+                    if (order != null)
+                    {
+                        order.TotalSum = model.TotalSum;
+                        order.Products = model.Products;
+                        order.ProductCount = model.ProductCount;
+                        _db.UserOrders.Update(order);
+                    }
+                    else
+                        await _db.UserOrders.AddAsync(model);
                 }
+                else if (model.Status == OrderStatus.Buy)
+                {
+                    var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.Id == model.Id);
+                    if (order != null)
+                        _db.UserOrders.Update(model);
+                    else
+                        await _db.UserOrders.AddAsync(model);
+
+                  
+                    //TODO: Может быть возвращать статусы ок или не ок
+                    //TODO: Task завернуть в исключения и логировать
+                    //TODO: Использовать Update везде где меняем данные
+                }
+                var history = new OrderHistory()
+                {
+                    IdOrder = model.Id,
+                    Status = model.Status
+                };
+                await _db.PurchasesHistorys.AddAsync(history);
+                await _db.SaveChangesAsync();
             }
-            var history = new OrderHistory()
+            catch
             {
-                IdOrder = model.Id,
-                Status = model.Status
-            };
-            //TODO: Task завернуть в исключения и логировать
-            //TODO: Использовать Update везде где меняем данные
-            await _db.PurchasesHistorys.AddAsync(history);
-            // _db.UserOrders.Update(order);
-            await _db.SaveChangesAsync();
-            return order;
+                return null;
+            }
+            return model;
         }
     }
 

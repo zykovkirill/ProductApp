@@ -1,0 +1,121 @@
+﻿@page "/users/details/{id}"
+@inject UsersService usersService
+@inject IFileReaderService fileReaderService
+@inject NavigationManager navigatorManager
+@using System.IO;
+
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Plan @model.UserEmail</h3>
+
+<div class="row">
+    <div class=" =col-6">
+        <EditForm Model="model" OnValidSubmit="async () => await editUserAsync() ">
+            <RadzenCard>
+                <AlertMessage Message="@message" MessageType="@messageType" />
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <RadzenTextBox Placeholder="Идентификатор" @bind-Value="model.UserId" Style="margin:10px;" />
+                <RadzenTextBox Placeholder="Электронная почта" @bind-Value="model.UserEmail" Style="margin:10px;" />
+                <hr />
+                <h3>Роли</h3>
+                @foreach (var role in model.Roles)
+                {
+
+                    <RadzenCheckBox @bind-Value=@role.IsOn TValue="bool" Change=@(args => OnChange(args, role.RoleName)) />
+                    <RadzenLabel Text="@role.RoleName" Component="@role.RoleName" Style="margin-left: 5px;" />
+                    <hr />
+                }
+
+                <hr />
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" ButtonStyle="Radzen.ButtonStyle.Success" Disabled="isBusy" Style="margin:5px" class="btn-block" Text="Редактировать" />
+            </RadzenCard>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+
+    ChangeRoleViewModel model = new ChangeRoleViewModel();
+  //  System.IO.Stream fileStream = null;
+    string imageContent = string.Empty;
+    string fileName = string.Empty;
+
+    bool isBusy = false;
+   // bool checkBoxValue;
+
+   // ElementReference inputReference;
+
+    //Сообщения об ошибках
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+
+
+
+    async Task editUserAsync()
+    {
+        isBusy = true;
+
+
+
+
+        var result = await usersService.EditUserAsync(model);
+        if (result.IsSuccess)
+        {
+            message = "Редактирование завершено";
+            messageType = Models.AlertMessageType.Success;
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+
+        isBusy = false;
+
+    }
+
+    async Task getUsersById()
+    {
+        isBusy = true;
+
+        var result = await usersService.GetUsersByIdAsync(Id);
+        if (result.IsSuccess)
+        {
+            model.UserId = result.Record.UserId;
+            model.UserEmail = result.Record.UserEmail;
+            model.Roles = result.Record.Roles;
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+
+        isBusy = false;
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var userState = authenticationState.Result;
+        string accessToken = userState.User.FindFirst("AccessToken").Value;
+        usersService.AccessToken = accessToken;
+        await getUsersById();
+    }
+
+
+    void OnChange(bool? value, string name)
+    {
+
+    }
+
+}

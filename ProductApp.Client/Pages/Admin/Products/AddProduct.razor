@@ -83,6 +83,7 @@
     {
         isBusy = true;
 
+        //TODO - Добавить туда где есть запросы!!!!!!!
         var userState = authenticationState.Result;
         productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
         model.CoverFile = fileStream;

@@ -39,7 +39,7 @@ namespace ProductApp.Server.Services
         public IEnumerable<UserOrder> GetPurchase(int pageSize, int pageNumber, string userId, out int totalProducts)
         {
             //TODO: IsDeleted - Нужно добавить? смотри GetAllUserProductsAsync УБРАТЬ USERPROFILE или ПРОВОДИТЬ СРАВНЕНИЕ ПО НЕМУ А НЕ ПО o.UserId == userId
-            var allProducts = _db.UserOrders.Where(o => o.Status == Status.Buy && o.UserId == userId).AsNoTracking();
+            var allProducts = _db.UserOrders.Where(o => o.Status == OrderStatus.Buy && o.UserId == userId).AsNoTracking();
 
             totalProducts = allProducts.Count();
          

@@ -1,0 +1,168 @@
+﻿
+
+@page "/admin/users"
+@*@page "/products/{PageNumber:int}"*@
+@inject UsersService usersService
+@inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
+
+@if (string.IsNullOrWhiteSpace(Query))
+{
+    <h2>Пользователи @*- Страница: @PageNumber*@</h2>
+}
+else
+{
+    <h2>Пользователи - Результат поиска: '@Query' - Страница: @PageNumber</h2>
+}
+
+@if (isBusy)
+{
+    <h2>Загрузка...</h2>
+}
+else
+{
+<div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
+    <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
+    <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getUsersAsync()" />
+    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="person_add_alt_1" Text="Добавить пользователя" Click=' () => navigationManager.NavigateTo($"/admin/users/create")' class="btn-block" />
+</div>
+    <hr />
+    <div class="row">
+        @foreach (var user in users)
+        {
+            @*<div class="col-4">*@
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">  
+                <div class="row">
+
+                    <a href='/products/details/@user.Id'> @user.Email </a>
+                    <p>Электронная почта: @user.Email</p>
+
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Icon="build" Text="Изменить" Click=' () => navigationManager.NavigateTo($"/users/details/{user.Id}")' class="btn-block" />
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="person_remove" Text="Удалить" class="btn-block" Click="() => selectUsers(user.Id)" />
+                    @if (selectedUserId == user.Id)
+                    {
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteUserAsync()" />
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectUsers()" />
+                    }
+                </div>
+            </RadzenCard>
+            @*</div>*@
+        }
+
+    </div>
+    <hr />
+    <div class="row">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            int page = i;
+            @if (page == PageNumber)
+            {
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Disabled="true" Style="margin:8px;" />
+            }
+            else
+            {
+                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="@i.ToString()" Click="async () => await moveToPageAsync(page)" Style="margin:8px;" />
+            }
+        }
+
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    public string Query { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+    List<EditUserViewModel> users = new List<EditUserViewModel>();
+
+    int totalPages = 1;
+
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    async Task getUsersAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        usersService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+
+
+        if (PageNumber == null)
+            PageNumber = 1;
+
+        CollectionPagingResponse<EditUserViewModel> result;
+        if (string.IsNullOrWhiteSpace(Query))
+            result = await usersService.GetAllUsersByPageAsync(PageNumber.Value);
+        else
+            result = await usersService.SearchUsersByPageAsync(Query, PageNumber.Value);
+
+        // 50 plans | page size = 10 => 5 pages
+        // 54 plans | page size = 10 => 5 pages -> page = 4 plans
+        if (result.IsSuccess)// Добавить вывод ошибок
+        {
+            if (result.Count % result.PageSize == 0)
+                totalPages = result.Count / result.PageSize;
+            else
+                totalPages = (result.Count / result.PageSize) + 1;
+
+            users = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+
+    async Task moveToPageAsync(int pageNumber)
+    {
+        PageNumber = pageNumber;
+        await getUsersAsync();
+    }
+
+    string selectedUserId = string.Empty;
+
+    void selectUsers(string id)
+    {
+        selectedUserId = id;
+
+    }
+
+    void cancelSelectUsers()
+    {
+        selectedUserId = String.Empty;
+
+    }
+
+    async Task deleteUserAsync()
+    {
+        isBusy = true;
+        var result = await usersService.DeleteUserAsync(selectedUserId);
+        if (result.IsSuccess)
+        {
+            var deletedProducts = users.SingleOrDefault(p => p.Id == selectedUserId);
+            users.Remove(deletedProducts);
+        }
+        else
+        {
+            await getUsersAsync();
+        }
+        isBusy = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await getUsersAsync();
+    }
+
+}

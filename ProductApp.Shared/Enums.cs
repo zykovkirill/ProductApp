@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ProductApp.Shared.Models
 {
-    /// <summary>Статус</summary>
-    public enum Status
+    /// <summary>Статус заказа</summary>
+    public enum OrderStatus
     {
         /// <summary>Неизвестно что</summary>
         None = 0,
@@ -26,20 +26,6 @@ namespace ProductApp.Shared.Models
         Cancel = 7,
     }
 
-    //TODO: убрать или переделать
-    /// <summary>Роли</summary>
-    public enum Roles
-    {
-        /// <summary>Неизвестно что</summary>
-        None = 0,
-        /// <summary>Администратор</summary>
-        Admin = 1,
-        /// <summary>Модератор</summary>
-        Moderator = 2,
-        /// <summary>Пользователь</summary>
-        User = 3
-    }
-    //TODO: как лучше хранить в БД инфу в string или с помощью
     /// <summary>
     /// Типы продуктов связаны с ProductType в Utils
     /// </summary>

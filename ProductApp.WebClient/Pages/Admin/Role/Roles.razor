@@ -1,0 +1,133 @@
+﻿
+
+@page "/admin/roles"
+@inject RolesService rolesService
+@inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
+
+<h2>Роли</h2>
+
+@if (isBusy)
+{
+    <h2>Загрузка...</h2>
+}
+else
+{
+
+<div class="row">
+    <AlertMessage Message="@message" MessageType="@messageType" />
+    <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
+    <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getRolesAsync()" />
+    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="library_add" Text="Добавить роль" Click=' () => navigationManager.NavigateTo($"/admin/roles/create")' class="btn-block" />
+</div>
+    <hr />
+
+
+    <div class="row">
+        @foreach (var role in roles)
+        {
+
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                <div class="row">
+
+                    <a href='/products/details/@role.Id'> @role.Name </a>
+                    <p>Роль: @role.Name</p>
+
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Icon="build" Text="Изменить" Click=' () => navigationManager.NavigateTo($"/roles/details/{role.Id}")' class="btn-block" />
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete_sweep" Text="Удалить" class="btn-block" Click="() => selectRoles(role.Id)" />
+                    @if (selectedRoleId == role.Id)
+                    {
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="done" Text="Подтвердить" class="btn-block" Click="async () => await deleteRoleAsync()" />
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Icon="cancel" Text="Отмена" class="btn-block" Click="() => cancelSelectRoles()" />
+                    }
+                </div>
+            </RadzenCard>
+        }
+
+    </div>
+    <hr />
+
+}
+
+
+@code {
+    [Parameter]
+    public int? PageNumber { get; set; }
+
+    [Parameter]
+    public string Query { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+    List<RoleViewModel> roles = new List<RoleViewModel>();
+
+   // int totalPages = 1;
+
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    async Task getRolesAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        rolesService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+        if (PageNumber == null)
+            PageNumber = 1;
+
+        CollectionResponse<RoleViewModel> result;
+
+        result = await rolesService.GetAllRolesByPageAsync();
+
+        if (result.IsSuccess)// Добавить вывод ошибок
+        {
+            roles = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+
+
+    string selectedRoleId = string.Empty;
+
+    void selectRoles(string id)
+    {
+        selectedRoleId = id;
+
+    }
+
+    void cancelSelectRoles()
+    {
+        selectedRoleId = String.Empty;
+
+    }
+
+
+    async Task deleteRoleAsync()
+    {
+        isBusy = true;
+        var result = await rolesService.DeleteRoleAsync(selectedRoleId);
+        if (result.IsSuccess)
+        {
+            var deletedRoles = roles.SingleOrDefault(p => p.Id == selectedRoleId);
+            roles.Remove(deletedRoles);
+        }
+        else
+        {
+            await getRolesAsync();
+        }
+        isBusy = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await getRolesAsync();
+    }
+
+}

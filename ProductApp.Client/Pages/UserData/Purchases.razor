@@ -76,7 +76,7 @@ else
 
         CollectionPagingResponse<UserOrder> result;
 
-        result = await productsService.GetPurchasesAsync();
+        result = await productsService.GetPurchasesAsync(PageNumber.Value);
 
         // 50 plans | page size = 10 => 5 pages
         // 54 plans | page size = 10 => 5 pages -> page = 4 plans

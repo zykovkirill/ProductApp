@@ -1,0 +1,103 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <img src="/images/LogoSite.png" alt="Акула" width="50px" />
+    <a class="navbar-brand" href="">TrustSoft</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <AuthorizeView Roles="Admin, User">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="userproducts">
+                    <span class="oi oi-box" aria-hidden="true"></span> Мои продукты
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="edituserproducts">
+                    <span class="oi oi-brush" aria-hidden="true"></span> Редактор
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="UserData/Purchases">
+                    <span class="oi oi-flag" aria-hidden="true"></span> Заказы
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="UserData/Cart">
+                    <span class="oi oi-cart" aria-hidden="true"></span> Корзина
+                </NavLink>
+            </li>
+        </AuthorizeView>
+        <AuthorizeView Roles="Admin">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="admin/users">
+                    <span class="oi oi-people" aria-hidden="true"></span> Пользователи
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="adminproducts">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span>Администратор
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="Settings">
+                    <span class="oi oi-wrench" aria-hidden="true"></span>Настройки
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="admin/roles">
+                    <span class="oi oi-justify-center" aria-hidden="true"></span> Роли
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="products/addproduct">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Добавить продукт
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="products/addproduct">
+                    <span class="oi oi-layers" aria-hidden="true"></span> Добавить тип продукта
+                </NavLink>
+            </li>
+        </AuthorizeView>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Домой
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="products">
+                <span class="oi oi-list" aria-hidden="true"></span> Продукты
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="UserData/profile">
+                <span class="oi oi-person" aria-hidden="true"></span> Профиль
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="about">
+                <span class="oi oi-task" aria-hidden="true"></span> О Нас
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="privacy">
+                <span class="oi oi-book" aria-hidden="true"></span>Политика
+            </NavLink>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+
+    }
+
+}

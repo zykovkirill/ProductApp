@@ -1,0 +1,59 @@
+﻿@page "/admin/roles/create"
+@inject RolesService rolesService
+@inject IFileReaderService fileReaderService
+@inject NavigationManager navigatorManager
+@using System.IO;
+
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Добавить роль</h3>
+
+<div class="row">
+    <div class=" =col-6">
+        <EditForm Model="model" OnValidSubmit="async () => await postRoleAsync() ">
+            <RadzenCard>
+                <AlertMessage Message="@message" MessageType="@messageType" />
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <Radzen.Blazor.RadzenTextArea Placeholder="Имя роли" @bind-Value="model.Name" Style="margin:10px;" />
+                <hr />
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" ButtonStyle="Radzen.ButtonStyle.Success" Disabled="isBusy" Style="margin:5px" class="btn-block" Text="Отправить" />
+            </RadzenCard>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    RoleViewModel model = new RoleViewModel();
+    bool isBusy = false;
+
+    //Сообщения об ошибках
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+
+    async Task postRoleAsync()
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        rolesService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+        var result = await rolesService.PostRoleAsync(model);
+        if (result.IsSuccess)
+            navigatorManager.NavigateTo("/admin/roles");
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+
+        isBusy = false;
+
+    }
+
+}
