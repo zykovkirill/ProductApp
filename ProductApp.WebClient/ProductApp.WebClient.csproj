@@ -5,35 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\images\1.jpg" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\LogoSite.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\logoText.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\logotype.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\toys_background.jpg" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\toy_1.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\toy_2.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\свидетельство.jpg" />
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\decode.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\script.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\script.js.map" />
-    <_ContentIncludedByDefault Remove="wwwroot\scripts\script.ts" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.data" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.framework.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.loader.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\Build\web.wasm" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\index.html" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\base.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\favicon.ico" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\fullscreen-button.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-empty-dark.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-empty-light.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-full-dark.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\progress-bar-full-light.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\shark.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\style.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\unity-logo-dark.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\unity-logo-light.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\unity\P00340\web\TemplateData\webgl-logo.png" />
+    <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
+    <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
+    <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
+    <None Include="wwwroot\css\open-iconic\README.md" />
+    <None Include="wwwroot\debug.log" />
+    <None Include="wwwroot\scripts\decode.js" />
+    <None Include="wwwroot\scripts\script.js" />
+    <None Include="wwwroot\scripts\script.js.map" />
+    <None Include="wwwroot\unity\P00340\web\Build\web.data" />
+    <None Include="wwwroot\unity\P00340\web\Build\web.framework.js" />
+    <None Include="wwwroot\unity\P00340\web\Build\web.loader.js" />
+    <None Include="wwwroot\unity\P00340\web\Build\web.wasm" />
+    <None Include="wwwroot\unity\P00340\web\TemplateData\base.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,8 +26,12 @@
     <PackageReference Include="Blazored.SessionStorage" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.11" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.4.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Radzen.Blazor" Version="3.11.6" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
@@ -51,6 +40,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProductApp.Shared\ProductApp.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\scripts\script.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,5 +60,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties wwwroot_4tsconfig_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

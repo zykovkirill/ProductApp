@@ -13,8 +13,7 @@ namespace ProductApp.Server.Services
     //TODO: Обобщить интерфейс
     public interface IProductsService
     {
-        // Сделать region для продуктов, продуктов пользователя и продуктов в корзине
-        // TODO: Убрать лишнюю реализацию методов или перенести в другой интерфейс
+        // Сделать region для продуктов, продуктов пользователя 
         IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts);
         IEnumerable<Product> SearchProductsAsync(string query, int pageSize, int pageNumber, out int totalProducts);
         IEnumerable<Product> FilterProductsAsync(string filter, int pageSize, int pageNumber, out int totalProducts);
@@ -24,11 +23,9 @@ namespace ProductApp.Server.Services
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
         Product GetProductByName(string name);
-        Task<UserOrder> GetProductsFromCart(string userId);
         IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts);
         Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath);
         Task<UserCreatedProduct> GetUserProductById(string id);
-        Task<UserOrder> AddOrderAsync(UserOrder model);
     }
 
     public class ProductsService : IProductsService
@@ -56,14 +53,6 @@ namespace ProductApp.Server.Services
 
             return product;
         }
-
-        public async Task<UserOrder> GetProductsFromCart(string userId)
-        {
-            //TODO: AsNoTracking добавить туда где данные не изменяются
-            var cart = await _db.UserOrders.Include(p => p.Products).AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.Status == OrderStatus.Cart);
-            return cart;
-        }
-
 
         public async Task<Product> DeleteProductAsync(string id)
         {
@@ -186,7 +175,7 @@ namespace ProductApp.Server.Services
         /// <returns></returns>
         public async Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId)
         {
-            //TODO:сделать отдельный сервис для сохранения изображения
+            //TODO:сделать отдельный сервис для сохранения и работы с  изображениями
             
             var profile = await _db.UserProfiles.Include(p => p.UserCreatedProducts).FirstOrDefaultAsync(pr => pr.UserId == userId);
             profile.UserCreatedProducts.Add(model);
@@ -225,52 +214,6 @@ namespace ProductApp.Server.Services
                 return null;
 
             return product;
-        }
-
-        public async Task<UserOrder> AddOrderAsync(UserOrder model)
-        {
-            //TODO: Логика с присваиванием модели не самый лучший вариант, мб оcтавить несколько ордеров со статусом корзина
-            try
-            {
-                if (model.Status == OrderStatus.Cart)
-                {
-                    var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == model.UserId && u.Status == OrderStatus.Cart);
-                    if (order != null)
-                    {
-                        order.TotalSum = model.TotalSum;
-                        order.Products = model.Products;
-                        order.ProductCount = model.ProductCount;
-                        _db.UserOrders.Update(order);
-                    }
-                    else
-                        await _db.UserOrders.AddAsync(model);
-                }
-                else if (model.Status == OrderStatus.Buy)
-                {
-                    var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.Id == model.Id);
-                    if (order != null)
-                        _db.UserOrders.Update(model);
-                    else
-                        await _db.UserOrders.AddAsync(model);
-
-                  
-                    //TODO: Может быть возвращать статусы ок или не ок
-                    //TODO: Task завернуть в исключения и логировать
-                    //TODO: Использовать Update везде где меняем данные
-                }
-                var history = new OrderHistory()
-                {
-                    IdOrder = model.Id,
-                    Status = model.Status
-                };
-                await _db.PurchasesHistorys.AddAsync(history);
-                await _db.SaveChangesAsync();
-            }
-            catch
-            {
-                return null;
-            }
-            return model;
         }
     }
 

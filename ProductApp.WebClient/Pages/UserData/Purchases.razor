@@ -1,7 +1,6 @@
 ﻿
-
 @page "/UserData/Purchases"
-@inject ProductsService productsService
+@inject UserDataService userDataService
 @inject NavigationManager navigationManager
 @attribute [Authorize(Roles = "Admin, User")]
 
@@ -69,14 +68,14 @@ else
         isBusy = true;
 
         var userState = authenticationState.Result;
-        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+        userDataService.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
         if (PageNumber == null)
             PageNumber = 1;
 
         CollectionPagingResponse<UserOrder> result;
 
-        result = await productsService.GetPurchasesAsync(PageNumber.Value);
+        result = await userDataService.GetPurchasesAsync(PageNumber.Value);
 
         // 50 plans | page size = 10 => 5 pages
         // 54 plans | page size = 10 => 5 pages -> page = 4 plans
@@ -116,22 +115,6 @@ else
         selectedUserId = String.Empty;
 
     }
-
-    //async Task deleteProductAsync()
-    //{
-    //    isBusy = true;
-    //    var result = await productsService.DeleteProductFromCartAsync(selectedUserId);
-    //    if (result.IsSuccess)
-    //    {
-    //        var deletedProducts = purchases.SingleOrDefault(p => p.Id == selectedUserId);
-    //        purchases.Remove(deletedProducts);
-    //    }
-    //    else
-    //    {
-    //        await getPurchasesAsync();
-    //    }
-    //    isBusy = false;
-    //}
 
     protected override async Task OnInitializedAsync()
     {

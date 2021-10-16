@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ProductApp.Shared.Models.UserData;
 using ProductApp.Shared.Models;
+using System.Net.Http;
 
 namespace ProductApp.WebClient.Services
 {
@@ -28,6 +29,7 @@ namespace ProductApp.WebClient.Services
                 client.AccessToken = value;
             }
         }
+
         /// <summary>
         /// Получить профиль пользователя
         /// </summary>
@@ -39,37 +41,46 @@ namespace ProductApp.WebClient.Services
         }
 
 
-        ///// <summary>
-        ///// Получить профиль пользователя
-        ///// </summary>
-        ///// <returns></returns>
-        //public async Task<OperationResponse<UserProfile>> GetUserCartAsync()
-        //{
-        //    var response = await client.GetProtectedAsync<OperationResponse<UserProfile>>($"{_baseUrl}/api/userdata");
-        //    return response.Result;
-        //}
+        /// <summary>
+        /// Добавление заказа
+        /// </summary>
+        public async Task<OperationResponse<UserOrder>> AddOrderAsync(UserOrder userOrder)
+        {
+            //TODO: Переписать используя этот запрос вместо await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
+            using (var client1 = new HttpClient())
+            {
+                client1.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", client.AccessToken);
+                var response1 = await client1.PostAsJsonAsync($"{_baseUrl}/api/usercart", userOrder);
+                response1.EnsureSuccessStatusCode();
+                return await response1.Content.ReadAsAsync<OperationResponse<UserOrder>>();
+            }
 
+            // var response = await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
+            //  return response.Result;
+        }
 
-        ///// <summary>
-        ///// Получить все продукты по id
-        ///// </summary>
-        ///// <param name="id"> ID продукта </param>
-        ///// <returns></returns>
-        //public async Task<OperationResponse<ChangeRoleViewModel>> GetUsersByIdAsync(string id)
-        //{
-        //    var response = await client.GetProtectedAsync<OperationResponse<ChangeRoleViewModel>>($"{_baseUrl}/api/users/edit?id={id}");
-        //    return response.Result;
-        //}
+        /// <summary>
+        /// Получить  корзину с продуктами 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<OperationResponse<UserOrder>> GetUserOrderAsync()
+        {
+            //TODO: Создать единый контроллер UserOrder вместо usercart и userpurchases
+            var response = await client.GetProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart/GetProductFromCart");
+            return response.Result;
+        }
 
-        ///// <summary>
-        ///// Редактировать пользователя  с помощью API
-        ///// </summary>
-        ///// <param name="model"> Обьект для добавления представляющий продукт </param>
-        ///// <returns></returns>
-        //public async Task<UserManagerResponse> EditUserAsync(ChangeRoleViewModel model)
-        //{
-        //    var response = await client.PutProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", model);
-        //    return response.Result;
-        //}
+        //TODO : Объеденить запросы GetUserOrderAsync и GetPurchasesAsync добавить в параметр тип статус основная проблемма в CollectionPagingResponse
+        /// <summary>
+        /// Получить  заказы и их статус
+        /// </summary>
+        /// <returns></returns>
+        public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync(int page)
+        {
+            //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
+            //TODO: Изображение сохраняется не с тем размеров в ПРОДУКТАХ ПОЛЬЗОВАТЕЛЯ!!!!! КРИТТТТТ!!!!
+            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/UserPurchases?page={page}");
+            return response.Result;
+        }
     }
 }

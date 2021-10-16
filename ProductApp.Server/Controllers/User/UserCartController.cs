@@ -23,11 +23,11 @@ namespace WebAPIApp.Controllers
     public class UserCartController : ControllerBase
     {
         //TODO: Разделить IProductsService на несколько интерфейсов
-        private readonly IProductsService _productsService;
+        private readonly IUserDataService _userDataService;
         private readonly IConfiguration _configuration;
-        public UserCartController(IProductsService productsService, IConfiguration configuration)
+        public UserCartController(IUserDataService userDataService, IConfiguration configuration)
         {
-            _productsService = productsService;
+            _userDataService = userDataService;
             _configuration = configuration;
         }
 
@@ -39,7 +39,7 @@ namespace WebAPIApp.Controllers
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var userOrder = await _productsService.GetProductsFromCart(userId);
+            var userOrder = await _userDataService.GetProductsFromCart(userId);
             if (userOrder == null)
                 return
                      Ok(new OperationResponse<UserOrder>
@@ -72,7 +72,7 @@ namespace WebAPIApp.Controllers
             {
                 if (string.IsNullOrEmpty(model.UserId))
                     model.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                var purchase = await _productsService.AddOrderAsync(model);
+                var purchase = await _userDataService.AddOrderAsync(model);
                 if (purchase == null)
                     return
                         BadRequest(new OperationResponse<UserOrder>

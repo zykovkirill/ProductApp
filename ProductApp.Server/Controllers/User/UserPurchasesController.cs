@@ -19,13 +19,13 @@ namespace ProductApp.Server.Controllers.User
     public class UserPurchasesController : Controller
     {
         //TODO: Разделить IProductsService на несколько интерфейсов
-        private readonly IPurchasesService _purchasesService;
+        private readonly IUserDataService _userDataService;
         private readonly IConfiguration _configuration;
         private const int PAGE_SIZE = 10;
 
-        public UserPurchasesController(IPurchasesService purchasesService, IConfiguration configuration)
+        public UserPurchasesController(IUserDataService userDataService, IConfiguration configuration)
         {
-            _purchasesService = purchasesService;
+            _userDataService = userDataService;
             _configuration = configuration;
         }
 
@@ -38,7 +38,7 @@ namespace ProductApp.Server.Controllers.User
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var purchase = _purchasesService.GetPurchase(PAGE_SIZE, page, userId, out totalProducts);
+            var purchase = _userDataService.GetPurchase(PAGE_SIZE, page, userId, out totalProducts);
 
             int totalPages = 0;
             if (totalProducts % PAGE_SIZE == 0)

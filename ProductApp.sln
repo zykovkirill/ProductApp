@@ -2,16 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductApp.Client", "ProductApp.Client\ProductApp.Client.csproj", "{FD7E9E6A-D646-447D-A99B-ED6332AA0038}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AAC1E65F-EBCC-48FB-821E-468FF9B2261A} = {AAC1E65F-EBCC-48FB-821E-468FF9B2261A}
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductApp.Shared", "ProductApp.Shared\ProductApp.Shared.csproj", "{AAC1E65F-EBCC-48FB-821E-468FF9B2261A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductApp.Server", "ProductApp.Server\ProductApp.Server.csproj", "{17690F4E-FA8F-49E1-B48B-A92CEFF3CFA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductApp.WebClient", "ProductApp.WebClient\ProductApp.WebClient.csproj", "{AEE846D8-59FE-4EF0-A088-D617C8F42ECD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductApp.WebClient", "ProductApp.WebClient\ProductApp.WebClient.csproj", "{AEE846D8-59FE-4EF0-A088-D617C8F42ECD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,18 +18,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Debug|x64.Build.0 = Debug|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Debug|x86.Build.0 = Debug|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Release|x64.ActiveCfg = Release|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Release|x64.Build.0 = Release|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Release|x86.ActiveCfg = Release|Any CPU
-		{FD7E9E6A-D646-447D-A99B-ED6332AA0038}.Release|x86.Build.0 = Release|Any CPU
 		{AAC1E65F-EBCC-48FB-821E-468FF9B2261A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAC1E65F-EBCC-48FB-821E-468FF9B2261A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAC1E65F-EBCC-48FB-821E-468FF9B2261A}.Debug|x64.ActiveCfg = Debug|Any CPU

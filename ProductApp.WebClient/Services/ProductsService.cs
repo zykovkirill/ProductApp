@@ -134,48 +134,6 @@ namespace ProductApp.WebClient.Services
             return response.Result;
         }
 
-        /// <summary>
-        /// Добавление заказа
-        /// </summary>
-        public async Task<OperationResponse<UserOrder>> AddOrderAsync(UserOrder userOrder)
-        {
-            //TODO: Переписать используя этот запрос вместо await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
-            using (var client1 = new HttpClient())
-            {
-                client1.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",client.AccessToken); 
-                var response1 = await client1.PostAsJsonAsync($"{_baseUrl}/api/usercart", userOrder);
-                response1.EnsureSuccessStatusCode();
-                return await response1.Content.ReadAsAsync<OperationResponse<UserOrder>>();
-            }
-
-           // var response = await client.PostProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart", userOrder);
-          //  return response.Result;
-        }
-
-        /// <summary>
-        /// Получить  корзину с продуктами 
-        /// </summary>
-        /// <returns></returns>
-        public async Task<OperationResponse<UserOrder>> GetUserOrderAsync()
-        {
-            //TODO: Создать единый контроллер UserOrder вместо usercart и userpurchases
-            var response = await client.GetProtectedAsync<OperationResponse<UserOrder>>($"{_baseUrl}/api/usercart/GetProductFromCart");
-            return response.Result;
-        }
-
-        //TODO : Объеденить запросы GetUserOrderAsync и GetPurchasesAsync добавить в параметр тип статус основная проблемма в CollectionPagingResponse
-        /// <summary>
-        /// Получить  заказы и их статус
-        /// </summary>
-        /// <returns></returns>
-        public async Task<CollectionPagingResponse<UserOrder>> GetPurchasesAsync(int page)
-        {
-            //TODO: Создать отдельный класс PurchaseService вынести его из ProductService
-            //TODO: Изображение сохраняется не с тем размеров в ПРОДУКТАХ ПОЛЬЗОВАТЕЛЯ!!!!! КРИТТТТТ!!!!
-            var response = await client.GetProtectedAsync<CollectionPagingResponse<UserOrder>>($"{_baseUrl}/api/userpurchases?page={page}");
-            return response.Result;
-        }
-
         public async Task<CollectionPagingResponse<UserCreatedProduct>> GetAllUserProductsByPageAsync(int page = 1)
         {
             // var str = page.ToString();

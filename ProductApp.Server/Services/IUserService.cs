@@ -40,7 +40,7 @@ namespace ProductApp.Server.Services
         private ApplicationDbContext _db;
         private const string _roleUser = /*"Admin";*/"User";
 
-        public UserService(UserManager<IdentityUser> userManager, /*RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
+        public UserService(UserManager<IdentityUser> userManager,/* RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
         {
             _db = db;
             _userManager = userManager;
@@ -83,12 +83,22 @@ namespace ProductApp.Server.Services
 
                     string url = $"{_configuration["AppUrl"]}/api/auth/confirmemail?userid={identityUser.Id}&token={validEmailToken}";
 
+                    UserProfile userProfile = new UserProfile
+                    {
+                        UserId = identityUser.Id,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName
+                    };
+
+                    await _db.UserProfiles.AddAsync(userProfile);
+                    await _db.SaveChangesAsync();
+
                     // TODO: Иногда возникает ошибка с подтверждением 
                     try
                     {
                         await _mailService.SendEmailAsync(identityUser.Email, "Подтвердите свой email", "<h1>Добро пожаловать</h1>" + $"<p>Пожалуйста подтвердите свою электронную почту <a href = '{url}'>Нажмите сюда</a></p>");
                     }
-                    catch (Exception ex)
+                    catch 
                     {
                         //TODO: Добавить в бд записи об ошибках
                         //Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !" + ex.Message);
@@ -101,15 +111,6 @@ namespace ProductApp.Server.Services
                         };
                     }
 
-                    UserProfile userProfile = new UserProfile
-                    {
-                        UserId = identityUser.Id,
-                        FirstName = model.FirstName,
-                        LastName = model.LastName
-                    };
-
-                    await _db.UserProfiles.AddAsync(userProfile);
-                    await _db.SaveChangesAsync();
                     // TODO: Переименовать IUserService 
                     // TODO: Отправлять подтверждение Email
                     return new UserManagerResponse
@@ -190,8 +191,8 @@ namespace ProductApp.Server.Services
             LocalUserInfo localUserInfo = new LocalUserInfo()
             {
                 Email = user.Email,
-                FirstName = data.FirstName,
-                LastName = data.LastName,
+                FirstName = data?.FirstName,
+                LastName = data?.LastName,
                 Id = user.Id,
                 AccessToken = tokenAsString,
                 Roles = claimsRoleList.Select(c => c.Value).ToList()

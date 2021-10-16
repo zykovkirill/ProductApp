@@ -46,6 +46,15 @@ https://docs.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?
 !!! https://answers.unity.com/questions/1181369/uncaught-rangeerror-maximum-call-stack-size-exceed.html - ПРИ ПЕРЕПОЛНЕНИИ СТЕКА ОЧИСТЬ КЕШ
 
 
+При Проектирование учитывать
+1) В клиенте при запросе к серверу  //TODO - Добавить туда где есть запросы!!!!!!!
+        var userState = authenticationState.Result;
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+2) Модель которая храниться в бд наследуется от RECORD
+
+
+
+
 
 CORS - необходимо настроить 
 https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino?hl=ru https://metanit.com/sharp/articles/mvc/14.php

@@ -80,8 +80,9 @@ namespace ProductApp.Server
             services.AddTransient<IMailService, SendGridMailService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAdminService, AdminService>();
+            //TODO : AddScoped или AddTransient
             services.AddTransient<IProductsService, ProductsService>();
-            services.AddTransient<IPurchasesService, PurchasesService>();
+            services.AddTransient<IUserDataService, UserDataService>();
             services.AddControllers();
             services.AddCors(options =>
             {

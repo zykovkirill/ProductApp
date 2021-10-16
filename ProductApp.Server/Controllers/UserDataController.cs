@@ -26,8 +26,6 @@ namespace WebAPIApp.Controllers
             _db = context;
         }
 
-
-
         #region Get
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserProfile>))]
         [HttpGet]
