@@ -39,6 +39,8 @@ https://docs.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?
 30) Взаимодействие JS c BLAZOR передача токена в Unity https://www.youtube.com/watch?v=3g0N__K7Wlo
 31) Очистить не нужные ссылки на сборки
 
+Обратить внимание на патерн https://dev.to/moe23/step-by-step-repository-pattern-and-unit-of-work-with-asp-net-core-5-3l92
+
  ПРИ СБОРКИ КОПИРУЕМ СКРИП из INDEX в папку TAMPLATEDATA под названием base.js, а также меняем стили комментируем /*#unity-container { position: absolute }
 #unity-container.unity-desktop { left: 50%; top: 50%; transform: translate(-50%, -50%) }*/
 ПРИМЕР Base.js находится в папке "файлы для сборки"
