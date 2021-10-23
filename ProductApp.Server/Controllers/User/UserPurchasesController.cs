@@ -21,7 +21,7 @@ namespace ProductApp.Server.Controllers.User
         //TODO: Разделить IProductsService на несколько интерфейсов
         private readonly IUserDataService _userDataService;
         private readonly IConfiguration _configuration;
-        private const int PAGE_SIZE = 10;
+        private const int _pageSize = 10;
 
         public UserPurchasesController(IUserDataService userDataService, IConfiguration configuration)
         {
@@ -38,13 +38,13 @@ namespace ProductApp.Server.Controllers.User
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var purchase = _userDataService.GetPurchase(PAGE_SIZE, page, userId, out totalProducts);
+            var purchase = _userDataService.GetPurchase(_pageSize, page, userId, out totalProducts);
 
             int totalPages = 0;
-            if (totalProducts % PAGE_SIZE == 0)
-                totalPages = totalProducts / PAGE_SIZE;
+            if (totalProducts % _pageSize == 0)
+                totalPages = totalProducts / _pageSize;
             else
-                totalPages = (totalProducts / PAGE_SIZE) + 1;
+                totalPages = (totalProducts / _pageSize) + 1;
 
             return Ok(new CollectionPagingResponse<UserOrder>
             {
@@ -52,7 +52,7 @@ namespace ProductApp.Server.Controllers.User
                 IsSuccess = true,
                 Message = "Продукты переданы",
                 OperationDate = DateTime.UtcNow,
-                PageSize = PAGE_SIZE,
+                PageSize = _pageSize,
                 Page = page,
                 Records = purchase
             });

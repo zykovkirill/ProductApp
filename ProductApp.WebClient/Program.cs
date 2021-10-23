@@ -35,7 +35,6 @@ namespace ProductApp.WebClient
                 return new UserDataService(URL);
             });
 
-            //TODO: Обьеденить UsersService и RolesService в AdminsService
             builder.Services.AddScoped<UsersService>(s =>
             {
                 return new UsersService(URL);

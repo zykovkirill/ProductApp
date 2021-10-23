@@ -1,0 +1,112 @@
+﻿@page "/products/ProductInfo/{ProductId}"
+@inject ProductsService productsService
+@attribute [Authorize(Roles = "Admin, User")]
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+
+<h2> Продукт @*- Страница: @PageNumber*@</h2>
+
+
+@if (isBusy)
+{
+    <h2>Загрузка...</h2>
+}
+else
+{
+    @if (TargetProduct != null)
+    {
+        <div class="row">
+            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+                <div class="row">
+                    <RadzenImage Path="@TargetProduct.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
+                    <div class="col-md-6">
+                        <h3> @TargetProduct.Name </h3>
+                        <h3>Цена: @TargetProduct.Price</h3>
+                        <hr />
+                    </div>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Добавить" Icon="add_shopping_cart" class="btn-block" Click="() => selectProduct(TargetProduct)" />
+                    @if (selectedProduct == TargetProduct)
+                    {
+                        <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="count" Style="margin:10px;" />
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Подтвердить" Icon="done" class="btn-block" Click="async () => await addProductToCartAsync()" />
+
+                    }
+                </div>
+            </RadzenCard>
+        </div>
+    }
+}
+
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    bool isBusy = false;
+
+    private ProductInfo Info;
+    private BaseProduct TargetProduct;
+    private int count;
+
+    [Parameter]
+    public string ProductId { get; set; }
+
+    //Сообщения об ошибках
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+
+    async Task getProductInfoAsync(string id)
+    {
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+
+
+        OperationResponse<ProductApp.Shared.Models.ProductInfo> result;
+
+        result = await productsService.GetProductInfoByIdAsync(id);
+
+        if (result.IsSuccess)
+        {
+            message = $"Информация о продукте получена";
+            messageType = Models.AlertMessageType.Success;
+
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+
+
+    BaseProduct selectedProduct;
+
+    void selectProduct(BaseProduct product)
+    {
+        selectedProduct = product;
+        message = String.Empty;
+    }
+
+    async Task addProductToCartAsync()
+    {
+        isBusy = true;
+        if (count != 0)
+        {
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count);
+        }
+        message = "Продукты добавлены в корзину";
+        messageType = Models.AlertMessageType.Success;
+        isBusy = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        TargetProduct = await SessionUtils.GetProductSessionStorageAsync(sessionStorage);
+        await getProductInfoAsync(TargetProduct.Id);
+    }
+}

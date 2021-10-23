@@ -24,6 +24,10 @@ namespace ProductApp.Server.Models
 
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<ProductInfo> ProductInfos { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
+
         public DbSet<UserOrderProduct> UserOrderProducts { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
     }

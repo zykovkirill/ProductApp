@@ -12,9 +12,11 @@ namespace ProductApp.WebClient
     /// </summary>
     public static class SessionUtils
     {
+        //TODO: Сделать абстрактную фабрику продуктов
         private const string _cartSessionStorageName = "CartSessionStorage";
         private const string _productSessionStorageName = "ProductSessionStorage";
         private static bool _isCartSessionExists = false;
+       // private static bool _isProductSessionExists = false;
 
         #region Работа с сессией корзины
         public async static Task<List<UserOrderProduct>> InitOrGetCartSessionStorageAsync(ISessionStorageService sessionStorage, List<UserOrderProduct> userOrderProducts = null )
@@ -77,6 +79,20 @@ namespace ProductApp.WebClient
         {
             await sessionStorage.RemoveItemAsync(_cartSessionStorageName);
             _isCartSessionExists = false;
+        }
+        #endregion
+
+        #region Передача продукта в сессию для  отоброжения детальной информации
+        public async static Task SetProductSessionStorageAsync(ISessionStorageService sessionStorage, BaseProduct product)
+        {
+            if (product != null )
+            {
+                await sessionStorage.SetItemAsync(_productSessionStorageName, product);
+            }
+        }
+        public async static Task<BaseProduct> GetProductSessionStorageAsync(ISessionStorageService sessionStorage)
+        {
+            return await sessionStorage.GetItemAsync<BaseProduct>(_productSessionStorageName);
         }
         #endregion
     }

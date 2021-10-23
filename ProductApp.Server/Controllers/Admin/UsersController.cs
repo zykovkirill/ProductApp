@@ -17,7 +17,7 @@ namespace CustomIdentityApp.Controllers
     {
 
         private IAdminService _adminService;
-        private const int PAGE_SIZE = 10;
+        private const int _pageSize = 10;
 
         public UsersController(IAdminService adminService)
         {
@@ -34,12 +34,12 @@ namespace CustomIdentityApp.Controllers
             int totalUsers = 0;
             if (page == 0)
                 page = 1;
-            var users = _adminService.GetAllUsersAsync(PAGE_SIZE, page, out totalUsers);
+            var users = _adminService.GetAllUsersAsync(_pageSize, page, out totalUsers);
             int totalPages = 0;
-            if (totalUsers % PAGE_SIZE == 0)
-                totalPages = totalUsers / PAGE_SIZE;
+            if (totalUsers % _pageSize == 0)
+                totalPages = totalUsers / _pageSize;
             else
-                totalPages = (totalUsers / PAGE_SIZE) + 1;
+                totalPages = (totalUsers / _pageSize) + 1;
 
             return Ok(new CollectionPagingResponse<IdentityUser>
             {
@@ -47,7 +47,7 @@ namespace CustomIdentityApp.Controllers
                 IsSuccess = true,
                 Message = "Users received successfully!",
                 OperationDate = DateTime.UtcNow,
-                PageSize = PAGE_SIZE,
+                PageSize = _pageSize,
                 Page = page,
                 Records = users
             });

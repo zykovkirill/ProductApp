@@ -24,7 +24,7 @@ namespace WebAPIApp.Controllers
     {
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
-        private const int PAGE_SIZE = 10;
+        private const int _pageSize = 10;
         private readonly ILogger<UserProductsController> _logger;
 
         private readonly List<string> allowedExtensions = new List<string>
@@ -46,13 +46,13 @@ namespace WebAPIApp.Controllers
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.GetAllUserProductsAsync(PAGE_SIZE, page, userId, out totalProducts);
+            var products = _productsService.GetAllUserProductsAsync(_pageSize, page, userId, out totalProducts);
 
             int totalPages = 0;
-            if (totalProducts % PAGE_SIZE == 0)
-                totalPages = totalProducts / PAGE_SIZE;
+            if (totalProducts % _pageSize == 0)
+                totalPages = totalProducts / _pageSize;
             else
-                totalPages = (totalProducts / PAGE_SIZE) + 1;
+                totalPages = (totalProducts / _pageSize) + 1;
             //TODO: Протестировать логи заключить их в try
             _logger.LogInformation("Продукты переданы");
             return Ok(new CollectionPagingResponse<UserCreatedProduct>
@@ -61,7 +61,7 @@ namespace WebAPIApp.Controllers
                 IsSuccess = true,
                 Message = "Продукты переданы",
                 OperationDate = DateTime.UtcNow,
-                PageSize = PAGE_SIZE,
+                PageSize = _pageSize,
                 Page = page,
                 Records = products
             });        

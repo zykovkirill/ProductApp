@@ -7,7 +7,6 @@ using ProductApp.Shared.Models;
 
 namespace ProductApp.WebClient.Services
 {
-    //TODO: Объеденить в единый админ сервис
     public class UsersService
     {
         private readonly string _baseUrl;

@@ -68,6 +68,17 @@ namespace ProductApp.WebClient.Services
         }
 
         /// <summary>
+        /// Получить информацию о продукте 
+        /// </summary>
+        /// <param name="id"> ID продукта </param>
+        /// <returns></returns>
+        public async Task<OperationResponse<ProductInfo>> GetProductInfoByIdAsync(string id)
+        {
+            var response = await client.GetProtectedAsync<OperationResponse<ProductInfo>>($"{_baseUrl}/api/products/edit?id={id}");
+            return response.Result;
+        }
+
+        /// <summary>
         /// Получить все продукты с помощью API
         /// </summary>
         /// <param name="page"> Номер страницы </param>

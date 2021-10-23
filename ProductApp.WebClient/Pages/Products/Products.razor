@@ -1,6 +1,7 @@
 ﻿@page "/products"
 @page "/products/{PageNumber:int}"
 @inject ProductsService productsService
+@inject NavigationManager navigationManager
 @attribute [Authorize(Roles = "Admin, User")]
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
@@ -42,6 +43,7 @@ else
                         <h3>Тип продукта: @Utils.GetNameProductType(product.ProductType)</h3>
                         <hr />
                     </div>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Text="Подробно" Icon="expand_more" class="btn-block" Click="async () => await moreInfo(product)" />
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Добавить" Icon="add_shopping_cart" class="btn-block" Click="() => selectProduct(product)" />
                     @if (selectedProduct == product)
                     {
@@ -124,8 +126,14 @@ else
             else
                 totalPages = (result.Count / result.PageSize) + 1;
 
-
+            message = $"Продукты страницы №{PageNumber.Value}";
+            messageType = Models.AlertMessageType.Success;
             products = result.Records.ToList();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
     }
@@ -142,6 +150,12 @@ else
     {
         selectedProduct = product;
         message = String.Empty;
+    }
+
+    async Task moreInfo(Product product)
+    {
+        await SessionUtils.SetProductSessionStorageAsync(sessionStorage, /*(BaseProduct)*/product);
+        navigationManager.NavigateTo($"/products/ProductInfo/{product.Id}");
     }
 
     async Task addProductToCartAsync()

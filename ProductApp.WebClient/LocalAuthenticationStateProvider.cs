@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
-using ProductApp.WebClient.Models;
 using ProductApp.Shared.Models;
 
 namespace ProductApp.WebClient
 {
+    //TODO : Возможно стоит использовать сессию таким же образом
     public class LocalAuthenticationStateProvider : AuthenticationStateProvider
     {
 

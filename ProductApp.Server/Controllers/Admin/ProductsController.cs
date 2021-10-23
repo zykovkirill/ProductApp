@@ -21,7 +21,7 @@ namespace WebAPIApp.Controllers
     {
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
-        private const int PAGE_SIZE = 10;
+        private const int _pageSize = 10;
         public ProductsController(IProductsService productsService, IConfiguration configuration)
         {
             _productsService = productsService;
@@ -44,13 +44,13 @@ namespace WebAPIApp.Controllers
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.GetAllProductsAsync(PAGE_SIZE, page, out totalProducts);
+            var products = _productsService.GetAllProductsAsync(_pageSize, page, out totalProducts);
 
             int totalPages = 0;
-            if (totalProducts % PAGE_SIZE == 0)
-                totalPages = totalProducts / PAGE_SIZE;
+            if (totalProducts % _pageSize == 0)
+                totalPages = totalProducts / _pageSize;
             else
-                totalPages = (totalProducts / PAGE_SIZE) + 1;
+                totalPages = (totalProducts / _pageSize) + 1;
 
             return Ok(new CollectionPagingResponse<Product>
             {
@@ -58,7 +58,7 @@ namespace WebAPIApp.Controllers
                 IsSuccess = true,
                 Message = "Продукты переданы",
                 OperationDate = DateTime.UtcNow,
-                PageSize = PAGE_SIZE,
+                PageSize = _pageSize,
                 Page = page,
                 Records = products
             });
@@ -73,13 +73,13 @@ namespace WebAPIApp.Controllers
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.SearchProductsAsync(query, PAGE_SIZE, page, out totalProducts);
+            var products = _productsService.SearchProductsAsync(query, _pageSize, page, out totalProducts);
 
             int totalPages = 0;
-            if (totalProducts % PAGE_SIZE == 0)
-                totalPages = totalProducts / PAGE_SIZE;
+            if (totalProducts % _pageSize == 0)
+                totalPages = totalProducts / _pageSize;
             else
-                totalPages = (totalProducts / PAGE_SIZE) + 1;
+                totalPages = (totalProducts / _pageSize) + 1;
 
             return Ok(new CollectionPagingResponse<Product>
             {
@@ -87,7 +87,7 @@ namespace WebAPIApp.Controllers
                 IsSuccess = true,
                 Message = $"Продукты по запросу '{query}' ",
                 OperationDate = DateTime.UtcNow,
-                PageSize = PAGE_SIZE,
+                PageSize = _pageSize,
                 Page = page,
                 Records = products
             });
@@ -102,13 +102,13 @@ namespace WebAPIApp.Controllers
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.FilterProductsAsync(filter, PAGE_SIZE, page, out totalProducts);
+            var products = _productsService.FilterProductsAsync(filter, _pageSize, page, out totalProducts);
 
             int totalPages = 0;
-            if (totalProducts % PAGE_SIZE == 0)
-                totalPages = totalProducts / PAGE_SIZE;
+            if (totalProducts % _pageSize == 0)
+                totalPages = totalProducts / _pageSize;
             else
-                totalPages = (totalProducts / PAGE_SIZE) + 1;
+                totalPages = (totalProducts / _pageSize) + 1;
 
             return Ok(new CollectionPagingResponse<Product>
             {
@@ -116,7 +116,7 @@ namespace WebAPIApp.Controllers
                 IsSuccess = true,
                 Message = $"Продукты по запросу '{filter}' ",
                 OperationDate = DateTime.UtcNow,
-                PageSize = PAGE_SIZE,
+                PageSize = _pageSize,
                 Page = page,
                 Records = products
             });

@@ -17,7 +17,6 @@ namespace ProductApp.Shared.Models
         [StringLength(50)]
         public string Name { get; set; }
 
-        //TODO: сделать set privat и колличество
         /// <summary>
         /// Цена
         /// </summary>

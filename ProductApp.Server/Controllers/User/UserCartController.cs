@@ -64,7 +64,7 @@ namespace WebAPIApp.Controllers
        
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] JObject json)
+        public async Task<IActionResult> Post([FromBody] JToken json)
         {
             //TODO: Можно динамически https://stackoverflow.com/questions/54158740/using-inherited-classes-in-net-web-api-post-put-method
             UserOrder model = json.ToObject<UserOrder>();
