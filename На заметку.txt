@@ -55,7 +55,7 @@ https://docs.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?
 2) Модель которая храниться в бд наследуется от RECORD
 
 
-
+Использовать Postgresql
 
 
 CORS - необходимо настроить 
