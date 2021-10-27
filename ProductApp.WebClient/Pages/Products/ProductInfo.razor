@@ -13,10 +13,13 @@
 }
 else
 {
+    <div class="row">
+        <AlertMessage Message="@message" MessageType="@messageType" />
+    </div>
     @if (TargetProduct != null)
     {
         <div class="row">
-            <RadzenCard Style="width:300px; margin: 15px 15px 15px 15px">
+            <RadzenCard Style="margin: 15px 15px 15px 15px">
                 <div class="row">
                     <RadzenImage Path="@TargetProduct.CoverPath" Style="height:auto; max-width:100%; margin:5px" />
                     <div class="col-md-6">
@@ -34,6 +37,42 @@ else
                 </div>
             </RadzenCard>
         </div>
+        <hr />
+        <h3>Рейтинг</h3>
+        <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
+        <div>
+            <h3>Комментарии</h3>
+            <hr />
+            @if (Info != null)
+            {
+                foreach (var comment in Info.Comments.OrderByDescending(c=>c.CreatedDate))
+                {
+                    <div class="text-body">
+
+                        <h3>@comment.CreatedDate.ToString()</h3>
+                        <h3>@comment.UserName</h3>
+                        <h3>@comment.UserComment</h3>
+                        <hr />
+                    </div>
+                }
+            }
+
+
+        @*<RadzenDataGrid Data="@Info.Comments" TItem="Comment" AllowVirtualization="true" Style="height:400px">
+            <Columns>
+                <RadzenDataGridColumn TItem="Comment" Property="CreatedDate" Title="OrderID" />
+                <RadzenDataGridColumn TItem="Comment" Property="UserName" Title="ProductID" />
+                <RadzenDataGridColumn TItem="Comment" Property="UserComment" Title="Unit Price"/>
+                 
+            </Columns>
+        </RadzenDataGrid>*@
+
+
+            <RadzenTextArea MaxLength="150" Style="width: 80%; margin: 10px 10px 10px 10px" Placeholder="Оставить комментарий..." @bind-Value="comment.UserComment" />
+            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Добавить" Icon="add_circle" class="btn-block" Click="async () => await AddComment()" />
+
+
+        </div>
     }
 }
 
@@ -44,8 +83,12 @@ else
     private Task<AuthenticationState> authenticationState { get; set; }
     bool isBusy = false;
 
-    private ProductInfo Info;
+    [Parameter]
+    public ProductApp.Shared.Models.ProductInfo Info { get; set; }
+
     private BaseProduct TargetProduct;
+    //TODO: Убрать создание экземпляра, создавать только при отправки
+    private Comment comment = new Comment();
     private int count;
 
     [Parameter]
@@ -55,7 +98,6 @@ else
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
 
-
     async Task getProductInfoAsync(string id)
     {
         isBusy = true;
@@ -63,17 +105,15 @@ else
         var userState = authenticationState.Result;
         productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
-
-
         OperationResponse<ProductApp.Shared.Models.ProductInfo> result;
 
         result = await productsService.GetProductInfoByIdAsync(id);
 
         if (result.IsSuccess)
         {
+            Info = result.Record;
             message = $"Информация о продукте получена";
             messageType = Models.AlertMessageType.Success;
-
         }
         else
         {
@@ -83,6 +123,39 @@ else
         isBusy = false;
     }
 
+    async Task AddComment()
+    {
+
+        //TODO: сделать в админке все заказы  https://blazor.radzen.com/datagrid-virtualization
+
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+
+        comment.CreatedDate = DateTime.Now;
+        comment.UserName = userState.User.FindFirst("FirstName").Value;
+
+        OperationResponse<Comment> result;
+        result = await productsService.AddCommentAsync(new BaseBuffer<Comment> { Entity = comment, Id = Info.ProductId });
+
+        if (result.IsSuccess)
+        {
+            //Info.Comments.Add(result.Record);
+            message = $"Комментарий добавлен";
+            messageType = Models.AlertMessageType.Success;
+            //TODO: Убрать создание экземпляра, создавать только при отправки
+            comment = new Comment();
+            await OnInitializedAsync();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+
+    }
 
     BaseProduct selectedProduct;
 
@@ -108,5 +181,10 @@ else
     {
         TargetProduct = await SessionUtils.GetProductSessionStorageAsync(sessionStorage);
         await getProductInfoAsync(TargetProduct.Id);
+    }
+
+    void OnChange(int value, string name)
+    {
+        // console.Log($"{name} value changed to {value}");
     }
 }

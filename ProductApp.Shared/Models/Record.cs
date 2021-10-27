@@ -16,12 +16,12 @@ namespace ProductApp.Shared.Models
         [Key]
         public string Id { get; set; }
 
-        [JsonIgnore]
+       // [JsonIgnore]
         public DateTime CreatedDate { get; set; }
-        [JsonIgnore]
+      //  [JsonIgnore]
         public DateTime ModifiedDate { get; set; }
 
-        [JsonIgnore]
+      //  [JsonIgnore]
         public bool IsDeleted { get; set; }
     }
 }

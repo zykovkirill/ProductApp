@@ -20,8 +20,10 @@ namespace ProductApp.Server.Services
         Task<Product> AddProductAsync(string name, string description, int price, int type, string imagePath);
         Task<Product> EditProductAsync(string id, string newName, string description, int price, int type, string newImagePath);
         Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId);
+        Task<ProductInfo> AddCommentAsync(string id, Comment comment);
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
+        Task<ProductInfo> GetProductInfoById(string id);
         Product GetProductByName(string name);
         IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts);
         Task<UserCreatedProduct> EditUserProductAsync(string id, string newName, string chevronProductIdiption, string toyProductId, float x, float y, float size, string newImagePath);
@@ -47,7 +49,9 @@ namespace ProductApp.Server.Services
                 Price = price,
                 ProductType = type
             };
-
+            var productInfo = new ProductInfo();
+            productInfo.ProductId = product.Id;
+            await _db.ProductInfos.AddAsync(productInfo);
             await _db.Products.AddAsync(product);
             await _db.SaveChangesAsync();
 
@@ -116,6 +120,25 @@ namespace ProductApp.Server.Services
                 return null;
 
             return product;
+        }
+
+        public async Task<ProductInfo> GetProductInfoById(string id)
+        {
+            var productInfo = await _db.ProductInfos.Include(p => p.Comments).AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == id);
+            if (productInfo == null || productInfo.IsDeleted)
+                return null;
+
+            return productInfo;
+        }
+
+        public async Task<ProductInfo> AddCommentAsync(string id, Comment comment)
+        {
+            var productInfo = await _db.ProductInfos.Include(p => p.Comments).FirstOrDefaultAsync(p => p.ProductId == id);
+            if (productInfo == null || productInfo.IsDeleted)
+                return null;
+            productInfo.Comments.Add(comment);
+            _db.SaveChanges();
+            return productInfo;
         }
 
         public Product GetProductByName(string name)

@@ -74,7 +74,18 @@ namespace ProductApp.WebClient.Services
         /// <returns></returns>
         public async Task<OperationResponse<ProductInfo>> GetProductInfoByIdAsync(string id)
         {
-            var response = await client.GetProtectedAsync<OperationResponse<ProductInfo>>($"{_baseUrl}/api/products/edit?id={id}");
+            var response = await client.GetProtectedAsync<OperationResponse<ProductInfo>>($"{_baseUrl}/api/productinfo/info?id={id}");
+            return response.Result;
+        }
+
+        /// <summary>
+        /// Получить информацию о продукте 
+        /// </summary>
+        /// <param name="id"> ID продукта </param>
+        /// <returns></returns>
+        public async Task<OperationResponse<Comment>> AddCommentAsync(BaseBuffer<Comment> model)
+        {
+            var response = await client.PostProtectedAsync<OperationResponse<Comment>>($"{_baseUrl}/api/productinfo", model);
             return response.Result;
         }
 
