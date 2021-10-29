@@ -79,13 +79,20 @@ namespace ProductApp.WebClient.Services
         }
 
         /// <summary>
-        /// Получить информацию о продукте 
+        /// Добавить комментарий 
         /// </summary>
-        /// <param name="id"> ID продукта </param>
-        /// <returns></returns>
         public async Task<OperationResponse<Comment>> AddCommentAsync(BaseBuffer<Comment> model)
         {
-            var response = await client.PostProtectedAsync<OperationResponse<Comment>>($"{_baseUrl}/api/productinfo", model);
+            var response = await client.PostProtectedAsync<OperationResponse<Comment>>($"{_baseUrl}/api/productinfo/comment", model);
+            return response.Result;
+        }
+
+        /// <summary>
+        /// Добавить рейтинг
+        /// </summary>
+        public async Task<OperationResponse<Rating>> AddRatingAsync(BaseBuffer<Rating> model)
+        {
+            var response = await client.PostProtectedAsync<OperationResponse<Rating>>($"{_baseUrl}/api/productinfo/rating", model);
             return response.Result;
         }
 

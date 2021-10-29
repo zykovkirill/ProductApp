@@ -61,7 +61,7 @@ namespace WebAPIApp.Controllers
         #region Post 
         [ProducesResponseType(200, Type = typeof(OperationResponse<ProductInfo>))]
         [ProducesResponseType(400, Type = typeof(OperationResponse<ProductInfo>))]
-        [HttpPost]
+        [HttpPost("comment")]
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Post([FromBody] BaseBuffer<Comment> model)
         {
@@ -76,6 +76,34 @@ namespace WebAPIApp.Controllers
                 Message = $"Комментарий  успешно добавлен!",
                 Record = productInfo
             });
+
+
+            return BadRequest(new OperationResponse<ProductInfo>
+            {
+                Message = "Что-то пошло не так",
+                IsSuccess = false
+            });
+
+        }
+
+        [ProducesResponseType(200, Type = typeof(OperationResponse<ProductInfo>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<ProductInfo>))]
+        [HttpPost("rating")]
+        [Authorize(Roles = "Admin, User")]
+        public async Task<IActionResult> Post([FromBody] BaseBuffer<Rating> model)
+        {
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            model.Entity.UserId = userId;
+            var productInfo = await _productsService.AddRatingAsync(model.Id, model.Entity);
+            if (productInfo != null)
+                return Ok(new OperationResponse<ProductInfo>
+                {
+                    IsSuccess = true,
+                    Message = $"Рейтинг  успешно добавлен!",
+                    Record = productInfo
+                });
 
 
             return BadRequest(new OperationResponse<ProductInfo>

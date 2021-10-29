@@ -39,13 +39,15 @@ else
         </div>
         <hr />
         <h3>Рейтинг</h3>
-        <RadzenRating Change=@(args => OnChange(args, "Rating with 5 stars")) />
+        <RadzenRating ReadOnly=@isVoitRating Stars="10" Change=@(async (args) => await AddRating(args)) />
+        <hr />
+        <RadzenRating ReadOnly="true" Stars="5" Value="4" />
         <div>
             <h3>Комментарии</h3>
             <hr />
             @if (Info != null)
             {
-                foreach (var comment in Info.Comments.OrderByDescending(c=>c.CreatedDate))
+                foreach (var comment in Info.Comments.OrderByDescending(c => c.CreatedDate))
                 {
                     <div class="text-body">
 
@@ -58,14 +60,14 @@ else
             }
 
 
-        @*<RadzenDataGrid Data="@Info.Comments" TItem="Comment" AllowVirtualization="true" Style="height:400px">
-            <Columns>
-                <RadzenDataGridColumn TItem="Comment" Property="CreatedDate" Title="OrderID" />
-                <RadzenDataGridColumn TItem="Comment" Property="UserName" Title="ProductID" />
-                <RadzenDataGridColumn TItem="Comment" Property="UserComment" Title="Unit Price"/>
-                 
-            </Columns>
-        </RadzenDataGrid>*@
+            @*<RadzenDataGrid Data="@Info.Comments" TItem="Comment" AllowVirtualization="true" Style="height:400px">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Comment" Property="CreatedDate" Title="OrderID" />
+                        <RadzenDataGridColumn TItem="Comment" Property="UserName" Title="ProductID" />
+                        <RadzenDataGridColumn TItem="Comment" Property="UserComment" Title="Unit Price"/>
+
+                    </Columns>
+                </RadzenDataGrid>*@
 
 
             <RadzenTextArea MaxLength="150" Style="width: 80%; margin: 10px 10px 10px 10px" Placeholder="Оставить комментарий..." @bind-Value="comment.UserComment" />
@@ -90,6 +92,8 @@ else
     //TODO: Убрать создание экземпляра, создавать только при отправки
     private Comment comment = new Comment();
     private int count;
+    private int rating;
+    private bool isVoitRating = false;
 
     [Parameter]
     public string ProductId { get; set; }
@@ -108,11 +112,15 @@ else
         OperationResponse<ProductApp.Shared.Models.ProductInfo> result;
 
         result = await productsService.GetProductInfoByIdAsync(id);
-
+        //TODO: В NavMenu не прокручивается все меню и отображается белым цветом нижние пункты(например на странице РОЛИ)
         if (result.IsSuccess)
         {
             Info = result.Record;
             message = $"Информация о продукте получена";
+            if (Info.Ratings.Any())
+                rating = (Info.Ratings.Select(r => r.ProductRating).Sum() / Info.Ratings.Count);
+            else
+                rating = 0;
             messageType = Models.AlertMessageType.Success;
         }
         else
@@ -131,7 +139,6 @@ else
         isBusy = true;
 
         var userState = authenticationState.Result;
-        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
         comment.CreatedDate = DateTime.Now;
         comment.UserName = userState.User.FindFirst("FirstName").Value;
@@ -183,8 +190,34 @@ else
         await getProductInfoAsync(TargetProduct.Id);
     }
 
-    void OnChange(int value, string name)
+    async Task AddRating(int value)
     {
-        // console.Log($"{name} value changed to {value}");
+        //TODO: сделать в админке все заказы  https://blazor.radzen.com/datagrid-virtualization
+        //TODO: Пример микроаритектуры https://github.com/dotnet-architecture/eShopOnContainers/tree/dev/src/Services/Basket/Basket.API
+        //TODO: Использовать патерн Репозиторий!
+        isBusy = true;
+
+        var userState = authenticationState.Result;
+        //var userId = userState.User.FindFirst("Id").Value;
+
+        OperationResponse<Rating> result;
+        result = await productsService.AddRatingAsync(new BaseBuffer<Rating> { Entity = new Rating { ProductRating = value/*, UserId = userId */}, Id = Info.ProductId });
+
+        if (result.IsSuccess)
+        {
+            //Info.Comments.Add(result.Record);
+            message = $"Комментарий добавлен";
+            messageType = Models.AlertMessageType.Success;
+            //TODO: Убрать создание экземпляра, создавать только при отправки
+            comment = new Comment();
+            await OnInitializedAsync();
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+
     }
 }

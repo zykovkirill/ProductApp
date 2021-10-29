@@ -67,6 +67,7 @@ namespace WebAPIApp.Controllers
         public async Task<IActionResult> Post([FromBody] JToken json)
         {
             //TODO: Можно динамически https://stackoverflow.com/questions/54158740/using-inherited-classes-in-net-web-api-post-put-method
+            //TODO: Создать дерево ролевой модели
             UserOrder model = json.ToObject<UserOrder>();
             if (model.Products.Any())
             {

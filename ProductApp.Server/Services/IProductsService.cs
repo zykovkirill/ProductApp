@@ -21,6 +21,7 @@ namespace ProductApp.Server.Services
         Task<Product> EditProductAsync(string id, string newName, string description, int price, int type, string newImagePath);
         Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId);
         Task<ProductInfo> AddCommentAsync(string id, Comment comment);
+        Task<ProductInfo> AddRatingAsync(string id, Rating comment);
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
         Task<ProductInfo> GetProductInfoById(string id);
@@ -140,7 +141,23 @@ namespace ProductApp.Server.Services
             _db.SaveChanges();
             return productInfo;
         }
-
+        public async Task<ProductInfo> AddRatingAsync(string id, Rating rating)
+        {
+            var productInfo = await _db.ProductInfos.Include(p => p.Ratings).FirstOrDefaultAsync(p => p.ProductId == id);
+            if (productInfo == null || productInfo.IsDeleted)
+                return null;
+            var oldRating = productInfo.Ratings.FirstOrDefault(r => r.UserId == rating.UserId);
+            if (oldRating == null)
+                productInfo.Ratings.Add(rating);
+            else
+            {
+                oldRating.ProductRating = rating.ProductRating;
+                //TODO: Изменять дату  где меняются данные 
+                oldRating.ModifiedDate = DateTime.UtcNow;
+            }
+            _db.SaveChanges();
+            return productInfo;
+        }
         public Product GetProductByName(string name)
         {
             var prod = _db.Products.SingleOrDefault(p => p.Name == name);
