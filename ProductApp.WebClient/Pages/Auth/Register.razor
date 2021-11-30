@@ -98,7 +98,12 @@
         }
         else
         {
-            message = result.Errors?.FirstOrDefault() ?? result.Message;
+            string mess = String.Empty;
+            foreach (var e in result.Errors)
+            {
+                mess += e;
+            }
+            message = mess ?? result.Message;
             messageType = Models.AlertMessageType.Error;
         }
         isBusy = false;
