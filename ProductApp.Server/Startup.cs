@@ -18,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using ProductApp.Server.Localized;
 
 namespace ProductApp.Server
 {
@@ -45,7 +46,7 @@ namespace ProductApp.Server
                 options.Password.RequiredLength = 5;
                 options.User.AllowedUserNameCharacters = null;
                 options.User.RequireUniqueEmail = true;
-            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddRoles<IdentityRole>();
+            }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddRoles<IdentityRole>().AddErrorDescriber<RussianIdentityErrorDescriber>();
 
 
 
@@ -95,6 +96,7 @@ namespace ProductApp.Server
                 });
             });
             services.AddRazorPages();
+            //services.AddLocalization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,6 +107,7 @@ namespace ProductApp.Server
                 app.UseDeveloperExceptionPage();
             }
 
+           // app.UseRequestLocalization("ru-RU");
             app.UseHttpsRedirection();
 
             app.UseRouting();

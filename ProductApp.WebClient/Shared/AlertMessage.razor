@@ -1,8 +1,8 @@
 ﻿@if (!string.IsNullOrWhiteSpace(Message))
 {
 <div class="alert @alertClass">
-    @Message 	&nbsp; <button style="position: absolute; top: 10px; right: 10px; " type="button" class="close" aria-label="Close">
-        <span @onclick="HideMessage" aria-hidden="true">&times;</span>
+    @Message 	&nbsp; <button  style="position: absolute; top: 10px; right: 10px; " type="button" class="close" aria-label="Close">
+        <span @onclick="HideMessage"  aria-hidden="true">&times;</span>
     </button>
 </div>
 }
@@ -12,6 +12,9 @@
     //TODO: Изменить стили в CSS нужен отступ
 
     private Models.AlertMessageType messageType;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
 
     [Parameter]
     public Models.AlertMessageType MessageType
@@ -43,6 +46,8 @@
     void HideMessage()
     {
         Message = string.Empty;
+        OnClickCallback.InvokeAsync();
     }
+
 
 }

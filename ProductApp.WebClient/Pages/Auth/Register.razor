@@ -12,7 +12,7 @@
         <EditForm Model="model" OnValidSubmit="RegisterUser">
             <RadzenCard>
 
-                <AlertMessage Message="@message" MessageType="@messageType" />
+                <AlertMessage Message="@message" MessageType="@messageType" OnClickCallback="CloseInfoMessage" />
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -81,7 +81,10 @@
         ValidReCAPTCHA = true;
     }
 
-
+    private void CloseInfoMessage()
+    {
+        message = String.Empty;
+    }
 
     public async Task RegisterUser()
     {

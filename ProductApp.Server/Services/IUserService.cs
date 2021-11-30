@@ -38,7 +38,7 @@ namespace ProductApp.Server.Services
         private IConfiguration _configuration;
         private IMailService _mailService;
         private ApplicationDbContext _db;
-        private const string _roleUser = /*"Admin";*/"User";
+        private const string _roleUser = "Admin";/*"User";*/
 
         public UserService(UserManager<IdentityUser> userManager,/* RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
         {
@@ -119,21 +119,23 @@ namespace ProductApp.Server.Services
                         IsSuccess = true,
                     };
                 }
-
-                return new UserManagerResponse
+                else
                 {
-                    Message = "Пользователь не был создан",
-                    IsSuccess = false,
-                    Errors = result.Errors.Select(e => e.Description).ToArray()
+                    return new UserManagerResponse
+                    {
+                        Message = "Пользователь не был создан",
+                        IsSuccess = false,
+                        Errors = result.Errors.Select(e => e.Description).ToArray()
 
-                };
+                    };
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Произошла ошибка" + ex.Message);
                 return new UserManagerResponse
                 {
-                    Message = "Пользователь не был создан",
+                    Message = "Пользователь не был создан, обратитесь в поддержку",
                     IsSuccess = false,
                 };
             }
