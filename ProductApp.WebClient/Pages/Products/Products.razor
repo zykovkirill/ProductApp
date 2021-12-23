@@ -27,7 +27,7 @@ else
                         @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
                         Change=@(args => OnChange(args))
                         Style=" margin: 15px 15px 15px 15px" />
-        <AlertMessage Message="@message" MessageType="@messageType" />
+        <AlertMessage Message="@message" MessageType="@messageType" OnClickCallback="CloseInfoMessage" />
     </div>
     <hr />
 
@@ -49,7 +49,6 @@ else
                     {
                         <RadzenNumeric Placeholder="Колличество" Min="0" @bind-Value="count" Style="margin:10px;" />
                         <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Подтвердить" Icon="done" class="btn-block" Click="async () => await addProductToCartAsync()" />
-
                     }
                 </div>
             </RadzenCard>
@@ -149,6 +148,10 @@ else
     void selectProduct(Product product)
     {
         selectedProduct = product;
+    }
+
+    private void CloseInfoMessage()
+    {
         message = String.Empty;
     }
 

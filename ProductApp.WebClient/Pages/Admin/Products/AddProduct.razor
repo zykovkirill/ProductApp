@@ -11,7 +11,7 @@
     <div class=" =col-6">
         <EditForm Model="model" OnValidSubmit="async () => await postProductAsync() ">
             <RadzenCard>
-                <AlertMessage Message="@message" MessageType="@messageType" />
+                <AlertMessage Message="@message" OnClickCallback="CloseInfoMessage" MessageType="@messageType" />
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 @*//TODO: Сделать проверку на не заполненные поля выводить предупреждение *@
@@ -57,7 +57,7 @@
         var file = (await fileReaderService.CreateReference(inputReference).EnumerateFilesAsync()).FirstOrDefault();
         var fileInfo = await file.ReadFileInfoAsync();
         string extension = Path.GetExtension(fileInfo.Name);
-        //TODO: Поддерживает jpg и bmp alpha channel 
+        //TODO: Поддерживает jpg и bmp alpha channel
         var allowedExtensions = new string[] { ".jpg", ".png", ".bmp" };
         if (!allowedExtensions.Contains(extension))
         {
@@ -82,20 +82,21 @@
     async Task postProductAsync()
     {
         isBusy = true;
-
-        var userState = authenticationState.Result;
-        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
         model.CoverFile = fileStream;
         model.FileName = fileName;
-        var result = await productsService.PostProductAsync(model);
-        if (result.IsSuccess)
-            navigatorManager.NavigateTo("/Products");
-        else
+        var userState = authenticationState.Result;
+        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+        if (Validate())
         {
-            message = result.Message;
-            messageType = Models.AlertMessageType.Error;
+            var result = await productsService.PostProductAsync(model);
+            if (result.IsSuccess)
+                navigatorManager.NavigateTo("/Products");
+            else
+            {
+                message = result.Message;
+                messageType = Models.AlertMessageType.Error;
+            }
         }
-
         isBusy = false;
 
     }
@@ -104,6 +105,47 @@
     {
         @*//TODO: Сделать проверку на стороне сервера на нулевые значения полей возможно добавить атрибут запрещающий сохранять пустые значения*@
         model.ProductType = (int)value;
+    }
+
+    private void CloseInfoMessage()
+    {
+        message = String.Empty;
+    }
+
+    bool Validate()
+    {
+
+        if (model.CoverFile == null)
+        {
+            messageType = Models.AlertMessageType.Warning;
+            message = "Файл не выбран";
+            return false;
+        }
+        if (String.IsNullOrEmpty(model.Description))
+        {
+            messageType = Models.AlertMessageType.Warning;
+            message = "Создайте описание";
+            return false;
+        }
+        if (String.IsNullOrEmpty(model.Name))
+        {
+            messageType = Models.AlertMessageType.Warning;
+            message = "Укажите название";
+            return false;
+        }
+        if (model.ProductType == 0)
+        {
+            messageType = Models.AlertMessageType.Warning;
+            message = "Выберите тип продукта";
+            return false;
+        }
+        if (model.Price == 0)
+        {
+            messageType = Models.AlertMessageType.Warning;
+            message = "Цена не может быть 0";
+            return false;
+        }
+        return true;
     }
 
 }

@@ -27,7 +27,7 @@ else
             @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
             Change=@(args => OnChange(args))
             Style=" margin: 15px 15px 15px 15px" />*@
-        <AlertMessage Message="@message" MessageType="@messageType" />
+        <AlertMessage Message="@message" MessageType="@messageType" OnClickCallback="CloseInfoMessage" />
     </div>
     <hr />
 
@@ -151,6 +151,10 @@ else
     void selectProduct(UserCreatedProduct userCreatedProduct)
     {
         selectedUserProduct = userCreatedProduct;
+    }
+
+    private void CloseInfoMessage()
+    {
         message = String.Empty;
     }
 

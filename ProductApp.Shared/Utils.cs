@@ -31,6 +31,7 @@ namespace ProductApp.Shared.Models
         /// </summary>
         public static readonly Dictionary<int, string> ProductTypeDictionary = new Dictionary<int, string>
         {
+            //{0, "Ничего"} - не использовать в коде(AddProduct) есть место где 0 выступает как пустота 
             {1,"Игрушки"},
             {2,"Шевроны" }
         };
