@@ -1,18 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using ProductApp.Server.Models;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System;
-using ProductApp.Shared.Models;
-using ProductApp.Server.Services;
 using Microsoft.Extensions.Configuration;
-using System.IO;
-using ProductApp.Shared.Models.UserData;
 using Newtonsoft.Json.Linq;
+using ProductApp.Server.Services;
+using ProductApp.Shared.Models;
+using ProductApp.Shared.Models.UserData;
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebAPIApp.Controllers
 {
@@ -61,7 +57,7 @@ namespace WebAPIApp.Controllers
         #endregion
 
         #region Post 
-       
+
         [ProducesResponseType(200, Type = typeof(OperationResponse<UserOrder>))]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] JToken json)
@@ -93,7 +89,7 @@ namespace WebAPIApp.Controllers
             }
             else
             {
-               return  BadRequest(new OperationResponse<UserOrder>
+                return BadRequest(new OperationResponse<UserOrder>
                 {
                     IsSuccess = false,
                     Message = $"Отсутствуют продукты",

@@ -1,15 +1,12 @@
-﻿using ProductApp.Server.Models;
-using ProductApp.Shared;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProductApp.Server.Models;
+using ProductApp.Shared.Models;
+using ProductApp.Shared.Models.UserData;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using ProductApp.Shared.Models.UserData;
-using ProductApp.Shared.Models;
 
 namespace WebAPIApp.Controllers
 {

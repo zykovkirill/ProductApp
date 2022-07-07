@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace ProductApp.Shared.Models
+﻿namespace ProductApp.Shared.Models
 {
     /// <summary>
     /// История изменения статусов заказа

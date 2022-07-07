@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using ProductApp.Server.Models;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System;
-using ProductApp.Shared.Models.UserData;
-using ProductApp.Shared.Models;
-using ProductApp.Server.Services;
-using System.IO;
 using Microsoft.Extensions.Configuration;
-using System.Globalization;
 using Microsoft.Extensions.Logging;
+using ProductApp.Server.Services;
+using ProductApp.Shared.Models;
+using ProductApp.Shared.Models.UserData;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebAPIApp.Controllers
 {
@@ -64,7 +61,7 @@ namespace WebAPIApp.Controllers
                 PageSize = _pageSize,
                 Page = page,
                 Records = products
-            });        
+            });
         }
 
         #endregion
@@ -110,7 +107,7 @@ namespace WebAPIApp.Controllers
                 X = float.Parse(model.X, CultureInfo.InvariantCulture.NumberFormat),
                 Y = float.Parse(model.Y, CultureInfo.InvariantCulture.NumberFormat),
                 Name = model.FileName
-                
+
             };
 
             var addedProduct = await _productsService.AddUserProductAsync(userProd, userId);

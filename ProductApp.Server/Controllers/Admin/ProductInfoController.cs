@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using ProductApp.Server.Models;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System;
-using ProductApp.Shared.Models;
-using ProductApp.Server.Services;
 using Microsoft.Extensions.Configuration;
+using ProductApp.Server.Services;
+using ProductApp.Shared.Models;
+using System;
 using System.IO;
-using ProductApp.Shared.Models.UserData;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebAPIApp.Controllers
 {
@@ -37,7 +32,7 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Get(string id)
         {
-           // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var productInfo = await _productsService.GetProductInfoById(id);
             if (productInfo == null)
@@ -70,12 +65,12 @@ namespace WebAPIApp.Controllers
 
             var productInfo = await _productsService.AddCommentAsync(model.Id, model.Entity);
             if (productInfo != null)
-            return Ok(new OperationResponse<ProductInfo>
-            {
-                IsSuccess = true,
-                Message = $"Комментарий  успешно добавлен!",
-                Record = productInfo
-            });
+                return Ok(new OperationResponse<ProductInfo>
+                {
+                    IsSuccess = true,
+                    Message = $"Комментарий  успешно добавлен!",
+                    Record = productInfo
+                });
 
 
             return BadRequest(new OperationResponse<ProductInfo>
@@ -122,7 +117,7 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Put([FromForm] ProductRequestServer model)
         {
-          //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             string url = $"{_configuration["AppUrl"]}Images/default.jpg";
             string fullPath = null;

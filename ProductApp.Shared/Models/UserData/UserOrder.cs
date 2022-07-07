@@ -1,8 +1,4 @@
-﻿using ProductApp.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 
 namespace ProductApp.Shared.Models.UserData
@@ -14,7 +10,7 @@ namespace ProductApp.Shared.Models.UserData
     {
 
         public string UserId { get; set; }
-        public IList<UserOrderProduct>  Products { get; set; }
+        public IList<UserOrderProduct> Products { get; set; }
         /// <summary>
         /// Колличество
         /// </summary>
@@ -31,6 +27,6 @@ namespace ProductApp.Shared.Models.UserData
         {
             Products = new List<UserOrderProduct>();
         }
-    
+
     }
 }

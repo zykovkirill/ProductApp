@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProductApp.Shared.Models
 {
-    public class UserRoleViewModel 
+    public class UserRoleViewModel
     {
 
         public UserRoleViewModel(bool isOn, string name)

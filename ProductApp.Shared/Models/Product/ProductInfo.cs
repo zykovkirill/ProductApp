@@ -1,6 +1,4 @@
-﻿using ProductApp.Shared.Models.UserData;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 
 namespace ProductApp.Shared.Models
 {
@@ -12,7 +10,7 @@ namespace ProductApp.Shared.Models
         /// <summary>
         /// Коментарии 
         /// </summary>
-        public  List<Comment> Comments { get; set; }
+        public List<Comment> Comments { get; set; }
         /// <summary>
         /// Рейтинг
         /// </summary>

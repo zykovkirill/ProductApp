@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProductApp.Shared.Models
@@ -10,18 +9,18 @@ namespace ProductApp.Shared.Models
         {
             Id = Guid.NewGuid().ToString();
             CreatedDate = DateTime.UtcNow;
-            ModifiedDate = DateTime.UtcNow; 
+            ModifiedDate = DateTime.UtcNow;
         }
 
         [Key]
         public string Id { get; set; }
 
-       // [JsonIgnore]
+        // [JsonIgnore]
         public DateTime CreatedDate { get; set; }
-      //  [JsonIgnore]
+        //  [JsonIgnore]
         public DateTime ModifiedDate { get; set; }
 
-      //  [JsonIgnore]
+        //  [JsonIgnore]
         public bool IsDeleted { get; set; }
     }
 }

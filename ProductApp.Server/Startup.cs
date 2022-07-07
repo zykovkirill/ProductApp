@@ -1,24 +1,17 @@
-using ProductApp.Server.Models;
-using ProductApp.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Claims;
 using ProductApp.Server.Localized;
+using ProductApp.Server.Models;
+using ProductApp.Server.Services;
+using System.Security.Claims;
+using System.Text;
 
 namespace ProductApp.Server
 {
@@ -51,7 +44,7 @@ namespace ProductApp.Server
 
 
 
-            services.AddAuthentication(auth => 
+            services.AddAuthentication(auth =>
             {
                 auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -85,6 +78,7 @@ namespace ProductApp.Server
             services.AddTransient<IProductsService, ProductsService>();
             services.AddTransient<IUserDataService, UserDataService>();
             services.AddControllers();
+
             services.AddCors(options =>
             {
                 options.AddPolicy("DevCorsPolicy", builder =>
@@ -96,6 +90,7 @@ namespace ProductApp.Server
                 });
             });
             services.AddRazorPages();
+            services.AddSwaggerGen();
             //services.AddLocalization();
         }
 
@@ -107,7 +102,7 @@ namespace ProductApp.Server
                 app.UseDeveloperExceptionPage();
             }
 
-           // app.UseRequestLocalization("ru-RU");
+            // app.UseRequestLocalization("ru-RU");
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -119,6 +114,10 @@ namespace ProductApp.Server
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI();
 
             app.UseEndpoints(endpoints =>
             {

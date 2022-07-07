@@ -1,12 +1,11 @@
-﻿using ProductApp.Server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductApp.Server.Models;
 using ProductApp.Shared.Models;
-using Microsoft.EntityFrameworkCore;
+using ProductApp.Shared.Models.UserData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ProductApp.Shared.Models.UserData;
-using System.IO;
 
 namespace ProductApp.Server.Services
 {
@@ -86,14 +85,14 @@ namespace ProductApp.Server.Services
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
             //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
-           // _db.Products.Update(prod);
+            // _db.Products.Update(prod);
             await _db.SaveChangesAsync();
             return prod;
         }
         //TODO :Сделать асинхронно 
         public IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts)
         {
-              var allProducts = _db.Products.Where(p => !p.IsDeleted).AsNoTracking();
+            var allProducts = _db.Products.Where(p => !p.IsDeleted).AsNoTracking();
 
             totalProducts = allProducts.Count();
 
@@ -105,7 +104,7 @@ namespace ProductApp.Server.Services
         //TODO :Сделать асинхронно 
         public IEnumerable<UserCreatedProduct> GetAllUserProductsAsync(int pageSize, int pageNumber, string userId, out int totalProducts)
         {
-            var profile =  _db.UserProfiles.Include(p => p.UserCreatedProducts).AsNoTracking().FirstOrDefault(pr => pr.UserId == userId);
+            var profile = _db.UserProfiles.Include(p => p.UserCreatedProducts).AsNoTracking().FirstOrDefault(pr => pr.UserId == userId);
             var allProducts = profile.UserCreatedProducts.Where(p => !p.IsDeleted);
 
             totalProducts = allProducts.Count();
@@ -196,7 +195,7 @@ namespace ProductApp.Server.Services
                 foreach (var i in words)
                 {
                     allProducts.AddRange(_db.Products.Where(p => !p.IsDeleted && p.ProductType == Int32.Parse(i)).AsNoTracking().ToList());
-                
+
                 };
             }
             else
@@ -216,7 +215,7 @@ namespace ProductApp.Server.Services
         public async Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId)
         {
             //TODO:сделать отдельный сервис для сохранения и работы с  изображениями
-            
+
             var profile = await _db.UserProfiles.Include(p => p.UserCreatedProducts).FirstOrDefaultAsync(pr => pr.UserId == userId);
             profile.UserCreatedProducts.Add(model);
             //await _db.UserProducts.AddAsync(model);

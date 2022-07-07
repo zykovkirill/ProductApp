@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductApp.Shared.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CustomIdentityApp.Controllers
 {
@@ -16,11 +15,11 @@ namespace CustomIdentityApp.Controllers
     public class SettingsController : ControllerBase
     {
         RoleManager<IdentityRole> _roleManager;
-       // UserManager<IdentityUser> _userManager;
+        // UserManager<IdentityUser> _userManager;
         public SettingsController(RoleManager<IdentityRole> roleManager/*, UserManager<IdentityUser> userManager*/)
         {
             _roleManager = roleManager;
-           // _userManager = userManager;
+            // _userManager = userManager;
         }
 
         #region Get
@@ -34,7 +33,7 @@ namespace CustomIdentityApp.Controllers
 
             var roles = _roleManager.Roles.ToList();
             var roleModels = new List<RoleViewModel>();
-            foreach(var role in roles)
+            foreach (var role in roles)
             {
 
                 var roleModel = new RoleViewModel(role.Id, role.Name);

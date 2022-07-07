@@ -1,9 +1,10 @@
-﻿using ProductApp.Server.Models;
-using ProductApp.Shared.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using ProductApp.Server.Models;
+using ProductApp.Shared.Models;
+using ProductApp.Shared.Models.UserData;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,11 +12,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using ProductApp.Shared.Models.UserData;
 
 namespace ProductApp.Server.Services
 {
-   public interface IUserService
+    public interface IUserService
     {
 
         Task<UserManagerResponse> RegisterUserAsync(RegisterRequest model);
@@ -98,7 +98,7 @@ namespace ProductApp.Server.Services
                     {
                         await _mailService.SendEmailAsync(identityUser.Email, "Подтвердите свой email", "<h1>Добро пожаловать</h1>" + $"<p>Пожалуйста подтвердите свою электронную почту <a href = '{url}'>Нажмите сюда</a></p>");
                     }
-                    catch 
+                    catch
                     {
                         //TODO: Добавить в бд записи об ошибках
                         //Console.WriteLine("Возникло исключение при отправки сообщения  подтверждения электронной почты !" + ex.Message);
@@ -166,12 +166,12 @@ namespace ProductApp.Server.Services
             // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль ;
             var roles = _userManager.GetRolesAsync(user).Result;
 
-            List<Claim> claimsRoleList = new List<Claim>();     
+            List<Claim> claimsRoleList = new List<Claim>();
             foreach (var item in roles)
             {
                 claimsRoleList.Add(new Claim(ClaimTypes.Role, item));
             }
-            
+
             List<Claim> claimsList = new List<Claim>();
             claimsList.Add(new Claim("Email", model.Email));
             claimsList.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));

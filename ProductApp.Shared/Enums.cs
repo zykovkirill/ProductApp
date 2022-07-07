@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ProductApp.Shared.Models
+﻿namespace ProductApp.Shared.Models
 {
     /// <summary>Статус заказа</summary>
     public enum OrderStatus

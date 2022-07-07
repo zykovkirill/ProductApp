@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using ProductApp.Server.Models;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System;
-using ProductApp.Shared.Models;
-using ProductApp.Server.Services;
 using Microsoft.Extensions.Configuration;
+using ProductApp.Server.Services;
+using ProductApp.Shared.Models;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using ProductApp.Shared.Models.UserData;
+using System.Threading.Tasks;
 
 namespace WebAPIApp.Controllers
 {
@@ -39,8 +34,8 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin, User")]
         public IActionResult Get(int page)
         {
-          //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-          //TODO: сделать единый сервис со страницами, отдельный метод или класс с привязкой типа объекта
+            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //TODO: сделать единый сервис со страницами, отдельный метод или класс с привязкой типа объекта
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
@@ -129,7 +124,7 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(string id)
         {
-           // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var prod = await _productsService.GetProductById(id);
             if (prod == null)
@@ -157,7 +152,7 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromForm] ProductRequestServer model)
         {
-           // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             string url = $"{_configuration["AppUrl"]}Images/default.jpg";
             string fullPath = null;
@@ -231,7 +226,7 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put([FromForm] ProductRequestServer model)
         {
-          //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             string url = $"{_configuration["AppUrl"]}Images/default.jpg";
             string fullPath = null;

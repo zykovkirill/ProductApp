@@ -1,12 +1,4 @@
-﻿using ProductApp.Shared;
-using ProductApp.Shared.Models.UserData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ProductApp.Shared.Models.UserData
+﻿namespace ProductApp.Shared.Models.UserData
 {
     public class UserCreatedProduct : BaseProduct
     {

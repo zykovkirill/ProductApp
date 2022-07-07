@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProductApp.Shared.Models
 {
     /// <summary>
     /// Базовый класс для продукта
     /// </summary>
-    public class BaseProduct: Record
+    public class BaseProduct : Record
     {
         /// <summary>
         /// Наименование

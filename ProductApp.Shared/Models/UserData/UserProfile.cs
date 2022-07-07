@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 
 namespace ProductApp.Shared.Models.UserData
 {
     /// <summary>
     /// Данные пользователя
     /// </summary>
-    public class UserProfile: Record
+    public class UserProfile : Record
     {
         public string UserId { get; set; }
         public string FirstName { get; set; }
@@ -23,7 +19,7 @@ namespace ProductApp.Shared.Models.UserData
         ///// Корзина
         ///// </summary>
         //public UserCart UserCart { get; set; }
-        public ICollection <UserCreatedProduct> UserCreatedProducts { get; set; }
+        public ICollection<UserCreatedProduct> UserCreatedProducts { get; set; }
         /// <summary>
         /// Заказы
         /// </summary>
@@ -40,7 +36,7 @@ namespace ProductApp.Shared.Models.UserData
         {
             UserCreatedProducts = new List<UserCreatedProduct>();
             UserOrder = new List<UserOrder>();
-          //  UserCart = new UserCart();
+            //  UserCart = new UserCart();
         }
     }
 }

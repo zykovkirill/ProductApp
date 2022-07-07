@@ -1,9 +1,7 @@
 ﻿using AKSoftware.WebApi.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using ProductApp.Shared.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProductApp.WebClient.Services
 {
@@ -31,7 +29,7 @@ namespace ProductApp.WebClient.Services
         /// </summary>
         /// <param name="page"> Номер страницы </param>
         /// <returns></returns>
-        public async Task<CollectionPagingResponse<EditUserViewModel>> GetAllUsersByPageAsync(int page =1 )
+        public async Task<CollectionPagingResponse<EditUserViewModel>> GetAllUsersByPageAsync(int page = 1)
         {
             var response = await client.GetProtectedAsync<CollectionPagingResponse<EditUserViewModel>>($"{_baseUrl}/api/users?page={page}");
             return response.Result;
@@ -69,8 +67,8 @@ namespace ProductApp.WebClient.Services
 
 
             var formKeyValues = new List<FormKeyValue>()
-            {    
-                new StringFormKeyValue("Email", model.Email),            
+            {
+                new StringFormKeyValue("Email", model.Email),
                 new StringFormKeyValue("Password", model.Password),
                 new StringFormKeyValue("ConfirmPassword", model.ConfirmPassword),
                 new StringFormKeyValue("FirstName", model.FirstName),

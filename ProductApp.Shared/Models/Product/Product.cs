@@ -1,5 +1,4 @@
-﻿using ProductApp.Shared.Models.UserData;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProductApp.Shared.Models
 {

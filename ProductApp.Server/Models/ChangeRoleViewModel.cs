@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using ProductApp.Shared.Models;
+﻿using ProductApp.Shared.Models;
 using System.Collections.Generic;
 
 public class ChangeRoleViewModel

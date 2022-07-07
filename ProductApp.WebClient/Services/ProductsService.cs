@@ -1,14 +1,8 @@
 ﻿using AKSoftware.WebApi.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using ProductApp.Shared.Models;
 using ProductApp.Shared.Models.UserData;
-using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProductApp.WebClient.Services
 {
@@ -36,9 +30,9 @@ namespace ProductApp.WebClient.Services
         /// </summary>
         /// <param name="page"> Номер страницы </param>
         /// <returns></returns>
-        public async Task<CollectionPagingResponse<Product>> GetAllProductsByPageAsync(int page =1 )
+        public async Task<CollectionPagingResponse<Product>> GetAllProductsByPageAsync(int page = 1)
         {
-           // var str = page.ToString();
+            // var str = page.ToString();
             var response = await client.GetProtectedAsync<CollectionPagingResponse<Product>>($"{_baseUrl}/api/products?page={page}");
             return response.Result;
         }
@@ -49,7 +43,7 @@ namespace ProductApp.WebClient.Services
         /// <param name="page"> Номер страницы </param>
         /// <param name="typeFilter"> Фильтр типов продуктов</param>
         /// <returns></returns>
-        public async Task<CollectionPagingResponse<Product>> GetFilterProductsByPageAsync( int page = 1, string typeFilter="")
+        public async Task<CollectionPagingResponse<Product>> GetFilterProductsByPageAsync(int page = 1, string typeFilter = "")
         {
             // var str = page.ToString();
             var response = await client.GetProtectedAsync<CollectionPagingResponse<Product>>($"{_baseUrl}/api/products/filter?filter={typeFilter}&page={page}");
@@ -139,7 +133,7 @@ namespace ProductApp.WebClient.Services
         {
             var formKeyValues = new List<FormKeyValue>()
             {
-                new StringFormKeyValue("Id", model.Id), 
+                new StringFormKeyValue("Id", model.Id),
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
@@ -148,7 +142,7 @@ namespace ProductApp.WebClient.Services
 
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
-            var response = await client.SendFormProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products", ActionType.PUT, formKeyValues.ToArray() );
+            var response = await client.SendFormProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products", ActionType.PUT, formKeyValues.ToArray());
             return response.Result;
         }
 

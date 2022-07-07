@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ProductApp.Shared.Models
 {
- 
+
     public class CollectionResponse<T> : BaseAPIResponse
     {
         public CollectionResponse()

@@ -1,13 +1,8 @@
-﻿using ProductApp.Server.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using ProductApp.Server.Models;
 using ProductApp.Server.Services;
 using ProductApp.Shared.Models;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProductApp.Server.Controllers
@@ -28,13 +23,13 @@ namespace ProductApp.Server.Controllers
         }
 
         // api/auth/register
-       // [EnableCors]
+        // [EnableCors]
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest model)
         {
             if (ModelState.IsValid)
             {
-                var result = await _userService.RegisterUserAsync(model);              
+                var result = await _userService.RegisterUserAsync(model);
                 if (result.IsSuccess)
                     return Ok(result); // Код : 200
 
@@ -47,7 +42,7 @@ namespace ProductApp.Server.Controllers
 
         //api/auth/login
         [HttpPost("Login")]
-        public async Task<IActionResult> LoginAsync([FromBody]LoginViewModel model)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -55,7 +50,7 @@ namespace ProductApp.Server.Controllers
 
                 if (result.IsSuccess)
                 {
-                   // await _mailService.SendEmailAsync(model.Email,"Привет", "<h1>Привет</h1>");
+                    // await _mailService.SendEmailAsync(model.Email,"Привет", "<h1>Привет</h1>");
                     return Ok(result);
                 }
                 return BadRequest(result);
@@ -74,7 +69,7 @@ namespace ProductApp.Server.Controllers
 
             var result = await _userService.ConfirmEmailAsync(userId, token);
 
-            if(result.IsSuccess)
+            if (result.IsSuccess)
             {
                 return Redirect($"{_configuration["AppUrl"]}/ConfirmEmail.html");
             }
@@ -101,7 +96,7 @@ namespace ProductApp.Server.Controllers
         public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordViewModel model)
         {
 
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var result = await _userService.ResetPsswordAsync(model);
 

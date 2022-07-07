@@ -1,11 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using ProductApp.Shared.Models;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductApp.Server.Services;
+using ProductApp.Shared.Models;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CustomIdentityApp.Controllers
 {
@@ -84,9 +84,9 @@ namespace CustomIdentityApp.Controllers
         #endregion
 
         #region Post 
-       [ProducesResponseType(200, Type = typeof(UserManagerResponse))]
-       [ProducesResponseType(400, Type = typeof(UserManagerResponse))]
-       [HttpPost]
+        [ProducesResponseType(200, Type = typeof(UserManagerResponse))]
+        [ProducesResponseType(400, Type = typeof(UserManagerResponse))]
+        [HttpPost]
         public async Task<IActionResult> Post([FromForm] RegisterRequest model)
         {
 
@@ -111,7 +111,7 @@ namespace CustomIdentityApp.Controllers
         #endregion
 
         #region Put
-        
+
         [ProducesResponseType(200, Type = typeof(UserManagerResponse))]
         [ProducesResponseType(400, Type = typeof(UserManagerResponse))]
         [HttpPut]
@@ -122,7 +122,7 @@ namespace CustomIdentityApp.Controllers
 
                 var result = await _adminService.EditUserById(model);
                 if (result.IsSuccess)
-                        return Ok(result); // Код : 200
+                    return Ok(result); // Код : 200
 
                 return BadRequest(result);
             }

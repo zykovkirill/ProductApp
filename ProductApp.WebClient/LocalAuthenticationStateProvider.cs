@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Security.Claims;
 using ProductApp.Shared.Models;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace ProductApp.WebClient
 {
@@ -22,7 +20,7 @@ namespace ProductApp.WebClient
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-          if (await _storageService.ContainKeyAsync("User"))
+            if (await _storageService.ContainKeyAsync("User"))
             {
                 var userInfo = await _storageService.GetItemAsync<LocalUserInfo>("User");
 
@@ -43,7 +41,7 @@ namespace ProductApp.WebClient
 
                 var identity = new ClaimsIdentity(claims.ToArray(), "BearerToken");
                 var user = new ClaimsPrincipal(identity);
-                var state =  new AuthenticationState(user);
+                var state = new AuthenticationState(user);
                 NotifyAuthenticationStateChanged(Task.FromResult(state));
                 return state;
             }

@@ -1,12 +1,10 @@
-﻿using ProductApp.Server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductApp.Server.Models;
 using ProductApp.Shared.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections;
+using ProductApp.Shared.Models.UserData;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ProductApp.Shared.Models.UserData;
 
 namespace ProductApp.Server.Services
 {

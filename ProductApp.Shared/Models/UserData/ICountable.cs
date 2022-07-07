@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ProductApp.Shared.Models.UserData
+﻿namespace ProductApp.Shared.Models.UserData
 {
-     interface ICountable
+    interface ICountable
     {
-         int Count { get; set; }
+        int Count { get; set; }
     }
 }

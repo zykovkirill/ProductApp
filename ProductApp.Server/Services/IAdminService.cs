@@ -1,21 +1,15 @@
-﻿using ProductApp.Server.Models;
-using ProductApp.Shared.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ProductApp.Server.Models;
+using ProductApp.Shared.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ProductApp.Server.Services
 {
-   public interface IAdminService
+    public interface IAdminService
     {
 
 
@@ -45,7 +39,7 @@ namespace ProductApp.Server.Services
         }
 
         //TODO: сделать асинхронно
-        public  IEnumerable<IdentityUser> GetAllUsersAsync(int pageSize, int pageNumber, out int totalUsers)
+        public IEnumerable<IdentityUser> GetAllUsersAsync(int pageSize, int pageNumber, out int totalUsers)
         {
             var allUsers = _db.Users.AsNoTracking();
             totalUsers = allUsers.Count();
@@ -61,7 +55,7 @@ namespace ProductApp.Server.Services
             var allUsers = _db.Users;
             var user = new IdentityUser { Email = model.Email, UserName = model.FirstName };
             var result = await _userManager.CreateAsync(user, model.Password);
-     
+
             if (result.Succeeded)
             {
                 return new UserManagerResponse
@@ -80,11 +74,11 @@ namespace ProductApp.Server.Services
                 };
             }
 
-           
+
 
         }
 
-    
+
         public async Task<ChangeRoleViewModel> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -92,11 +86,12 @@ namespace ProductApp.Server.Services
             {
                 // получем список ролей пользователя
                 var userRoles = await _userManager.GetRolesAsync(user);
-                var allRoles = _roleManager.Roles.Select(r=>r.Name).ToList();
+                var allRoles = _roleManager.Roles.Select(r => r.Name).ToList();
                 List<UserRoleViewModel> roles = new List<UserRoleViewModel>();
-                foreach (var all in allRoles) {
+                foreach (var all in allRoles)
+                {
                     var result = userRoles.FirstOrDefault(u => u == all);
-                    if(result == null)
+                    if (result == null)
                         roles.Add(new UserRoleViewModel(false, all));
                     else
                         roles.Add(new UserRoleViewModel(true, all));
@@ -110,7 +105,7 @@ namespace ProductApp.Server.Services
                 };
                 return model;
             }
-                return null;
+            return null;
 
         }
 
@@ -129,8 +124,8 @@ namespace ProductApp.Server.Services
                     IsSuccess = false,
                 };
 
-                user.Email = model.UserEmail;
-                user.UserName = model.UserEmail;
+            user.Email = model.UserEmail;
+            user.UserName = model.UserEmail;
 
 
             // получем список ролей пользователя
@@ -152,24 +147,24 @@ namespace ProductApp.Server.Services
 
 
             var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
+            if (result.Succeeded)
+            {
+                return new UserManagerResponse
                 {
-                    return new UserManagerResponse
-                    {
-                        Message = "Пользователь отредактирован",
-                        IsSuccess = true,
-                    };
-                }
-                else
+                    Message = "Пользователь отредактирован",
+                    IsSuccess = true,
+                };
+            }
+            else
+            {
+                return new UserManagerResponse
                 {
-                    return new UserManagerResponse
-                    {
-                        Message = "Пользователь не отредактирован",
-                        IsSuccess = false,
-                        Errors = result.Errors.Select(r => r.Description).ToArray()
-                    };
-                }
-            
+                    Message = "Пользователь не отредактирован",
+                    IsSuccess = false,
+                    Errors = result.Errors.Select(r => r.Description).ToArray()
+                };
+            }
+
 
         }
         public async Task<UserManagerResponse> DeleteUserById(string id)

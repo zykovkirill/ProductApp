@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using AKSoftware.WebApi.Client;
+﻿using AKSoftware.WebApi.Client;
 using ProductApp.Shared.Models;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ProductApp.WebClient.Services
 {

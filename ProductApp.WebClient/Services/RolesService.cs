@@ -1,9 +1,6 @@
 ﻿using AKSoftware.WebApi.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using ProductApp.Shared.Models;
+using System.Threading.Tasks;
 
 namespace ProductApp.WebClient.Services
 {

@@ -5,10 +5,7 @@ using ProductApp.Server.Services;
 using ProductApp.Shared.Models;
 using ProductApp.Shared.Models.UserData;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace ProductApp.Server.Controllers.User
 {
