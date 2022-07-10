@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using ProductApp.Server.Localized;
 using ProductApp.Server.Models;
 using ProductApp.Server.Services;
+using Serilog;
 using System.Security.Claims;
 using System.Text;
 
@@ -41,8 +42,7 @@ namespace ProductApp.Server
                 options.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddRoles<IdentityRole>().AddErrorDescriber<RussianIdentityErrorDescriber>();
 
-
-
+            services.AddSingleton(Log.Logger);
 
             services.AddAuthentication(auth =>
             {

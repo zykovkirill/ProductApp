@@ -24,10 +24,10 @@ namespace ProductApp.Server.Services
     public class AdminService : IAdminService
     {
 
-        private UserManager<IdentityUser> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
-        private IConfiguration _configuration;
-        private ApplicationDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _db;
 
         public AdminService(UserManager<IdentityUser> userManager, IConfiguration configuration, RoleManager<IdentityRole> roleManager, ApplicationDbContext db)
         {

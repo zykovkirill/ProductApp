@@ -11,7 +11,7 @@ namespace ProductApp.Server
         {
             try
             {
-                string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}";
+                string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] ({SourceContext}.{Method}) {Message}{NewLine}{Exception}";
                 Log.Logger = new
                     LoggerConfiguration().WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + "\\Log.txt",
                     rollingInterval: RollingInterval.Day, outputTemplate:

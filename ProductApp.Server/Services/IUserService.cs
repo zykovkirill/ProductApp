@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using ProductApp.Server.Models;
 using ProductApp.Shared.Models;
@@ -33,15 +34,17 @@ namespace ProductApp.Server.Services
     public class UserService : IUserService
     {
 
-        private UserManager<IdentityUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
         //private RoleManager<IdentityRole> _roleManager;
-        private IConfiguration _configuration;
-        private IMailService _mailService;
-        private ApplicationDbContext _db;
+        private readonly IConfiguration _configuration;
+        private readonly IMailService _mailService;
+        private readonly ApplicationDbContext _db;
         private const string _roleUser = "Admin";/*"User";*/
+        private readonly ILogger<IUserService> _logger;
 
-        public UserService(UserManager<IdentityUser> userManager,/* RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db)
+        public UserService(UserManager<IdentityUser> userManager,/* RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db,  ILogger<IUserService> logger)
         {
+            _logger = logger;
             _db = db;
             _userManager = userManager;
             _configuration = configuration;
@@ -166,6 +169,15 @@ namespace ProductApp.Server.Services
             // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль ;
             var roles = _userManager.GetRolesAsync(user).Result;
 
+            if(!roles.Any())
+            {
+                return new UserManagerResponse
+                {
+                    IsSuccess = false,
+                    Message = "У пользователя нет ролей"
+                };
+            }
+
             List<Claim> claimsRoleList = new List<Claim>();
             foreach (var item in roles)
             {
@@ -189,7 +201,16 @@ namespace ProductApp.Server.Services
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
-
+            //TODO: ДОБАВИТЬ ЛОГИРОВАНИЕ В КЛИЕНТЕ ТОЖЕ
+            //_logger.LogInformation("Test1");
+            if (data == null)
+            {
+                return new UserManagerResponse
+                {
+                    IsSuccess = false,
+                    Message = "У пользователя отсутствуют данные о профиле"
+                };
+            }
             LocalUserInfo localUserInfo = new LocalUserInfo()
             {
                 Email = user.Email,
