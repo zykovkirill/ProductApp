@@ -83,11 +83,11 @@
 
     async Task editProductAsync()
     {
+        var userState = authenticationState.Result;
         isBusy = true;
-
-
         model.CoverFile = fileStream;
         model.FileName = fileName;
+        //model.EditedUser = userState.User.FindFirst("Id").Value;
         var result = await productsService.EditProductAsync(model);
         if (result.IsSuccess)
         {
@@ -138,7 +138,7 @@
 
     void OnChange(object value)
     {
-        model.ProductType = (int)value;
+        //model.ProductType = (int)value;
     }
 
 }

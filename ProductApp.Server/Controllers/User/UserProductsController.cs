@@ -21,10 +21,10 @@ namespace WebAPIApp.Controllers
     {
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
-        private const int _pageSize = 10;
+        private const int PageSize = 10;
         private readonly ILogger<UserProductsController> _logger;
 
-        private readonly List<string> allowedExtensions = new List<string>
+        private readonly List<string> _allowedExtensions = new List<string>
         {
             ".jpg", ".bmp", ".png"
         };
@@ -43,13 +43,13 @@ namespace WebAPIApp.Controllers
             int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.GetAllUserProductsAsync(_pageSize, page, userId, out totalProducts);
+            var products = _productsService.GetAllUserProductsAsync(PageSize, page, userId, out totalProducts);
 
             int totalPages = 0;
-            if (totalProducts % _pageSize == 0)
-                totalPages = totalProducts / _pageSize;
+            if (totalProducts % PageSize == 0)
+                totalPages = totalProducts / PageSize;
             else
-                totalPages = (totalProducts / _pageSize) + 1;
+                totalPages = (totalProducts / PageSize) + 1;
             //TODO: Протестировать логи заключить их в try
             _logger.LogInformation("Продукты переданы");
             return Ok(new CollectionPagingResponse<UserCreatedProduct>
@@ -58,7 +58,7 @@ namespace WebAPIApp.Controllers
                 IsSuccess = true,
                 Message = "Продукты переданы",
                 OperationDate = DateTime.UtcNow,
-                PageSize = _pageSize,
+                PageSize = PageSize,
                 Page = page,
                 Records = products
             });
@@ -79,7 +79,7 @@ namespace WebAPIApp.Controllers
             {
                 string extension = Path.GetExtension(model.CoverFile.FileName);
 
-                if (!allowedExtensions.Contains(extension))
+                if (!_allowedExtensions.Contains(extension))
                     return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
                         Message = "Данный тип изображения не поддерживается",
@@ -100,16 +100,18 @@ namespace WebAPIApp.Controllers
 
             var userProd = new UserCreatedProduct
             {
-                ChevronProductId = model.ChevronProductId,
-                ToyProductId = model.ToyProductId,
+                BaseProductId = model.ToyProductId,
                 CoverPath = url,
-                Size = float.Parse(model.Size, CultureInfo.InvariantCulture.NumberFormat),
-                X = float.Parse(model.X, CultureInfo.InvariantCulture.NumberFormat),
-                Y = float.Parse(model.Y, CultureInfo.InvariantCulture.NumberFormat),
                 Name = model.FileName
 
             };
-
+            userProd.IncludedProducts.Add(new IncludedProduct
+            {
+                ProductID = model.ChevronProductId,
+                Size = float.Parse(model.Size, CultureInfo.InvariantCulture.NumberFormat),
+                X = float.Parse(model.X, CultureInfo.InvariantCulture.NumberFormat),
+                Y = float.Parse(model.Y, CultureInfo.InvariantCulture.NumberFormat)
+            });
             var addedProduct = await _productsService.AddUserProductAsync(userProd, userId);
             if (addedProduct != null)
             {
@@ -159,7 +161,7 @@ namespace WebAPIApp.Controllers
             {
                 string extension = Path.GetExtension(model.CoverFile.FileName);
 
-                if (!allowedExtensions.Contains(extension))
+                if (!_allowedExtensions.Contains(extension))
                     return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
                         Message = "Данный тип изображения не поддерживается",

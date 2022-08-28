@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ProductApp.Server.Models;
 using ProductApp.Shared.Models;
 using ProductApp.Shared.Models.UserData;
@@ -9,18 +10,21 @@ using System.Threading.Tasks;
 
 namespace ProductApp.Server.Services
 {
-    //TODO: Обобщить интерфейс
+    //TODO: Обобщить интерфейс, разделить принцип  SOLID
     public interface IProductsService
     {
         // Сделать region для продуктов, продуктов пользователя 
         IEnumerable<Product> GetAllProductsAsync(int pageSize, int pageNumber, out int totalProducts);
+        IEnumerable<ProductType> GetProductTypesAsync();
         IEnumerable<Product> SearchProductsAsync(string query, int pageSize, int pageNumber, out int totalProducts);
         IEnumerable<Product> FilterProductsAsync(string filter, int pageSize, int pageNumber, out int totalProducts);
-        Task<Product> AddProductAsync(string name, string description, int price, int type, string imagePath);
-        Task<Product> EditProductAsync(string id, string newName, string description, int price, int type, string newImagePath);
+        Task<Product> AddProductAsync(string name, string description, int price, ProductType type, string imagePath, string editedUser);
+        Task<Product> EditProductAsync(string id, string newName, string description, int price, ProductType type, string newImagePath);
         Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId);
         Task<ProductInfo> AddCommentAsync(string id, Comment comment);
         Task<ProductInfo> AddRatingAsync(string id, Rating comment);
+        Task<bool> AddProductTypeAsync(ProductType model);
+        Task<bool> AddProductsTypeAsync(List<ProductType> models);
         Task<Product> DeleteProductAsync(string id);
         Task<Product> GetProductById(string id);
         Task<ProductInfo> GetProductInfoById(string id);
@@ -34,12 +38,14 @@ namespace ProductApp.Server.Services
     {
 
         private readonly ApplicationDbContext _db;
-        public ProductsService(ApplicationDbContext db)
+        private readonly ILogger<IApplicationStartupService> _logger;
+        public ProductsService(ApplicationDbContext db, ILogger<IApplicationStartupService> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
-        public async Task<Product> AddProductAsync(string name, string description, int price, int type, string imagePath)
+        public async Task<Product> AddProductAsync(string name, string description, int price, ProductType type, string imagePath, string editedUser)
         {
             var product = new Product
             {
@@ -47,9 +53,14 @@ namespace ProductApp.Server.Services
                 Name = name,
                 Description = description,
                 Price = price,
-                ProductType = type
+                ProductType = type,
+                EditedUser = editedUser
             };
-            var productInfo = new ProductInfo();
+            var productInfo = new ProductInfo()
+            {
+
+                EditedUser = editedUser
+            };
             productInfo.ProductId = product.Id;
             await _db.ProductInfos.AddAsync(productInfo);
             await _db.Products.AddAsync(product);
@@ -71,7 +82,7 @@ namespace ProductApp.Server.Services
             return prod;
         }
 
-        public async Task<Product> EditProductAsync(string id, string newName, string description, int price, int type, string newImagePath)
+        public async Task<Product> EditProductAsync(string id, string newName, string description, int price, ProductType type, string newImagePath)
         {
             var prod = await _db.Products.FindAsync(id);
             if (prod.IsDeleted)
@@ -99,6 +110,11 @@ namespace ProductApp.Server.Services
             var prod = allProducts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray();
 
             return prod;
+        }
+
+        public IEnumerable<ProductType> GetProductTypesAsync()
+        {
+            return  _db.ProductTypes.Where(p => !p.IsDeleted).AsNoTracking();
         }
 
         //TODO :Сделать асинхронно 
@@ -181,20 +197,21 @@ namespace ProductApp.Server.Services
         /// <summary>
         /// Возвращает продукты с учетом фильтра по типам 
         /// </summary>
-        /// <param name="filter">тип</param>
+        /// <param name="type">тип</param>
         /// <param name="pageSize">размер страницы</param>
         /// <param name="pageNumber">номер страницы</param>
         /// <param name="totalProducts">общее количество продуктов</param>
         /// <returns></returns>
-        public IEnumerable<Product> FilterProductsAsync(string filter, int pageSize, int pageNumber, out int totalProducts)
+        /// TODO: ПЕРЕДЕЛАТЬ ФИЛДЬТР НА ФРОНТЕ
+        public IEnumerable<Product> FilterProductsAsync(string type, int pageSize, int pageNumber, out int totalProducts)
         {
             List<Product> allProducts = new List<Product>();
-            if (!String.IsNullOrWhiteSpace(filter))
+            if (!String.IsNullOrWhiteSpace(type))
             {
-                string[] words = filter.Split(',');
+                string[] words = type.Split(',');
                 foreach (var i in words)
                 {
-                    allProducts.AddRange(_db.Products.Where(p => !p.IsDeleted && p.ProductType == Int32.Parse(i)).AsNoTracking().ToList());
+                    allProducts.AddRange(_db.Products.Where(p => !p.IsDeleted && p.ProductType.Id == i).AsNoTracking().ToList());
 
                 };
             }
@@ -220,7 +237,7 @@ namespace ProductApp.Server.Services
             profile.UserCreatedProducts.Add(model);
             //await _db.UserProducts.AddAsync(model);
             await _db.SaveChangesAsync();
-
+            //TODO : Проверить использование сервисом возвращаемых значений - может проще bool сделать а на вход модель добавления 
             return model;
         }
 
@@ -231,11 +248,11 @@ namespace ProductApp.Server.Services
                 return null;
 
             prod.Name = newName;
-            prod.ChevronProductId = chevronProductIdiption;
-            prod.ToyProductId = toyProductId;
-            prod.X = x;
-            prod.Y = y;
-            prod.Size = size;
+          //  prod.ChevronProductId = chevronProductIdiption;
+            //prod.ToyProductId = toyProductId;
+            //prod.X = x;
+            //prod.Y = y;
+            //prod.Size = size;
             if (newImagePath != null)
                 prod.CoverPath = newImagePath;
             prod.ModifiedDate = DateTime.Now;
@@ -253,6 +270,37 @@ namespace ProductApp.Server.Services
                 return null;
 
             return product;
+        }
+
+        public async Task<bool> AddProductTypeAsync(ProductType model)
+        {
+            try
+            {
+                await _db.ProductTypes.AddAsync(model);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception e )
+            {
+                _logger.LogWarning($"Тип продукта не был добавлен, ошибка - {e}");
+                return false;
+            }
+
+        }
+
+        public async Task<bool> AddProductsTypeAsync(List<ProductType> models)
+        {
+            try
+            {
+                await _db.ProductTypes.AddRangeAsync(models);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"Тип продукта не был добавлен, ошибка - {e}");
+                return false;
+            }
         }
     }
 

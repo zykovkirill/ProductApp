@@ -9,9 +9,9 @@ namespace ProductApp.Shared.Models
         /// <summary>
         /// Возвращает название продукта 
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">Тип продукта</param>
         /// <returns></returns>
-        public static string GetNameProductType(int type)
+        public static string GetNameProductByType(int type)
         {
             string value = String.Empty;
             bool hasValue = ProductTypeDictionary.TryGetValue(type, out value);
@@ -20,10 +20,9 @@ namespace ProductApp.Shared.Models
             else
                 //TODO: Сделать запись в логи об ошибке
                 return value;
-
-
         }
 
+        //TODO: Типы вынести в базу и инициализировать в скрипте развертке(таж же и создавать пользователя Admin)
         /// <summary>
         /// Словарь типов продуктов 
         /// </summary>
@@ -33,14 +32,12 @@ namespace ProductApp.Shared.Models
             {1,"Игрушки"},
             {2,"Шевроны" }
         };
-
-
+        
         /// <summary>
         /// Класс типов продуктов(вспомогательный) 
         /// </summary>
         public class ProductType
         {
-
             public string ProductTypeInt { get; set; }
 
             public string ProductTypeName { get; set; }

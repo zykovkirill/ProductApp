@@ -23,13 +23,19 @@ namespace ProductApp.Server
             Configuration = configuration;
         }
 
+        private const string ConnectionString = "PgConnection";
+
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //{
+            //    options.UseSqlServer(Configuration.GetConnectionString(ConnectionString));
+            //});
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(Configuration.GetConnectionString(ConnectionString));
             });
 
 
@@ -77,6 +83,7 @@ namespace ProductApp.Server
             //TODO : AddScoped или AddTransient
             services.AddTransient<IProductsService, ProductsService>();
             services.AddTransient<IUserDataService, UserDataService>();
+            services.AddTransient<IApplicationStartupService, ApplicationStartupService>();
             services.AddControllers();
 
             services.AddCors(options =>

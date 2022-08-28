@@ -5,7 +5,6 @@
     /// </summary>
     public class OrderHistory : Record
     {
-
         public string IdOrder { get; set; }
 
         public OrderStatus Status { get; set; }

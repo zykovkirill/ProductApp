@@ -56,7 +56,8 @@ namespace ProductApp.Server.Services
                 var history = new OrderHistory()
                 {
                     IdOrder = model.Id,
-                    Status = model.Status
+                    Status = model.Status,
+                    EditedUser = model.EditedUser
                 };
                 await _db.PurchasesHistorys.AddAsync(history);
                 await _db.SaveChangesAsync();

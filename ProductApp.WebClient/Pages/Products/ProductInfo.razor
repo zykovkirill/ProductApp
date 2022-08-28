@@ -1,7 +1,7 @@
 ﻿@page "/products/ProductInfo/{ProductId}"
-@inject ProductsService productsService
+@inject ProductApp.WebClient.Services.ProductsService Service
 @attribute [Authorize(Roles = "Admin, User")]
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorage
 
 
 <h2> Продукт @*- Страница: @PageNumber*@</h2>
@@ -107,11 +107,11 @@ else
         isBusy = true;
 
         var userState = authenticationState.Result;
-        productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
+        Service.AccessToken = userState.User.FindFirst("AccessToken").Value;
 
         OperationResponse<ProductApp.Shared.Models.ProductInfo> result;
 
-        result = await productsService.GetProductInfoByIdAsync(id);
+        result = await Service.GetProductInfoByIdAsync(id);
         //TODO: В NavMenu не прокручивается все меню и отображается белым цветом нижние пункты(например на странице РОЛИ)
         if (result.IsSuccess)
         {
@@ -142,9 +142,10 @@ else
 
         comment.CreatedDate = DateTime.Now;
         comment.UserName = userState.User.FindFirst("FirstName").Value;
+        //comment.EditedUser = userState.User.FindFirst("Id").Value;
 
         OperationResponse<Comment> result;
-        result = await productsService.AddCommentAsync(new BaseBuffer<Comment> { Entity = comment, Id = Info.ProductId });
+        result = await Service.AddCommentAsync(new BaseBuffer<Comment> { Entity = comment, Id = Info.ProductId });
 
         if (result.IsSuccess)
         {
@@ -178,7 +179,8 @@ else
         isBusy = true;
         if (count != 0)
         {
-            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count);
+            var userState = authenticationState.Result;
+            await SessionUtils.AddProductToCartSessionStorageAsync(SessionStorage, selectedProduct, count, userState.User.FindFirst("Id").Value);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
@@ -187,7 +189,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        TargetProduct = await SessionUtils.GetProductSessionStorageAsync(sessionStorage);
+        TargetProduct = await SessionUtils.GetProductSessionStorageAsync(SessionStorage);
         await getProductInfoAsync(TargetProduct.Id);
     }
 
@@ -200,9 +202,10 @@ else
 
         var userState = authenticationState.Result;
         //var userId = userState.User.FindFirst("Id").Value;
-
+        
         OperationResponse<Rating> result;
-        result = await productsService.AddRatingAsync(new BaseBuffer<Rating> { Entity = new Rating { ProductRating = value/*, UserId = userId */}, Id = Info.ProductId });
+        result = await Service.AddRatingAsync(new BaseBuffer<Rating> { Entity = new Rating { ProductRating = value/*, UserId = userId */, 
+                                                                                                     /*EditedUser = userState.User.FindFirst("Id").Value*/}, Id = Info.ProductId });
 
         if (result.IsSuccess)
         {

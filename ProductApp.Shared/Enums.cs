@@ -21,18 +21,18 @@
         Cancel = 7,
     }
 
-    /// <summary>
-    /// Типы продуктов связаны с ProductType в Utils
-    /// </summary>
-    public enum ProductTypeEnum
-    {
-        /// <summary>Неизвестно что</summary>
-        None = 0,
-        /// <summary>Игрушка</summary>
-        Toy = 1,
-        /// <summary>Шеврон</summary>
-        Сhevron = 2
-    }
+    ///// <summary>
+    ///// Типы продуктов связаны с ProductType в Utils
+    ///// </summary>
+    //public enum ProductTypeEnum
+    //{
+    //    /// <summary>Неизвестно что</summary>
+    //    None = 0,
+    //    /// <summary>Игрушка</summary>
+    //    Toy = 1,
+    //    /// <summary>Шеврон</summary>
+    //    Сhevron = 2
+    //}
 
     /// <summary>Тип</summary>
     public enum ClassType

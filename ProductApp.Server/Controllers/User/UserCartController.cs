@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace WebAPIApp.Controllers
 {
@@ -67,8 +68,13 @@ namespace WebAPIApp.Controllers
             UserOrder model = json.ToObject<UserOrder>();
             if (model.Products.Any())
             {
+
                 if (string.IsNullOrEmpty(model.UserId))
                     model.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                else
+                {
+                    //TODO: сделать лог
+                }
                 var purchase = await _userDataService.AddOrderAsync(model);
                 if (purchase == null)
                     return

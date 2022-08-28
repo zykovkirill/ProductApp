@@ -11,10 +11,15 @@ namespace ProductApp.Shared.Models
         /// Коментарии 
         /// </summary>
         public List<Comment> Comments { get; set; }
+
         /// <summary>
         /// Рейтинг
         /// </summary>
         public List<Rating> Ratings { get; set; }
+
+        /// <summary>
+        /// Идентификатор продукта
+        /// </summary>
         public string ProductId { get; set; }
         public ProductInfo()
         {

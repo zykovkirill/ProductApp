@@ -89,8 +89,6 @@ namespace CustomIdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] RegisterRequest model)
         {
-
-
             if (ModelState.IsValid)
             {
                 UserManagerResponse result = await _adminService.CreateUserAsync(model);
@@ -101,12 +99,7 @@ namespace CustomIdentityApp.Controllers
             }
 
             return BadRequest("Одно или несколько свойств не прошли валидацию"); // Код : 400
-
-
-
         }
-
-
 
         #endregion
 

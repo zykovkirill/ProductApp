@@ -9,7 +9,7 @@
         {
 
         }
-        public UserOrderProduct(BaseProduct baseProduct, int count)
+        public UserOrderProduct(BaseProduct baseProduct, int count, string editedUser)
         {
             this.Count = count;
             this.CoverPath = baseProduct.CoverPath;
@@ -17,6 +17,7 @@
             this.Price = baseProduct.Price;
             this.ProductKind = baseProduct.ProductKind;
             this.ProductId = baseProduct.Id;
+            this.EditedUser = editedUser;
         }
         /// <summary>
         /// Колличество

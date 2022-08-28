@@ -10,11 +10,11 @@ namespace ProductApp.Shared.Models
         [StringLength(200)]
         public string Description { get; set; }
 
-        /// <summary>
-        /// Тип продукта
-        /// </summary>
-        [Required]
-        public int ProductType { get; set; }
+        ///// <summary>
+        ///// Тип продукта
+        ///// </summary>
+        //[Required]
+        //public int ProductType { get; set; }
 
     }
 }

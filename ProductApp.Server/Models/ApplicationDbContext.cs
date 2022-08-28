@@ -7,7 +7,7 @@ namespace ProductApp.Server.Models
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        //TODO: Записи в БД НАСЛЕДУЙ от RECORD
+        //TODO: Записи в БД НАСЛЕДУЙ от RECORD и не забывай при изменении записи менять поле EditUser, мб нужно обертку сделать какую-нибудь
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 
@@ -19,6 +19,8 @@ namespace ProductApp.Server.Models
         public DbSet<OrderHistory> PurchasesHistorys { get; set; }
 
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<ProductType> ProductTypes { get; set; }
 
         public DbSet<ProductInfo> ProductInfos { get; set; }
 

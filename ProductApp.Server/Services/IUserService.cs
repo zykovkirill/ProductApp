@@ -28,28 +28,26 @@ namespace ProductApp.Server.Services
         Task<UserManagerResponse> ForgetPsswordAsync(string email);
 
         Task<UserManagerResponse> ResetPsswordAsync(ResetPasswordViewModel model);
-    }
 
+    }
 
     public class UserService : IUserService
     {
 
         private readonly UserManager<IdentityUser> _userManager;
-        //private RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly IMailService _mailService;
         private readonly ApplicationDbContext _db;
-        private const string _roleUser = "Admin";/*"User";*/
+        private const string RoleUser = "User";
         private readonly ILogger<IUserService> _logger;
 
-        public UserService(UserManager<IdentityUser> userManager,/* RoleManager<IdentityRole> roleManager,*/ IConfiguration configuration, IMailService mailService, ApplicationDbContext db,  ILogger<IUserService> logger)
+        public UserService(UserManager<IdentityUser> userManager, IConfiguration configuration, IMailService mailService, ApplicationDbContext db,  ILogger<IUserService> logger)
         {
             _logger = logger;
             _db = db;
             _userManager = userManager;
             _configuration = configuration;
             _mailService = mailService;
-            //_roleManager = roleManager;
         }
 
 
@@ -73,10 +71,8 @@ namespace ProductApp.Server.Services
                     UserName = model.FirstName
                 };
 
-
-                //await _roleManager.CreateAsync(new IdentityRole(_roleUser));
                 var result = await _userManager.CreateAsync(identityUser, model.Password);
-                await _userManager.AddToRoleAsync(identityUser, _roleUser);
+                await _userManager.AddToRoleAsync(identityUser, RoleUser);
                 if (result.Succeeded)
                 {
 
@@ -90,7 +86,8 @@ namespace ProductApp.Server.Services
                     {
                         UserId = identityUser.Id,
                         FirstName = model.FirstName,
-                        LastName = model.LastName
+                        LastName = model.LastName,
+                        EditedUser = identityUser.Id
                     };
 
                     await _db.UserProfiles.AddAsync(userProfile);
@@ -135,7 +132,7 @@ namespace ProductApp.Server.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Произошла ошибка" + ex.Message);
+                _logger.LogError("Произошла ошибка" + ex.Message);
                 return new UserManagerResponse
                 {
                     Message = "Пользователь не был создан, обратитесь в поддержку",
@@ -144,96 +141,105 @@ namespace ProductApp.Server.Services
             }
         }
 
-
         public async Task<UserManagerResponse> LoginUserAsync(LoginViewModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            try
             {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    return new UserManagerResponse
+                    {
+                        Message = "Данный Email не соответствует не одному пользователю",
+                        IsSuccess = false,
+
+                    };
+                }
+
+                var result = await _userManager.CheckPasswordAsync(user, model.Password);
+
+                if (!result)
+                    return new UserManagerResponse
+                    {
+                        Message = "Неправильный пароль",
+                        IsSuccess = false,
+                    };
+                // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль ;
+                var roles = _userManager.GetRolesAsync(user).Result;
+
+                if (!roles.Any())
+                {
+                    return new UserManagerResponse
+                    {
+                        IsSuccess = false,
+                        Message = "У пользователя нет ролей"
+                    };
+                }
+
+                List<Claim> claimsRoleList = new List<Claim>();
+                foreach (var item in roles)
+                {
+                    claimsRoleList.Add(new Claim(ClaimTypes.Role, item));
+                }
+
+                List<Claim> claimsList = new List<Claim>();
+                claimsList.Add(new Claim("Email", model.Email));
+                claimsList.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                claimsList.Add(new Claim(ClaimTypes.Name, user.UserName));
+                claimsList.AddRange(claimsRoleList);
+                var claims = claimsList.ToArray();
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
+                var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["AuthSettings:Issuer"],
+                    audience: _configuration["AuthSettings:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(30),
+                    signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+
+                string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
+                //TODO: ДОБАВИТЬ ЛОГИРОВАНИЕ В КЛИЕНТЕ ТОЖЕ
+                //_logger.LogInformation("Test1");
+                if (data == null)
+                {
+                    return new UserManagerResponse
+                    {
+                        IsSuccess = false,
+                        Message = "У пользователя отсутствуют данные о профиле"
+                    };
+                }
+                LocalUserInfo localUserInfo = new LocalUserInfo()
+                {
+                    Email = user.Email,
+                    FirstName = data?.FirstName,
+                    LastName = data?.LastName,
+                    Id = user.Id,
+                    AccessToken = tokenAsString,
+                    Roles = claimsRoleList.Select(c => c.Value).ToList()
+                };
+
                 return new UserManagerResponse
                 {
-                    Message = "Данный Email не соответствует не одному пользователю",
-                    IsSuccess = false,
-
+                    Message = tokenAsString,
+                    IsSuccess = true,
+                    ExpireDate = token.ValidTo,
+                    UserInfo = localUserInfo
                 };
             }
-
-            var result = await _userManager.CheckPasswordAsync(user, model.Password);
-
-            if (!result)
+            catch(Exception ex)
+            {
+                _logger.LogError("Произошла ошибка" + ex.Message);
                 return new UserManagerResponse
                 {
-                    Message = "Неправильный пароль",
+                    Message = "Пользователь не может пройти авторизацию, обратитесь в поддержку",
                     IsSuccess = false,
                 };
-            // TODO: добавить инициализация ролей при создании БД cкрипт создающий пользователя и роль ;
-            var roles = _userManager.GetRolesAsync(user).Result;
-
-            if(!roles.Any())
-            {
-                return new UserManagerResponse
-                {
-                    IsSuccess = false,
-                    Message = "У пользователя нет ролей"
-                };
             }
-
-            List<Claim> claimsRoleList = new List<Claim>();
-            foreach (var item in roles)
-            {
-                claimsRoleList.Add(new Claim(ClaimTypes.Role, item));
-            }
-
-            List<Claim> claimsList = new List<Claim>();
-            claimsList.Add(new Claim("Email", model.Email));
-            claimsList.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-            claimsList.Add(new Claim(ClaimTypes.Name, user.UserName));
-            claimsList.AddRange(claimsRoleList);
-            var claims = claimsList.ToArray();
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthSettings:Key"]));
-            var data = _db.UserProfiles.FirstOrDefault(d => d.UserId == user.Id);
-            var token = new JwtSecurityToken(
-                issuer: _configuration["AuthSettings:Issuer"],
-                audience: _configuration["AuthSettings:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddDays(30),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
-
-            string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
-            //TODO: ДОБАВИТЬ ЛОГИРОВАНИЕ В КЛИЕНТЕ ТОЖЕ
-            //_logger.LogInformation("Test1");
-            if (data == null)
-            {
-                return new UserManagerResponse
-                {
-                    IsSuccess = false,
-                    Message = "У пользователя отсутствуют данные о профиле"
-                };
-            }
-            LocalUserInfo localUserInfo = new LocalUserInfo()
-            {
-                Email = user.Email,
-                FirstName = data?.FirstName,
-                LastName = data?.LastName,
-                Id = user.Id,
-                AccessToken = tokenAsString,
-                Roles = claimsRoleList.Select(c => c.Value).ToList()
-            };
-
-            return new UserManagerResponse
-            {
-                Message = tokenAsString,
-                IsSuccess = true,
-                ExpireDate = token.ValidTo,
-                UserInfo = localUserInfo
-            };
-
         }
 
         public async Task<UserManagerResponse> ConfirmEmailAsync(string userId, string token)
         {
-
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -326,5 +332,6 @@ namespace ProductApp.Server.Services
                 Errors = result.Errors.Select(e => e.Description).ToArray(),
             };
         }
+
     }
 }

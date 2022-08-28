@@ -37,7 +37,14 @@ namespace ProductApp.Shared.Models
         /// Тип продукта
         /// </summary>
         [Required]
-        public int ProductType { get; set; }
+        public ProductType ProductType { get; set; }
+
+        ///// <summary>
+        ///// Пользователь отправивший запрос
+        ///// </summary>
+        //[Required]
+        //[StringLength(100)]
+        //public string EditedUser { get; set; }
 
 
     }

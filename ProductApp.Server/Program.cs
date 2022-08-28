@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProductApp.Server.Services;
+using ProductApp.Shared.Models;
 using Serilog;
 using System;
 
@@ -16,7 +19,10 @@ namespace ProductApp.Server
                     LoggerConfiguration().WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + "\\Log.txt",
                     rollingInterval: RollingInterval.Day, outputTemplate:
                     outputTemplate).CreateLogger();
-                CreateHostBuilder(args).Build().Run();
+                var host = CreateHostBuilder(args).Build();
+                host.Run();
+                //TODO: CancellationToken
+                // host.RunAsync();
             }
             catch
             {

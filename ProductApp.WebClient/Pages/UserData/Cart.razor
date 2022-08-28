@@ -125,10 +125,12 @@ else
 
     async Task buyProductAsync()
     {
+        var userState = authenticationState.Result;
         isBusy = true;
         userOrder.Status = OrderStatus.Buy;
         userOrder.ProductCount = userOrder.Products.Select(p => p.Count).Sum();
         userOrder.TotalSum = userOrder.Products.Select(p => p.Count * p.Price).Sum();
+        //userOrder.EditedUser = userState.User.FindFirst("Id").Value;
         var result = await userDataService.AddOrderAsync(userOrder);
         if (result.IsSuccess)
         {
@@ -163,10 +165,12 @@ else
     }
     async Task saveCartAsync()
     {
+        var userState = authenticationState.Result;
         isBusy = true;
         userOrder.Status = OrderStatus.Cart;
         userOrder.ProductCount = userOrder.Products.Select(p => p.Count).Sum();
         userOrder.TotalSum = userOrder.Products.Select(p => p.Count * p.Price).Sum();
+        //userOrder.EditedUser = userState.User.FindFirst("Id").Value;
         var result = await userDataService.AddOrderAsync(userOrder);
         if (result.IsSuccess)
         {

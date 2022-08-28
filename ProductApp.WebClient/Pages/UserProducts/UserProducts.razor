@@ -93,7 +93,7 @@ else
 
     int totalPages = 1;
     //  string filterType = String.Empty;
-
+    UserCreatedProduct selectedUserProduct;
     IEnumerable<string> multipleValues;
     List<Utils.ProductType> prod = new List<Utils.ProductType>();
     //Сообщения об ошибках
@@ -146,8 +146,6 @@ else
         await getProductsAsync();
     }
 
-    UserCreatedProduct selectedUserProduct;
-
     void selectProduct(UserCreatedProduct userCreatedProduct)
     {
         selectedUserProduct = userCreatedProduct;
@@ -164,7 +162,8 @@ else
         isBusy = true;
         if (count != 0)
         {
-            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedUserProduct, count);
+            var userState = authenticationState.Result;
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedUserProduct, count, userState.User.FindFirst("Id").Value);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;

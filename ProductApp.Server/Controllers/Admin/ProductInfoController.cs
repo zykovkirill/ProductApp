@@ -16,7 +16,7 @@ namespace WebAPIApp.Controllers
     {
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
-        private const int _pageSize = 10;
+        private const int PageSize = 10;
         public ProductInfoController(IProductsService productsService, IConfiguration configuration)
         {
             _productsService = productsService;

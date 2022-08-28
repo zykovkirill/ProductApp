@@ -113,7 +113,7 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
-                new StringFormKeyValue("ProductType", model.ProductType.ToString())
+                //new StringFormKeyValue("ProductType", model.ProductType.ToString())
             };
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
@@ -137,7 +137,7 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
-                new StringFormKeyValue("ProductType", model.ProductType.ToString())
+                //new StringFormKeyValue("ProductType", model.ProductType.ToString())
             };
 
             if (model.CoverFile != null)

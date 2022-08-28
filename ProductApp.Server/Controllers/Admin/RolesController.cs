@@ -14,7 +14,7 @@ namespace CustomIdentityApp.Controllers
     [Authorize(Roles = "Admin")]
     public class RolesController : ControllerBase
     {
-        RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         // UserManager<IdentityUser> _userManager;
         public RolesController(RoleManager<IdentityRole> roleManager/*, UserManager<IdentityUser> userManager*/)
         {

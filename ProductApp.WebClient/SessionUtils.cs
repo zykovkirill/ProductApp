@@ -33,13 +33,13 @@ namespace ProductApp.WebClient
             return await sessionStorage.GetItemAsync<List<UserOrderProduct>>(_cartSessionStorageName);
         }
 
-        public async static Task AddProductToCartSessionStorageAsync(ISessionStorageService sessionStorage, BaseProduct selectedProduct, int count)
+        public async static Task AddProductToCartSessionStorageAsync(ISessionStorageService sessionStorage, BaseProduct selectedProduct, int count, string editedUser)
         {
             var cartSessionStorage = await InitOrGetCartSessionStorageAsync(sessionStorage);
             var isProductExists = cartSessionStorage.Any(c => c.ProductId == selectedProduct.Id);
             if (!isProductExists)
             {
-                var userOrderProduct = new UserOrderProduct(selectedProduct, count);
+                var userOrderProduct = new UserOrderProduct(selectedProduct, count, editedUser);
                 userOrderProduct.Count = count;
                 cartSessionStorage.Add(userOrderProduct);
                 await sessionStorage.SetItemAsync(_cartSessionStorageName, cartSessionStorage);

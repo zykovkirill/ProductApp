@@ -6,6 +6,7 @@ using ProductApp.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
@@ -14,52 +15,53 @@ namespace WebAPIApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductTypesController : ControllerBase
     {
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
+        private readonly List<string> _allowedExtensions = new List<string>
+        {
+            ".jpg", ".bmp", ".png"
+        };
         private const int PageSize = 10;
-        public ProductsController(IProductsService productsService, IConfiguration configuration)
+        public ProductTypesController(IProductsService productsService, IConfiguration configuration)
         {
             _productsService = productsService;
             _configuration = configuration;
         }
 
-        private readonly List<string> allowedExtensions = new List<string>
-        {
-            ".jpg", ".bmp", ".png"
-        };
+      
 
         #region Get
-        [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<Product>))]
+        [ProducesResponseType(200, Type = typeof(CollectionResponse<ProductType>))]
         [HttpGet]
-        [Authorize(Roles = "Admin, User")]
-        public IActionResult Get(int page)
+        [Authorize(Roles = "Admin")]
+        public IActionResult Get()
         {
-
-             // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             //TODO: сделать единый сервис со страницами, отдельный метод или класс с привязкой типа объекта
-            int totalProducts = 0;
-            if (page == 0)
-                page = 1;
-            var products = _productsService.GetAllProductsAsync(PageSize, page, out totalProducts);
 
-            int totalPages = 0;
-            if (totalProducts % PageSize == 0)
-                totalPages = totalProducts / PageSize;
-            else
-                totalPages = (totalProducts / PageSize) + 1;
-
-            return Ok(new CollectionPagingResponse<Product>
+            try
             {
-                Count = totalProducts,
-                IsSuccess = true,
-                Message = "Продукты переданы",
-                OperationDate = DateTime.UtcNow,
-                PageSize = PageSize,
-                Page = page,
-                Records = products
-            });
+                var productTypes = _productsService.GetProductTypesAsync();
+                return Ok(new CollectionResponse<ProductType>
+                {
+                    Count = productTypes.Count(),
+                    IsSuccess = true,
+                    Message = "Типы продуктов переданы",
+                    OperationDate = DateTime.UtcNow,
+                    Records = productTypes
+                });
+            }
+            catch
+            {
+                //TODO: запись в лог
+                return BadRequest(new OperationResponse<Product>
+                {
+                    Message = "Что-то пошло не так",
+                    IsSuccess = false
+                });
+            }
         }
 
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<Product>))]
@@ -126,7 +128,7 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(string id)
         {
-            //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             var prod = await _productsService.GetProductById(id);
             if (prod == null)
@@ -154,7 +156,6 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromForm] ProductRequestServer model)
         {
-          
              string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             string url = $"{_configuration["AppUrl"]}Images/default.jpg";
@@ -164,7 +165,7 @@ namespace WebAPIApp.Controllers
             {
                 string extension = Path.GetExtension(model.CoverFile.FileName);
 
-                if (!allowedExtensions.Contains(extension))
+                if (!_allowedExtensions.Contains(extension))
                     return BadRequest(new OperationResponse<Product>
                     {
                         Message = "Данный тип изображения не поддерживается",
@@ -183,7 +184,7 @@ namespace WebAPIApp.Controllers
                 url = $"{_configuration["AppUrl"]}{newFileName}";
             }
 
-            await using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
             {
                 if (fullPath != null)
                 {
@@ -238,7 +239,7 @@ namespace WebAPIApp.Controllers
             {
                 string extension = Path.GetExtension(model.CoverFile.FileName);
 
-                if (!allowedExtensions.Contains(extension))
+                if (!_allowedExtensions.Contains(extension))
                     return BadRequest(new OperationResponse<Product>
                     {
                         Message = "Данный тип изображения не поддерживается",

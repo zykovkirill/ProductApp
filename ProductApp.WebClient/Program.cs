@@ -26,6 +26,12 @@ namespace ProductApp.WebClient
             {
                 return new ProductsService(URL);
             });
+
+            builder.Services.AddScoped<ProductTypesService>(s =>
+            {
+                return new ProductTypesService(URL);
+            });
+
             builder.Services.AddScoped<UserDataService>(s =>
             {
                 return new UserDataService(URL);

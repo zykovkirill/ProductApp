@@ -15,8 +15,7 @@ namespace WebAPIApp.Controllers
     [Authorize(Roles = "Admin, User")]
     public class UserDataController : ControllerBase
     {
-        private ApplicationDbContext _db;
-
+        private readonly ApplicationDbContext _db;
 
         public UserDataController(ApplicationDbContext context)
         {

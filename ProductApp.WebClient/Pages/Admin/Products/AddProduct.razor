@@ -1,5 +1,6 @@
 ﻿@page "/products/AddProduct"
 @inject ProductsService productsService
+@inject ProductTypesService productTypesService
 @inject IFileReaderService fileReaderService
 @inject NavigationManager navigatorManager
 @using System.IO;
@@ -21,8 +22,8 @@
                 <RadzenNumeric Placeholder="Цена" Min="0" @bind-Value="model.Price" Style="margin:10px;" />
 
                 <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" TValue="int"
-                                Data=@(Utils.ProductTypeDictionary)
-                                TextProperty="Value" ValueProperty="Key"
+                                Data=@productTypes
+                                TextProperty="TypeName" ValueProperty="TypeName"
                                 Change=@(args => OnChange(args)) />
 
                 <input type="file" Style="margin:10px;" @ref="inputReference" @onchange="async () => await chooseFileAsync()" />
@@ -43,6 +44,7 @@
     System.IO.Stream fileStream = null;
     string imageContent = string.Empty;
     string fileName = string.Empty;
+    IList<ProductType> productTypes = new List<ProductType>();
 
     bool isBusy = false;
 
@@ -51,6 +53,13 @@
     //Сообщения об ошибках
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await getProductTypeAsync();
+        base.OnInitializedAsync();
+    }
+
 
     async Task chooseFileAsync()
     {
@@ -74,17 +83,22 @@
             fileName = fileInfo.Name;
             imageContent = $"data:{fileInfo.Type};base64, {Convert.ToBase64String(memoryStream.ToArray())}";
         }
-
-
     }
 
+    async Task getProductTypeAsync()
+    {
+        var result = await productTypesService.GetProductTypesAsync();
+        productTypes = result.Records.ToList();
+    } 
+     
 
     async Task postProductAsync()
     {
+        var userState = authenticationState.Result;
         isBusy = true;
         model.CoverFile = fileStream;
         model.FileName = fileName;
-        var userState = authenticationState.Result;
+        //model.EditedUser = userState.User.FindFirst("Id").Value;
         productsService.AccessToken = userState.User.FindFirst("AccessToken").Value;
         if (Validate())
         {
@@ -104,7 +118,7 @@
     void OnChange(object value)
     {
         @*//TODO: Сделать проверку на стороне сервера на нулевые значения полей возможно добавить атрибут запрещающий сохранять пустые значения*@
-        model.ProductType = (int)value;
+        //model.ProductType = (int)value;
     }
 
     private void CloseInfoMessage()
@@ -133,7 +147,7 @@
             message = "Укажите название";
             return false;
         }
-        if (model.ProductType == 0)
+        if (model.ProductType == null)
         {
             messageType = Models.AlertMessageType.Warning;
             message = "Выберите тип продукта";

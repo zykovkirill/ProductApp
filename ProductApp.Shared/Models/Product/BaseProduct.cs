@@ -33,5 +33,11 @@ namespace ProductApp.Shared.Models
         [StringLength(256)]
         public int ProductKind { get; set; }
 
+        /// <summary>
+        /// Тип продукта
+        /// </summary>
+        [Required]
+        public ProductType ProductType { get; set; }
+
     }
 }

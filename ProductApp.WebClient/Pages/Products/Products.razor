@@ -40,7 +40,7 @@ else
                     <div class="col-md-6">
                         <h3> @product.Name </h3>
                         <h3>Цена: @product.Price</h3>
-                        <h3>Тип продукта: @Utils.GetNameProductType(product.ProductType)</h3>
+                        <h3>Тип продукта: @*@Utils.GetNameProductByType(product.ProductType)*@</h3>
                         <hr />
                     </div>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Text="Подробно" Icon="expand_more" class="btn-block" Click="async () => await moreInfo(product)" />
@@ -166,7 +166,8 @@ else
         isBusy = true;
         if (count != 0)
         {
-            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count);
+            var userState = authenticationState.Result;
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count, userState.User.FindFirst("Id").Value);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
