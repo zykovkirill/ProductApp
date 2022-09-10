@@ -2,6 +2,8 @@
 using ProductApp.Shared.Models;
 using ProductApp.Shared.Models.UserData;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace ProductApp.WebClient.Services
@@ -11,19 +13,30 @@ namespace ProductApp.WebClient.Services
         private readonly string _baseUrl;
 
         ServiceClient client = new ServiceClient();
+        private readonly  HttpClient _httpClient; 
 
-        public ProductsService(string url)
+        public ProductsService(HttpClient httpClient)
         {
-            _baseUrl = url;
+            _baseUrl = "http://192.168.1.7:1485";
+            _httpClient = httpClient;
         }
 
         public string AccessToken
         {
-            get => client.AccessToken;
+
+            //_httpClient.DefaultRequestHeaders.Authorization =
+            //    new AuthenticationHeaderValue("Bearer", client.AccessToken);
+        get => client.AccessToken;
             set
             {
                 client.AccessToken = value;
             }
+
+            //set
+            //{
+            //    _httpClient.DefaultRequestHeaders.Authorization =
+            //    new AuthenticationHeaderValue("Bearer", value);
+            //}
         }
         /// <summary>
         /// Получить все продукты с помощью API
@@ -113,7 +126,7 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
-                new StringFormKeyValue("ProductTypeId", model.ProductTypeId)
+                new StringFormKeyValue("ProductType", model.ProductType)
             };
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
@@ -128,7 +141,7 @@ namespace ProductApp.WebClient.Services
         /// <summary>
         /// Редактировать продукт  с помощью API
         /// </summary>
-        /// <param name="model"> Обьект для добавления представляющий продукт </param>
+        /// <param name="model"> Обьект для редактирования  представляющий продукт </param>
         /// <returns></returns>
         public async Task<OperationResponse<Product>> EditProductAsync(ProductRequestClient model)
         {
@@ -138,13 +151,32 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
-                new StringFormKeyValue("ProductTypeId", model.ProductTypeId)
+                new StringFormKeyValue("ProductType", model.ProductType)
             };
 
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", client.AccessToken);
+
+            var formData = new MultipartFormDataContent() {
+            { new StringContent(model.Id), "Id" },
+            { new StringContent(model.Name), "Name" },
+            { new StringContent(model.Description), "Description" },
+            { new StringContent(model.Price.ToString()), "Price" },
+            { new StringContent(model.ProductType), "ProductType" },
+        };
+            if (model.CoverFile != null)
+            {
+                var streamContent = new StreamContent(model.CoverFile);
+                formData.Add(streamContent, model.FileName);
+            }
+
+            var response1 = await _httpClient.PutAsync($"{_httpClient.BaseAddress.AbsoluteUri}api/products", formData);
+            if(response1.StatusCode == System.Net.HttpStatusCode.BadRequest || response1.StatusCode == System.Net.HttpStatusCode.OK)
+            return await response1.Content.ReadAsAsync<OperationResponse<Product>>();
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
 
-            //TODO: не рпботает переписать на HTTPClient + использовать фабрику через DI 
+            //TODO: не работает переписать на HTTPClient + использовать фабрику через DI 
             var response = await client.SendFormProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products", ActionType.PUT, formKeyValues.ToArray());
             return response.Result;
         }

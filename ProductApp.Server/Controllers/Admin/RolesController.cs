@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ProductApp.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -15,40 +17,50 @@ namespace CustomIdentityApp.Controllers
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<RolesController> _logger;
         // UserManager<IdentityUser> _userManager;
-        public RolesController(RoleManager<IdentityRole> roleManager/*, UserManager<IdentityUser> userManager*/)
+        public RolesController(RoleManager<IdentityRole> roleManager/*, UserManager<IdentityUser> userManager*/, ILogger<RolesController> logger)
         {
             _roleManager = roleManager;
+            _logger = logger;
             // _userManager = userManager;
         }
 
         #region Get
         [ProducesResponseType(200, Type = typeof(CollectionResponse<RoleViewModel>))]
+        [ProducesResponseType(404)]
         [HttpGet]
-        public IActionResult Get()
-
+        public async Task<IActionResult> Get()
         {
-            ////  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            //int totalUsers = 0;
-
-            var roles = _roleManager.Roles.ToList();
-            var roleModels = new List<RoleViewModel>();
-            foreach (var role in roles)
+            try
             {
+                ////  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                //int totalUsers = 0;
+                var roles = await _roleManager.Roles.ToListAsync();
+                if (!roles.Any())
+                    return NotFound();
+                var roleModels = new List<RoleViewModel>();
+                foreach (var role in roles)
+                {
 
-                var roleModel = new RoleViewModel(role.Id, role.Name);
-                roleModels.Add(roleModel);
+                    var roleModel = new RoleViewModel(role.Id, role.Name);
+                    roleModels.Add(roleModel);
+                }
+                var totalRoles = roles.Count;
+                return Ok(new CollectionResponse<RoleViewModel>
+                {
+                    Count = totalRoles,
+                    IsSuccess = true,
+                    Message = "Users received successfully!",
+                    OperationDate = DateTime.UtcNow,
+                    Records = roleModels
+                });
             }
-            var totalRoles = roles.Count;
-            return Ok(new CollectionResponse<RoleViewModel>
+            catch (Exception e)
             {
-                Count = totalRoles,
-                IsSuccess = true,
-                Message = "Users received successfully!",
-                OperationDate = DateTime.UtcNow,
-                Records = roleModels
-            });
-
+                _logger.LogError($"Ошибка при получении ролей - {e}");
+                return Problem("Ошибка при получении ролей");
+            }
 
         }
 
@@ -61,7 +73,7 @@ namespace CustomIdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RoleViewModel model)
         {
-            if (!string.IsNullOrEmpty(model.Name))
+            try
             {
                 IdentityResult result = await _roleManager.CreateAsync(new IdentityRole(model.Name));
                 if (result.Succeeded)
@@ -74,18 +86,20 @@ namespace CustomIdentityApp.Controllers
                 }
                 else
                 {
+                    _logger.LogError($" Ошибка при создании роли {result.Errors.FirstOrDefault().Description}");
                     return BadRequest(new BaseAPIResponse
                     {
                         IsSuccess = false,
-                        Message = result.Errors.FirstOrDefault().Description
+                        Message = "Ошибка при создании роли,менеджер ролей вернул отрицательный результат"
                     });
                 }
             }
-            return BadRequest(new BaseAPIResponse
+            catch (Exception e)
             {
-                IsSuccess = false,
-                Message = "Роль не может быть пустой"
-            });
+                _logger.LogError($"Ошибка при создании роли - {e}");
+                return Problem("Ошибка при создании роли");
+            }
+
         }
         #endregion
         #region Delete
@@ -95,35 +109,47 @@ namespace CustomIdentityApp.Controllers
         [HttpDelete("{Id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            IdentityRole role = await _roleManager.FindByIdAsync(id);
-            if (role != null)
+            try
             {
-                IdentityResult result = await _roleManager.DeleteAsync(role);
-                if (result.Succeeded)
+
+                IdentityRole role = await _roleManager.FindByIdAsync(id);
+                if (role != null)
                 {
-                    return Ok(new BaseAPIResponse
+                    IdentityResult result = await _roleManager.DeleteAsync(role);
+                    if (result.Succeeded)
                     {
-                        IsSuccess = true,
-                        Message = "Роль удалена"
-                    });
+                        return Ok(new BaseAPIResponse
+                        {
+                            IsSuccess = true,
+                            Message = "Роль удалена"
+                        });
+                    }
+                    else
+                    {
+                        _logger.LogError($"Ошибка при удалении роли - {result.Errors.FirstOrDefault().Description}");;
+                        return BadRequest(new BaseAPIResponse
+                        {
+                            IsSuccess = false,
+                            Message = "Ошибка при создании роли,менеджер ролей вернул отрицательный результат"
+                        });
+                    }
                 }
-                else
+
+                return BadRequest(new BaseAPIResponse
                 {
-                    return BadRequest(new BaseAPIResponse
-                    {
-                        IsSuccess = false,
-                        Message = result.Errors.FirstOrDefault().Description
-                    });
-                }
+                    IsSuccess = false,
+                    Message = "Роль не найдена"
+                });
             }
-
-            return BadRequest(new BaseAPIResponse
+            catch(Exception e)
             {
-                IsSuccess = false,
-                Message = "Роль не найдена"
-            });
+                _logger.LogError($"Ошибка при удалении роли - {e}");
+                return Problem("Ошибка при удалении роли");
+            }
         }
-
         #endregion
+
     }
+
+
 }

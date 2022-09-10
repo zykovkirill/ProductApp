@@ -20,7 +20,7 @@
                 <RadzenTextBox Placeholder="Наименование" @bind-Value="model.Name" Style="margin:10px;" />
                 <RadzenNumeric Placeholder="Цена" @bind-Value="model.Price" Style="margin:10px;" />
                 <Radzen.Blazor.RadzenTextArea Placeholder="Description" @bind-Value="model.Description" Style="margin:10px;" />
-                <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" @bind-Value=@model.ProductTypeId 
+                <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" @bind-Value=@model.ProductType 
                                 Data=@productTypes
                                 TextProperty="TypeName" ValueProperty="Id"
                                 Change=@(args => OnChange(args))>
@@ -131,7 +131,7 @@
             model.Price = result.Record.Price;
             imageContent = result.Record.CoverPath;
             model.Id = Id;
-            model.ProductTypeId = result.Record.ProductType.Id;
+            model.ProductType = result.Record.ProductType.Id;
         }
         else
         {
@@ -154,7 +154,7 @@
 
     void OnChange(object value)
     {
-        model.ProductTypeId = (string)value;
+        model.ProductType = (string)value;
     }
 
 }

@@ -141,7 +141,7 @@ else
 
         var userState = authenticationState.Result;
 
-        comment.CreatedDate = DateTime.Now;
+        comment.CreatedDate = DateTime.UtcNow;
         comment.UserName = userState.User.FindFirst("FirstName").Value;
         //comment.EditedUser = userState.User.FindFirst("Id").Value;
 

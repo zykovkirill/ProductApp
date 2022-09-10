@@ -8,7 +8,7 @@ namespace ProductApp.Shared.Models
     {
         public CollectionResponse()
         {
-            OperationDate = DateTime.Now;
+            OperationDate = DateTime.UtcNow;
         }
 
         public IEnumerable<T> Records { get; set; }

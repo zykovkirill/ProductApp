@@ -48,7 +48,7 @@ namespace ProductApp.Server
                 options.User.AllowedUserNameCharacters = null;
                 options.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders().AddRoles<IdentityRole>().AddErrorDescriber<RussianIdentityErrorDescriber>();
-
+            //TODO: нужно ли использовать этот логгер ?
             services.AddSingleton(Log.Logger);
 
             services.AddAuthentication(auth =>

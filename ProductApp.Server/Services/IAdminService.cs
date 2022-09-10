@@ -13,7 +13,7 @@ namespace ProductApp.Server.Services
     {
 
 
-        IEnumerable<IdentityUser> GetAllUsersAsync(int pageSize, int pageNumber, out int totalUsers);
+        Task<(int,IEnumerable<IdentityUser>)> GetAllUsersAsync(int pageSize, int pageNumber);
         Task<UserManagerResponse> CreateUserAsync(RegisterRequest model);
         Task<ChangeRoleViewModel> GetUserById(string id);
         Task<UserManagerResponse> EditUserById(ChangeRoleViewModel model);
@@ -38,14 +38,11 @@ namespace ProductApp.Server.Services
 
         }
 
-        //TODO: сделать асинхронно
-        public IEnumerable<IdentityUser> GetAllUsersAsync(int pageSize, int pageNumber, out int totalUsers)
+        public async Task<(int, IEnumerable<IdentityUser>)> GetAllUsersAsync(int pageSize, int pageNumber)
         {
             var allUsers = _db.Users.AsNoTracking();
-            totalUsers = allUsers.Count();
-            var users = allUsers.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray();
-
-            return users;
+            var users = await allUsers.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return (allUsers.Count(), users);
         }
 
 

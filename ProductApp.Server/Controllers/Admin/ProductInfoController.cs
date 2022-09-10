@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ProductApp.Server.Services;
 using ProductApp.Shared.Models;
 using System;
@@ -16,11 +17,12 @@ namespace WebAPIApp.Controllers
     {
         private readonly IProductsService _productsService;
         private readonly IConfiguration _configuration;
-        private const int PageSize = 10;
-        public ProductInfoController(IProductsService productsService, IConfiguration configuration)
+        private readonly ILogger<ProductInfoController> _logger;
+        public ProductInfoController(IProductsService productsService, IConfiguration configuration, ILogger<ProductInfoController> logger)
         {
             _productsService = productsService;
             _configuration = configuration;
+            _logger = logger;
         }
 
 
@@ -33,22 +35,29 @@ namespace WebAPIApp.Controllers
         public async Task<IActionResult> Get(string id)
         {
             // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var productInfo = await _productsService.GetProductInfoById(id);
-            if (productInfo == null)
-                return BadRequest(new OperationResponse<string>
-                {
-                    IsSuccess = false,
-                    Message = "Информация о продукте не найдена",
-                });
-
-            return Ok(new OperationResponse<ProductInfo>
+            try
             {
-                Record = productInfo,
-                Message = "Информация о продукте передана",
-                IsSuccess = true,
-                OperationDate = DateTime.UtcNow
-            });
+                var productInfo = await _productsService.GetProductInfoById(id);
+                if (productInfo == null)
+                    return BadRequest(new OperationResponse<ProductInfo>
+                    {
+                        IsSuccess = false,
+                        Message = "Информация о продукте не найдена",
+                    });
+
+                return Ok(new OperationResponse<ProductInfo>
+                {
+                    Record = productInfo,
+                    Message = "Информация о продукте передана",
+                    IsSuccess = true,
+                    OperationDate = DateTime.UtcNow
+                });
+            }
+            catch(Exception e)
+            {
+                _logger.LogError($"Ошибка при запросе информации о продукте {id} - {e}");
+                return Problem("Ошибка при запросе информации о продукте");
+            }
         }
 
         #endregion
@@ -60,24 +69,29 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Post([FromBody] BaseBuffer<Comment> model)
         {
-            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-
-            var productInfo = await _productsService.AddCommentAsync(model.Id, model.Entity);
-            if (productInfo != null)
-                return Ok(new OperationResponse<ProductInfo>
-                {
-                    IsSuccess = true,
-                    Message = $"Комментарий  успешно добавлен!",
-                    Record = productInfo
-                });
-
-
-            return BadRequest(new OperationResponse<ProductInfo>
+            try
             {
-                Message = "Что-то пошло не так",
-                IsSuccess = false
-            });
+                // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var productInfo = await _productsService.AddCommentAsync(model.Id, model.Entity);
+                if (productInfo != null)
+                    return Ok(new OperationResponse<ProductInfo>
+                    {
+                        IsSuccess = true,
+                        Message = $"Комментарий  успешно добавлен!",
+                        Record = productInfo
+                    });
+
+                return BadRequest(new OperationResponse<ProductInfo>
+                {
+                    Message = "Что-то пошло не так",
+                    IsSuccess = false
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при добавлении комментария о продукте - {e}");
+                return Problem("Ошибка при добавлении комментария о продукте");
+            }
 
         }
 
@@ -87,121 +101,58 @@ namespace WebAPIApp.Controllers
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Post([FromBody] BaseBuffer<Rating> model)
         {
-            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            model.Entity.UserId = userId;
-            var productInfo = await _productsService.AddRatingAsync(model.Id, model.Entity);
-            if (productInfo != null)
-                return Ok(new OperationResponse<ProductInfo>
-                {
-                    IsSuccess = true,
-                    Message = $"Рейтинг  успешно добавлен!",
-                    Record = productInfo
-                });
-
-
-            return BadRequest(new OperationResponse<ProductInfo>
+            try
             {
-                Message = "Что-то пошло не так",
-                IsSuccess = false
-            });
+                // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                model.Entity.UserId = userId;
+                var productInfo = await _productsService.AddRatingAsync(model.Id, model.Entity);
+                if (productInfo != null)
+                    return Ok(new OperationResponse<ProductInfo>
+                    {
+                        IsSuccess = true,
+                        Message = $"Рейтинг  успешно добавлен!",
+                        Record = productInfo
+                    });
+
+
+                return BadRequest(new OperationResponse<ProductInfo>
+                {
+                    Message = "Что-то пошло не так",
+                    IsSuccess = false
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при добавлении рейтинга о продукте - {e}");
+                return Problem("Ошибка при добавлении рейтинга о продукте");
+            }
 
         }
         #endregion
-
+        //TODO: Дописать изменение комментария 
         #region Put 
-        [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
-        [ProducesResponseType(400, Type = typeof(OperationResponse<Product>))]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<ProductInfo>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<ProductInfo>))]
         [HttpPut]
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Put([FromForm] ProductRequestServer model)
         {
-            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            string url = $"{_configuration["AppUrl"]}Images/default.jpg";
-            string fullPath = null;
-            // Check the file 
-            if (model.CoverFile != null)
-            {
-                string extension = Path.GetExtension(model.CoverFile.FileName);
-
-                //if (!allowedExtensions.Contains(extension))
-                //    return BadRequest(new OperationResponse<Product>
-                //    {
-                //        Message = "Данный тип изображения не поддерживается",
-                //        IsSuccess = false,
-                //    });
-
-                if (model.CoverFile.Length > 500000)
-                    return BadRequest(new OperationResponse<Product>
-                    {
-                        Message = "Изображение не должно быть больше  5 мб",
-                        IsSuccess = false,
-                    });
-
-                string newFileName = $"Images/{Guid.NewGuid()}{extension}";
-                fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", newFileName);
-                url = $"{_configuration["AppUrl"]}{newFileName}";
-            }
-            var oldProduct = await _productsService.GetProductById(model.Id);
-            if (fullPath == null)
-                url = oldProduct.CoverPath;
-
-            var editedProduct = await _productsService.EditProductAsync(model.Id, model.Name, model.Description, model.Price, model.ProductTypeId, url);
-
-            if (editedProduct != null)
-            {
-                if (fullPath != null)
-                {
-                    using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
-                    {
-                        await model.CoverFile.CopyToAsync(fs);
-                    }
-                }
-
-                return Ok(new OperationResponse<Product>
-                {
-                    IsSuccess = true,
-                    Message = $"{editedProduct.Name} продукт успешно отредактирован!",
-                    Record = editedProduct
-                });
-            }
-
-
-            return BadRequest(new OperationResponse<Product>
-            {
-                Message = "Что-то пошло не так",
-                IsSuccess = false
-            });
-
+            return Problem("Метод не реализован");
         }
         #endregion
-
+        //TODO: Дописать удаление комментария 
         #region Delete
-        [ProducesResponseType(200, Type = typeof(OperationResponse<Product>))]
-        [ProducesResponseType(404)]
+        [ProducesResponseType(200, Type = typeof(OperationResponse<ProductInfo>))]
         [HttpDelete("{Id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
-            //string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var getOld = await _productsService.GetProductById(id);
-            if (getOld == null)
-                return NotFound();
-
-            var deletedProduct = await _productsService.DeleteProductAsync(id);
-
-            return Ok(new OperationResponse<Product>
-            {
-                IsSuccess = true,
-                Message = $"{getOld.Name} продукт успешно удален!",
-                Record = deletedProduct
-            });
+            return Problem("Метод не реализован");
         }
 
-        #endregion 
+        #endregion
 
 
     }

@@ -121,7 +121,7 @@
     void OnChange(object value)
     {
         @*TODO: Сделать проверку на стороне сервера на нулевые значения полей возможно добавить атрибут запрещающий сохранять пустые значения*@
-        model.ProductTypeId = ((ProductType)value).Id;
+        model.ProductType = ((ProductType)value).Id;
     }
 
     private void CloseInfoMessage()
@@ -150,7 +150,7 @@
             message = "Укажите название";
             return false;
         }
-        if (string.IsNullOrEmpty(model.ProductTypeId))
+        if (string.IsNullOrEmpty(model.ProductType))
         {
             messageType = Models.AlertMessageType.Warning;
             message = "Выберите тип продукта";

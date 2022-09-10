@@ -37,13 +37,12 @@ namespace WebAPIApp.Controllers
         #region Get
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<UserCreatedProduct>))]
         [HttpGet]
-        public IActionResult Get(int page)
+        public async Task<IActionResult> Get(int page)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            int totalProducts = 0;
             if (page == 0)
                 page = 1;
-            var products = _productsService.GetAllUserProductsAsync(PageSize, page, userId, out totalProducts);
+            (var totalProducts, var products) = await _productsService.GetAllUserProductsAsync(PageSize, page, userId);
 
             int totalPages = 0;
             if (totalProducts % PageSize == 0)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ProductApp.Server.Services;
 using ProductApp.Shared.Models;
 using System;
@@ -18,39 +19,56 @@ namespace CustomIdentityApp.Controllers
 
         private IAdminService _adminService;
         private const int _pageSize = 10;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(IAdminService adminService)
+        public UsersController(IAdminService adminService, ILogger<UsersController> logger)
         {
             _adminService = adminService;
+            _logger = logger;
         }
 
         #region Get
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<IdentityUser>))]
         [HttpGet]
-        public IActionResult Get(int page)
-
+        public async Task<IActionResult> Get(int page)
         {
-            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            int totalUsers = 0;
-            if (page == 0)
-                page = 1;
-            var users = _adminService.GetAllUsersAsync(_pageSize, page, out totalUsers);
-            int totalPages = 0;
-            if (totalUsers % _pageSize == 0)
-                totalPages = totalUsers / _pageSize;
-            else
-                totalPages = (totalUsers / _pageSize) + 1;
-
-            return Ok(new CollectionPagingResponse<IdentityUser>
+            try
             {
-                Count = totalUsers,
-                IsSuccess = true,
-                Message = "Users received successfully!",
-                OperationDate = DateTime.UtcNow,
-                PageSize = _pageSize,
-                Page = page,
-                Records = users
-            });
+                //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                if (page == 0)
+                    page = 1;
+                (var totalUsers, var users) = await _adminService.GetAllUsersAsync(_pageSize, page);
+                if (!users.Any())
+                    return BadRequest(new CollectionPagingResponse<IdentityUser>
+                    {
+                        IsSuccess = false,
+                        Message = "Пользователи не найдены!",
+                        OperationDate = DateTime.UtcNow,
+
+                    });
+
+                int totalPages = 0;
+                if (totalUsers % _pageSize == 0)
+                    totalPages = totalUsers / _pageSize;
+                else
+                    totalPages = (totalUsers / _pageSize) + 1;
+
+                return Ok(new CollectionPagingResponse<IdentityUser>
+                {
+                    Count = totalUsers,
+                    IsSuccess = true,
+                    Message = "Пользователи переданы!",
+                    OperationDate = DateTime.UtcNow,
+                    PageSize = _pageSize,
+                    Page = page,
+                    Records = users
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при получении пользователей - {e}");
+                return Problem("Ошибка при получении пользователей");
+            }
         }
 
 
@@ -61,23 +79,31 @@ namespace CustomIdentityApp.Controllers
         [HttpGet("Edit")]
         public async Task<IActionResult> Get(string id)
         {
-            // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            var user = await _adminService.GetUserById(id);
-            if (user == null)
-                return BadRequest(new OperationResponse<ChangeRoleViewModel>
-                {
-                    IsSuccess = false,
-                    Message = "Invalid operation",
-                });
-
-            return Ok(new OperationResponse<ChangeRoleViewModel>
+            try
             {
-                Record = user,
-                Message = "User retrieved successfully!",
-                IsSuccess = true,
-                OperationDate = DateTime.UtcNow
-            });
+                // string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                var user = await _adminService.GetUserById(id);
+                if (user == null)
+                    return BadRequest(new OperationResponse<ChangeRoleViewModel>
+                    {
+                        IsSuccess = false,
+                        Message = "Пользователь не найден",
+                    });
+
+                return Ok(new OperationResponse<ChangeRoleViewModel>
+                {
+                    Record = user,
+                    Message = "Пользователь передан",
+                    IsSuccess = true,
+                    OperationDate = DateTime.UtcNow
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при получении пользователя по id - {e}");
+                return Problem("Ошибка при получении пользователя по id ");
+            }
         }
 
 
@@ -89,16 +115,24 @@ namespace CustomIdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] RegisterRequest model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                UserManagerResponse result = await _adminService.CreateUserAsync(model);
-                if (result.IsSuccess)
-                    return Ok(result); // Код : 200
+                if (ModelState.IsValid)
+                {
+                    UserManagerResponse result = await _adminService.CreateUserAsync(model);
+                    if (result.IsSuccess)
+                        return Ok(result);
 
-                return BadRequest(result);
+                    return BadRequest(result);
+                }
+
+                return BadRequest("Одно или несколько свойств не прошли валидацию"); // Код : 400
             }
-
-            return BadRequest("Одно или несколько свойств не прошли валидацию"); // Код : 400
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при создании пользователя  - {e}");
+                return Problem("Ошибка при создании пользователя по id ");
+            }
         }
 
         #endregion
@@ -130,37 +164,44 @@ namespace CustomIdentityApp.Controllers
         [HttpDelete("{Id}")]
         public async Task<ActionResult> Delete(string id)
         {
-            if (ModelState.IsValid)
+            try
             {
 
-                var result = await _adminService.DeleteUserById(id);
-                if (result.IsSuccess)
+                if (ModelState.IsValid)
                 {
-                    return Ok(new OperationResponse<IdentityUser>
+
+                    var result = await _adminService.DeleteUserById(id);
+                    if (result.IsSuccess)
                     {
-                        IsSuccess = true,
-                        Message = $"{id} has been deleted !",
-                    });
+                        return Ok(new OperationResponse<IdentityUser>
+                        {
+                            IsSuccess = true,
+                            Message = $"{id} has been deleted !",
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(new OperationResponse<IdentityUser>
+                        {
+                            IsSuccess = false,
+                            Message = result.Errors.FirstOrDefault(),
+                        });
+                    }
                 }
-                else
+                return BadRequest(new OperationResponse<IdentityUser>
                 {
-                    return BadRequest(new OperationResponse<IdentityUser>
-                    {
-                        IsSuccess = false,
-                        Message = result.Errors.FirstOrDefault(),
-                    });
-                }
+                    Message = "Одно или несколько свойств не прошли валидацию",
+                    IsSuccess = false
+                });
             }
-            return BadRequest(new OperationResponse<IdentityUser>
+            catch (Exception e)
             {
-                Message = "Not Valid",
-                IsSuccess = false
-            });
+                _logger.LogError($"Ошибка при создании пользователя  - {e}");
+                return Problem("Ошибка при создании пользователя по id ");
+            }
         }
 
         #endregion
-
-
 
     }
 }

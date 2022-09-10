@@ -22,10 +22,11 @@ namespace ProductApp.WebClient
             {
                 return new AuthenticationService(URL);
             });
-            builder.Services.AddScoped<ProductsService>(s =>
-            {
-                return new ProductsService(URL);
-            });
+            builder.Services.AddScoped<ProductsService>();
+            //builder.Services.AddScoped<ProductsService>(s =>
+            //{
+            //    return new ProductsService(URL);
+            //});
 
             builder.Services.AddScoped<ProductTypesService>(s =>
             {
@@ -53,6 +54,10 @@ namespace ProductApp.WebClient
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddOptions();
             builder.Services.AddAuthorizationCore();
+            builder.Services.AddHttpClient<ProductsService>(client =>
+            {
+                client.BaseAddress = new Uri(URL);
+            });
             builder.Services.AddScoped<AuthenticationStateProvider, LocalAuthenticationStateProvider>();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
