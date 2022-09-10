@@ -34,6 +34,8 @@ namespace WebAPIApp.Controllers
         [ProducesResponseType(200, Type = typeof(CollectionPagingResponse<Product>))]
         [HttpGet]
         [Authorize(Roles = "Admin, User")]
+
+        //TODO: переделать на async Task<IActionResult>
         public IActionResult Get(int page)
         {
 
@@ -130,7 +132,7 @@ namespace WebAPIApp.Controllers
 
             var prod = await _productsService.GetProductById(id);
             if (prod == null)
-                return BadRequest(new OperationResponse<string>
+                return BadRequest(new OperationResponse<Product>
                 {
                     IsSuccess = false,
                     Message = "Продукт не найден",
@@ -199,7 +201,7 @@ namespace WebAPIApp.Controllers
                         });
                     }
                 }
-                var addedProduct = await _productsService.AddProductAsync(model.Name, model.Description, model.Price, model.ProductType, url, userId);
+                var addedProduct = await _productsService.AddProductAsync(model.Name, model.Description, model.Price, model.ProductTypeId, url, userId);
 
                 if (addedProduct != null)
                 {
@@ -260,7 +262,7 @@ namespace WebAPIApp.Controllers
             if (fullPath == null)
                 url = oldProduct.CoverPath;
 
-            var editedProduct = await _productsService.EditProductAsync(model.Id, model.Name, model.Description, model.Price, model.ProductType, url);
+            var editedProduct = await _productsService.EditProductAsync(model.Id, model.Name, model.Description, model.Price, model.ProductTypeId, url);
 
             if (editedProduct != null)
             {

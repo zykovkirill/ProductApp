@@ -2,6 +2,7 @@
 using ProductApp.Shared.Models;
 using ProductApp.Shared.Models.UserData;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ProductApp.WebClient.Services
@@ -73,14 +74,31 @@ namespace ProductApp.WebClient.Services
         //    return response.Result;
         //}
 
-        ///// <summary>
-        ///// Добавить комментарий 
-        ///// </summary>
-        //public async Task<OperationResponse<Comment>> AddCommentAsync(BaseBuffer<Comment> model)
-        //{
-        //    var response = await client.PostProtectedAsync<OperationResponse<Comment>>($"{_baseUrl}/api/productinfo/comment", model);
-        //    return response.Result;
-        //}
+        /// <summary>
+        /// Добавить тип продукта
+        /// </summary>
+        public async Task<OperationResponse<ProductType>> AddProductTypeAsync(ProductType model)
+        {
+
+            var response = await client.PostProtectedAsync<OperationResponse<ProductType>>($"{_baseUrl}/api/productTypes", model);
+            return response.Result;
+
+
+            //var formKeyValues = new List<FormKeyValue>()
+            //    {
+            //        new StringFormKeyValue("TypeName", model.TypeName),
+            //        //new StringFormKeyValue("ProductType", model.ProductType.ToString())
+            //    };
+
+
+
+
+            //var response = await client.SendFormProtectedAsync<OperationResponse<ProductType>>($"{_baseUrl}/api/productTypes", ActionType.POST, formKeyValues.ToArray());
+            //return response.Result;
+
+
+
+        }
 
         ///// <summary>
         ///// Добавить рейтинг

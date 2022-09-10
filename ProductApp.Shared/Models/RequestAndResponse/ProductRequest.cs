@@ -33,11 +33,20 @@ namespace ProductApp.Shared.Models
         /// </summary>
         public int Price { get; set; }
 
+        ///// <summary>
+        ///// Тип продукта
+        ///// </summary>
+        //[Required]
+        //public ProductType ProductType { get; set; }
+
+
         /// <summary>
-        /// Тип продукта
+        /// ID типа продукта
         /// </summary>
         [Required]
-        public ProductType ProductType { get; set; }
+        [StringLength(50)]
+        public string ProductTypeId { get; set; }
+
 
         ///// <summary>
         ///// Пользователь отправивший запрос

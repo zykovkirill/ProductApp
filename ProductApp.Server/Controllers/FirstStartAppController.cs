@@ -4,6 +4,7 @@ using ProductApp.Server.Models;
 using ProductApp.Server.Services;
 using ProductApp.Shared.Models;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ProductApp.Server.Controllers
@@ -63,12 +64,17 @@ namespace ProductApp.Server.Controllers
             try
             {
                 //TODO: вынести в конфигурацию  в скрипт развертывания
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
                 var config = _configuration.GetSection("FistStartSettings");
                 Boolean.TryParse(config["IsNeedCreateDefaultProductType"], out bool IsNeedCreateAdminUser);
                 if (IsNeedCreateAdminUser)
                 {
-                    await _applicationStartupService.CreateDefaultProductTypeAsync();
-                    return Ok("Типы Продуктов по умолчанию добавлены");
+                    var result = await _applicationStartupService.CreateDefaultProductTypeAsync(userId);
+                    if (result)
+                        return Ok("Типы Продуктов по умолчанию добавлены");
+                    else
+                        return BadRequest("Произошла ошибка при добавлении");
                 }
                 return BadRequest("В настройках выключено создание типов продуктов по умолчанию ");
             }

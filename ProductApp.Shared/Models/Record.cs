@@ -31,7 +31,6 @@ namespace ProductApp.Shared.Models
         /// </summary>
         //  [JsonIgnore]
         [Required]
-
         public string EditedUser { get; set; }
         //  [JsonIgnore]
         public bool IsDeleted { get; set; }

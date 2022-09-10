@@ -3,6 +3,7 @@
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
 @attribute [Authorize(Roles = "Admin, User")]
+@using System.Security.Claims;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @if (string.IsNullOrWhiteSpace(Query))
@@ -94,8 +95,8 @@ else
     int totalPages = 1;
     //  string filterType = String.Empty;
     UserCreatedProduct selectedUserProduct;
-    IEnumerable<string> multipleValues;
-    List<Utils.ProductType> prod = new List<Utils.ProductType>();
+    //IEnumerable<string> multipleValues;
+    //List<Utils.ProductType> prod = new List<Utils.ProductType>();
     //Сообщения об ошибках
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
@@ -163,7 +164,7 @@ else
         if (count != 0)
         {
             var userState = authenticationState.Result;
-            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedUserProduct, count, userState.User.FindFirst("Id").Value);
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedUserProduct, count, /*userState.User.FindFirst("Id").Value*/userState.User.FindFirst(ClaimTypes.NameIdentifier).Value);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
@@ -173,13 +174,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        List<string> multiple = new List<string>();
-        foreach (var k in Utils.ProductTypeDictionary)
-        {
-            prod.Add(new Utils.ProductType() { ProductTypeInt = k.Key.ToString(), ProductTypeName = k.Value });
-            multiple.Add(k.Key.ToString());
-        }
-        multipleValues = multiple;
+        //List<string> multiple = new List<string>();
+        //foreach (var k in Utils.ProductTypeDictionary)
+        //{
+        //    prod.Add(new Utils.ProductType() { ProductTypeInt = k.Key.ToString(), ProductTypeName = k.Value });
+        //    multiple.Add(k.Key.ToString());
+        //}
+        //multipleValues = multiple;
         await getProductsAsync();
     }
 

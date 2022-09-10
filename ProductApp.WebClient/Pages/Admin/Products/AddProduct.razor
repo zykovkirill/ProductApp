@@ -21,9 +21,9 @@
                 @*//TODO: Сделать проверку на стороне сервера на отрицательные значения*@
                 <RadzenNumeric Placeholder="Цена" Min="0" @bind-Value="model.Price" Style="margin:10px;" />
 
-                <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" TValue="int"
+                <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" TValue="ProductType"
                                 Data=@productTypes
-                                TextProperty="TypeName" ValueProperty="TypeName"
+                                TextProperty="TypeName" ValueProperty="ProductType"
                                 Change=@(args => OnChange(args)) />
 
                 <input type="file" Style="margin:10px;" @ref="inputReference" @onchange="async () => await chooseFileAsync()" />
@@ -87,6 +87,9 @@
 
     async Task getProductTypeAsync()
     {
+
+        var userState = authenticationState.Result;
+        productTypesService.AccessToken = userState.User.FindFirst("AccessToken").Value;
         var result = await productTypesService.GetProductTypesAsync();
         productTypes = result.Records.ToList();
     } 
@@ -117,8 +120,8 @@
 
     void OnChange(object value)
     {
-        @*//TODO: Сделать проверку на стороне сервера на нулевые значения полей возможно добавить атрибут запрещающий сохранять пустые значения*@
-        //model.ProductType = (int)value;
+        @*TODO: Сделать проверку на стороне сервера на нулевые значения полей возможно добавить атрибут запрещающий сохранять пустые значения*@
+        model.ProductTypeId = ((ProductType)value).Id;
     }
 
     private void CloseInfoMessage()
@@ -147,7 +150,7 @@
             message = "Укажите название";
             return false;
         }
-        if (model.ProductType == null)
+        if (string.IsNullOrEmpty(model.ProductTypeId))
         {
             messageType = Models.AlertMessageType.Warning;
             message = "Выберите тип продукта";

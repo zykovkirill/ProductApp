@@ -12,7 +12,7 @@ namespace ProductApp.Server.Services
     public interface IApplicationStartupService
     {
         Task CreateAdminUserAsync(RegisterRequest model);
-        Task CreateDefaultProductTypeAsync();
+        Task<bool> CreateDefaultProductTypeAsync(string userId);
     }
 
 
@@ -84,31 +84,31 @@ namespace ProductApp.Server.Services
             }
         }
 
-        public async Task CreateDefaultProductTypeAsync()
+        public async Task<bool> CreateDefaultProductTypeAsync(string userId)
         {
             try
             {
                 //TODO: изображения по умолчанию + пользователь который создал 
                 var productsType = new List<ProductType>();
-                productsType.Add(new ProductType() { TypeName = TypeToys });
-                productsType.Add(new ProductType() { TypeName = TypeChevrons });
-                productsType.Add(new ProductType() { TypeName = TypeBeads });
+                productsType.Add(new ProductType() { TypeName = TypeToys , EditedUser = userId});
+                productsType.Add(new ProductType() { TypeName = TypeChevrons, EditedUser = userId });
+                productsType.Add(new ProductType() { TypeName = TypeBeads, EditedUser = userId });
 
                 var result = await _productsService.AddProductsTypeAsync(productsType);
 
-                if (result)
-                {
-
+                if (result)   
                     _logger.LogInformation("Типы продуктов добавлены ");
-                }
+
                 else
-                {
                     _logger.LogWarning("Типы продуктов не  добавлены ");
-                }
+
+                return result;
             }
+
             catch (Exception e)
-            {
+            {   
                 _logger.LogWarning($"Типы продуктов не были добавлены, произошла ошибка - {e} ");
+                return false;
             }
         }
 

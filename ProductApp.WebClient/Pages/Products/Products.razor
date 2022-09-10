@@ -1,8 +1,10 @@
 ﻿@page "/products"
 @page "/products/{PageNumber:int}"
 @inject ProductsService productsService
+@inject ProductTypesService productTypesService
 @inject NavigationManager navigationManager
 @attribute [Authorize(Roles = "Admin, User")]
+@using System.Security.Claims;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @if (string.IsNullOrWhiteSpace(Query))
@@ -24,7 +26,7 @@ else
         <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
         <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
         <RadzenDropDown AllowClear="true"
-                        @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
+                       @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@productTypes TextProperty="TypeName" ValueProperty="Id"
                         Change=@(args => OnChange(args))
                         Style=" margin: 15px 15px 15px 15px" />
         <AlertMessage Message="@message" MessageType="@messageType" OnClickCallback="CloseInfoMessage" />
@@ -40,7 +42,7 @@ else
                     <div class="col-md-6">
                         <h3> @product.Name </h3>
                         <h3>Цена: @product.Price</h3>
-                        <h3>Тип продукта: @*@Utils.GetNameProductByType(product.ProductType)*@</h3>
+                        <h3>Тип продукта: @product.ProductType.TypeName</h3>
                         <hr />
                     </div>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Text="Подробно" Icon="expand_more" class="btn-block" Click="async () => await moreInfo(product)" />
@@ -91,7 +93,7 @@ else
     string filterType = String.Empty;
 
     IEnumerable<string> multipleValues;
-    List<Utils.ProductType> prod = new List<Utils.ProductType>();
+    List<ProductType> productTypes = new List<ProductType>();
     //Сообщения об ошибках
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
@@ -161,13 +163,21 @@ else
         navigationManager.NavigateTo($"/products/ProductInfo/{product.Id}");
     }
 
+    async Task getProductTypeAsync()
+    {
+        var state = authenticationState.Result;
+        productTypesService.AccessToken = state.User.FindFirst("AccessToken").Value;
+        var result = await productTypesService.GetProductTypesAsync();
+        productTypes = result.Records.ToList();
+    } 
+
     async Task addProductToCartAsync()
     {
         isBusy = true;
         if (count != 0)
         {
             var userState = authenticationState.Result;
-            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count, userState.User.FindFirst("Id").Value);
+            await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count, /*userState.User.FindFirst("Id").Value*/userState.User.FindFirst(ClaimTypes.NameIdentifier).Value);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
@@ -176,13 +186,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await getProductTypeAsync();
         List<string> multiple = new List<string>();
-        foreach (var k in Utils.ProductTypeDictionary)
+        foreach (var k in productTypes)
         {
-            prod.Add(new Utils.ProductType() { ProductTypeInt = k.Key.ToString(), ProductTypeName = k.Value });
-            multiple.Add(k.Key.ToString());
+            multiple.Add(k.TypeName.ToString());
         }
         multipleValues = multiple;
+
         await getProductsAsync();
 
     }
@@ -191,7 +202,7 @@ else
     {
         if (value != null)
         {
-            filterType = string.Join(", ", (IEnumerable<object>)value);
+            filterType = string.Join(",", (IEnumerable<object>)value);
             multipleValues = (IEnumerable<string>)value;
             if (multipleValues.Any())
                 await getProductsAsync();

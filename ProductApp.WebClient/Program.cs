@@ -13,7 +13,7 @@ namespace ProductApp.WebClient
 {
     public class Program
     {
-        private const string URL = "http://localhost:1485";//RELEASE /*http://188.235.156.133:1485*/
+        private const string URL = "http://192.168.1.7:1485";//RELEASE /*http://188.235.156.133:1485*/
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);

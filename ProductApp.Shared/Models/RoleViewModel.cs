@@ -2,6 +2,7 @@
 
 namespace ProductApp.Shared.Models
 {
+    //TODO: возможно стоит наследовать от Record и записывать в бд кошда была создана роль
     public class RoleViewModel
     {
 

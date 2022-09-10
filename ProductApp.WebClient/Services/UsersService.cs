@@ -64,23 +64,9 @@ namespace ProductApp.WebClient.Services
         /// <returns></returns>
         public async Task<UserManagerResponse> PostUserAsync(RegisterRequest model)
         {
-
-
-            var formKeyValues = new List<FormKeyValue>()
-            {
-                new StringFormKeyValue("Email", model.Email),
-                new StringFormKeyValue("Password", model.Password),
-                new StringFormKeyValue("ConfirmPassword", model.ConfirmPassword),
-                new StringFormKeyValue("FirstName", model.FirstName),
-                new StringFormKeyValue("LastName", model.LastName)
-
-            };
-
-            var response = await client.SendFormProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", ActionType.POST, formKeyValues.ToArray());
+            var response = await client.PostProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", model);
 
             return response.Result;
-
-
         }
 
 
@@ -91,16 +77,8 @@ namespace ProductApp.WebClient.Services
         /// <returns></returns>
         public async Task<UserManagerResponse> EditUserAsync(ChangeRoleViewModel model)
         {
-            //var formKeyValues = new List<FormKeyValue>()
-            //{
-            //    new StringFormKeyValue("UserId", model.UserId), 
-            //    new StringFormKeyValue("UserEmail", model.UserEmail),
-
-
-            //};
             var response = await client.PutProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", model);
 
-            //var response = await client.SendFormProtectedAsync<UserManagerResponse>($"{_baseUrl}/api/users", ActionType.PUT, formKeyValues.ToArray() );
             return response.Result;
         }
 

@@ -113,12 +113,13 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
-                //new StringFormKeyValue("ProductType", model.ProductType.ToString())
+                new StringFormKeyValue("ProductTypeId", model.ProductTypeId)
             };
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
 
-
+            //var response = await client.PostProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products", model);
+            //return response.Result;
 
             var response = await client.SendFormProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products", ActionType.POST, formKeyValues.ToArray());
             return response.Result;
@@ -137,11 +138,13 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("Name", model.Name),
                 new StringFormKeyValue("Description", model.Description),
                 new StringFormKeyValue("Price", model.Price.ToString()),
-                //new StringFormKeyValue("ProductType", model.ProductType.ToString())
+                new StringFormKeyValue("ProductTypeId", model.ProductTypeId)
             };
 
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
+
+            //TODO: не рпботает переписать на HTTPClient + использовать фабрику через DI 
             var response = await client.SendFormProtectedAsync<OperationResponse<Product>>($"{_baseUrl}/api/products", ActionType.PUT, formKeyValues.ToArray());
             return response.Result;
         }

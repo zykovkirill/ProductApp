@@ -2,6 +2,7 @@
 @inject ProductsService productsService
 @inject IFileReaderService fileReaderService
 @inject NavigationManager navigatorManager
+@inject ProductTypesService productTypesService
 @using System.IO;
 
 @attribute [Authorize(Roles = "Admin")]
@@ -19,9 +20,9 @@
                 <RadzenTextBox Placeholder="Наименование" @bind-Value="model.Name" Style="margin:10px;" />
                 <RadzenNumeric Placeholder="Цена" @bind-Value="model.Price" Style="margin:10px;" />
                 <Radzen.Blazor.RadzenTextArea Placeholder="Description" @bind-Value="model.Description" Style="margin:10px;" />
-                <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" @bind-Value=@model.ProductType 
-                                Data=@(Utils.ProductTypeDictionary)
-                                TextProperty="Value" ValueProperty="Key"
+                <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" @bind-Value=@model.ProductTypeId 
+                                Data=@productTypes
+                                TextProperty="TypeName" ValueProperty="Id"
                                 Change=@(args => OnChange(args))>
                 </RadzenDropDown>
                 <input type="file" Style="margin:10px;" @ref="inputReference" @onchange="async () => await chooseFileAsync()" />
@@ -42,11 +43,16 @@
     public string Id { get; set; }
 
     ProductRequestClient model = new ProductRequestClient();
+    //ProductType productTypes = new ProductType();
+
+
     System.IO.Stream fileStream = null;
     string imageContent = string.Empty;
     string fileName = string.Empty;
 
     bool isBusy = false;
+
+    List<ProductType> productTypes = new List<ProductType>();
 
     ElementReference inputReference;
 
@@ -104,6 +110,15 @@
 
     }
 
+    async Task getProductTypeAsync()
+    {
+        var state = authenticationState.Result;
+        productTypesService.AccessToken = state.User.FindFirst("AccessToken").Value;
+        var result = await productTypesService.GetProductTypesAsync();
+        productTypes = result.Records.ToList();
+    }
+
+
     async Task getProductById()
     {
         isBusy = true;
@@ -116,7 +131,7 @@
             model.Price = result.Record.Price;
             imageContent = result.Record.CoverPath;
             model.Id = Id;
-            model.ProductType = result.Record.ProductType;
+            model.ProductTypeId = result.Record.ProductType.Id;
         }
         else
         {
@@ -133,12 +148,13 @@
         string accessToken = userState.User.FindFirst("AccessToken").Value;
         productsService.AccessToken = accessToken;
         //itemService.AccessToken = accessToken;
+        await getProductTypeAsync();
         await getProductById();
     }
 
     void OnChange(object value)
     {
-        //model.ProductType = (int)value;
+        model.ProductTypeId = (string)value;
     }
 
 }

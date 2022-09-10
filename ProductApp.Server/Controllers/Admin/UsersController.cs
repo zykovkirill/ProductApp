@@ -87,7 +87,7 @@ namespace CustomIdentityApp.Controllers
         [ProducesResponseType(200, Type = typeof(UserManagerResponse))]
         [ProducesResponseType(400, Type = typeof(UserManagerResponse))]
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] RegisterRequest model)
+        public async Task<IActionResult> Post([FromBody] RegisterRequest model)
         {
             if (ModelState.IsValid)
             {

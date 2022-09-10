@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+//using ProductApp.Server.BindModels;
 using ProductApp.Server.Localized;
 using ProductApp.Server.Models;
 using ProductApp.Server.Services;
@@ -85,6 +86,10 @@ namespace ProductApp.Server
             services.AddTransient<IUserDataService, UserDataService>();
             services.AddTransient<IApplicationStartupService, ApplicationStartupService>();
             services.AddControllers();
+            //services.AddControllers(options =>
+            //{
+            //    options.ModelBinderProviders.Insert(0, new StreamBinderProvider());
+            //});
 
             services.AddCors(options =>
             {

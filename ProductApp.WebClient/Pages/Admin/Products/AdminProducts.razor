@@ -3,7 +3,10 @@
 @page "/adminproducts/{PageNumber:int}"
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
+@inject ProductTypesService productTypesService
 @attribute [Authorize(Roles = "Admin")]
+
+
 
 @if (string.IsNullOrWhiteSpace(Query))
 {
@@ -24,10 +27,10 @@ else
     <AlertMessage Message="@message" MessageType="@messageType" />
     <RadzenTextBox Placeholder="Введите запрос" @bind-Value="Query" Style=" margin: 15px 15px 15px 15px" />
     <RadzenButton Text="Искать" Icon="search" Style=" margin: 15px 15px 15px 15px" Click="async () => await getProductsAsync()" />
-    <RadzenDropDown AllowClear="true"
-                    @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@(prod) TextProperty="ProductTypeName" ValueProperty="ProductTypeInt"
-                    Change=@(args => OnChange(args))
-                    Style=" margin: 15px 15px 15px 15px" />
+   <RadzenDropDown AllowClear="true"
+                       @bind-Value=@multipleValues Multiple="true" Placeholder="Тип продукта" Data=@productTypes TextProperty="TypeName" ValueProperty="Id"
+                        Change=@(args => OnChange(args))
+                        Style=" margin: 15px 15px 15px 15px" />
 </div>
     <hr />
 
@@ -66,7 +69,7 @@ else
                         @*<img src="@product.CoverPath" style="height:auto; max-width:100%;  margin:5px" />*@
                         <h3> @product.Name </h3>
                         <h3>Цена: @product.Price</h3>
-                        <h3>Тип продукта: @*@Utils.GetNameProductByType(product.ProductType)*@</h3>
+                        <h3>Тип продукта: @product.ProductType.TypeName</h3>
                         <hr />
                     </div>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Icon="build" Text="Изменить" Click=' () => navigationManager.NavigateTo($"/products/details/{product.Id}")' class="btn-block" />
@@ -105,6 +108,7 @@ else
 
 
 @code {
+    //TODO: Объеденить с обычной страницей продуктов или сделать общий класс! не плоди говно код!!
     [Parameter]
     public int? PageNumber { get; set; }
 
@@ -120,7 +124,7 @@ else
     string filter = String.Empty;
 
     IEnumerable<string> multipleValues;
-    List<Utils.ProductType> prod = new List<Utils.ProductType>();
+    List<ProductType> productTypes = new List<ProductType>();
 
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
@@ -184,6 +188,14 @@ else
 
     }
 
+    async Task getProductTypeAsync()
+    {
+        var state = authenticationState.Result;
+        productTypesService.AccessToken = state.User.FindFirst("AccessToken").Value;
+        var result = await productTypesService.GetProductTypesAsync();
+        productTypes = result.Records.ToList();
+    } 
+
     async Task deleteProductAsync()
     {
         isBusy = true;
@@ -203,11 +215,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await getProductTypeAsync();
         List<string> multiple = new List<string>();
-        foreach (var k in Utils.ProductTypeDictionary)
+        foreach (var k in productTypes)
         {
-            prod.Add(new Utils.ProductType() { ProductTypeInt = k.Key.ToString(), ProductTypeName = k.Value });
-            multiple.Add(k.Key.ToString());
+            multiple.Add(k.TypeName);
         }
         multipleValues = multiple;
         await getProductsAsync();
@@ -215,10 +227,17 @@ else
 
     async Task OnChange(object value)
     {
-
-        filter = string.Join(", ", (IEnumerable<object>)value);
-        multipleValues = (IEnumerable<string>)value;
-        await getProductsAsync();
+        if (value != null)
+        {
+            filter = string.Join(",", (IEnumerable<object>)value);
+            multipleValues = (IEnumerable<string>)value;
+            if (multipleValues.Any())
+                await getProductsAsync();
+            else
+                products.Clear();
+        }
+        else
+            products.Clear();
     }
 
 }

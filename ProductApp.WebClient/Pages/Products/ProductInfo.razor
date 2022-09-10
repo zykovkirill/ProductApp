@@ -1,6 +1,7 @@
 ﻿@page "/products/ProductInfo/{ProductId}"
 @inject ProductApp.WebClient.Services.ProductsService Service
 @attribute [Authorize(Roles = "Admin, User")]
+@using System.Security.Claims;
 @inject Blazored.SessionStorage.ISessionStorageService SessionStorage
 
 
@@ -180,7 +181,7 @@ else
         if (count != 0)
         {
             var userState = authenticationState.Result;
-            await SessionUtils.AddProductToCartSessionStorageAsync(SessionStorage, selectedProduct, count, userState.User.FindFirst("Id").Value);
+            await SessionUtils.AddProductToCartSessionStorageAsync(SessionStorage, selectedProduct, count, /*userState.User.FindFirst("Id").Value*/userState.User.FindFirst(ClaimTypes.NameIdentifier).Value);
         }
         message = "Продукты добавлены в корзину";
         messageType = Models.AlertMessageType.Success;
