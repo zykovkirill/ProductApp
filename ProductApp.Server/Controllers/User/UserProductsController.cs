@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -39,28 +40,42 @@ namespace WebAPIApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(int page)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (page == 0)
-                page = 1;
-            (var totalProducts, var products) = await _productsService.GetAllUserProductsAsync(PageSize, page, userId);
-
-            int totalPages = 0;
-            if (totalProducts % PageSize == 0)
-                totalPages = totalProducts / PageSize;
-            else
-                totalPages = (totalProducts / PageSize) + 1;
-            //TODO: Протестировать логи заключить их в try
-            _logger.LogInformation("Продукты переданы");
-            return Ok(new CollectionPagingResponse<UserCreatedProduct>
+            try
             {
-                Count = totalProducts,
-                IsSuccess = true,
-                Message = "Продукты переданы",
-                OperationDate = DateTime.UtcNow,
-                PageSize = PageSize,
-                Page = page,
-                Records = products
-            });
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                if (page == 0)
+                    page = 1;
+                (var totalProducts, var products) = await _productsService.GetAllUserProductsAsync(PageSize, page, userId);
+                if (!products.Any())
+                    return BadRequest(new CollectionPagingResponse<UserCreatedProduct>
+                    {
+                        IsSuccess = false,
+                        Message = "Продукты не найдены",
+                        OperationDate = DateTime.UtcNow,
+                    });
+
+
+                int totalPages = 0;
+                if (totalProducts % PageSize == 0)
+                    totalPages = totalProducts / PageSize;
+                else
+                    totalPages = (totalProducts / PageSize) + 1;
+                return Ok(new CollectionPagingResponse<UserCreatedProduct>
+                {
+                    Count = totalProducts,
+                    IsSuccess = true,
+                    Message = "Продукты переданы",
+                    OperationDate = DateTime.UtcNow,
+                    PageSize = PageSize,
+                    Page = page,
+                    Records = products
+                });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при передачи продуктов - {e}");
+                return Problem("Ошибка при передачи продуктов ");
+            }
         }
 
         #endregion
@@ -71,6 +86,8 @@ namespace WebAPIApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] UserProductRequest model)
         {
+            try 
+            { 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             string url = $"{_configuration["AppUrl"]}UsersImages/default.jpg";
             string fullPath = null;
@@ -135,6 +152,12 @@ namespace WebAPIApp.Controllers
                 Message = "Что-то пошло не так",
                 IsSuccess = false
             });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Ошибка при создании пользовательских продуктов - {e}");
+                return Problem("Ошибка при создании пользовательских продуктов");
+            }
         }
         #endregion
 
@@ -145,69 +168,76 @@ namespace WebAPIApp.Controllers
         //TODO: попробовать типизировать все в единый запрос Put Post Get Delete <Product> <UserProduct> 
         public async Task<IActionResult> Put([FromForm] UserProductRequest model)
         {
-            //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            string url = $"{_configuration["AppUrl"]}Images/default.jpg";
-            string fullPath = null;
-            if (model.Id == null)
-                return BadRequest(new OperationResponse<UserCreatedProduct>
-                {
-                    Message = "Не найден продукт",
-                    IsSuccess = false,
-                });
-            // Check the file 
-            if (model.CoverFile != null)
+            try
             {
-                string extension = Path.GetExtension(model.CoverFile.FileName);
+                //  string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                if (!_allowedExtensions.Contains(extension))
+                string url = $"{_configuration["AppUrl"]}Images/default.jpg";
+                string fullPath = null;
+                if (model.Id == null)
                     return BadRequest(new OperationResponse<UserCreatedProduct>
                     {
-                        Message = "Данный тип изображения не поддерживается",
+                        Message = "Не найден продукт",
                         IsSuccess = false,
                     });
-
-                if (model.CoverFile.Length > 500000)
-                    return BadRequest(new OperationResponse<UserCreatedProduct>
-                    {
-                        Message = "Изображение не должно быть больше  5 мб",
-                        IsSuccess = false,
-                    });
-
-                string newFileName = $"Images/{Guid.NewGuid()}{extension}";
-                fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", newFileName);
-                url = $"{_configuration["AppUrl"]}{newFileName}";
-            }
-            var oldProduct = await _productsService.GetUserProductById(model.Id);
-            if (fullPath == null)
-                url = oldProduct.CoverPath;
-
-            var editedProduct = await _productsService.EditUserProductAsync(model.Id, model.FileName, model.ChevronProductId, model.ToyProductId, float.Parse(model.X), float.Parse(model.Y), float.Parse(model.Size), url);
-
-            if (editedProduct != null)
-            {
-                if (fullPath != null)
+                if (model.CoverFile != null)
                 {
-                    using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                    string extension = Path.GetExtension(model.CoverFile.FileName);
+
+                    if (!_allowedExtensions.Contains(extension))
+                        return BadRequest(new OperationResponse<UserCreatedProduct>
+                        {
+                            Message = "Данный тип изображения не поддерживается",
+                            IsSuccess = false,
+                        });
+
+                    if (model.CoverFile.Length > 500000)
+                        return BadRequest(new OperationResponse<UserCreatedProduct>
+                        {
+                            Message = "Изображение не должно быть больше  5 мб",
+                            IsSuccess = false,
+                        });
+
+                    string newFileName = $"Images/{Guid.NewGuid()}{extension}";
+                    fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", newFileName);
+                    url = $"{_configuration["AppUrl"]}{newFileName}";
+                }
+                var oldProduct = await _productsService.GetUserProductById(model.Id);
+                if (fullPath == null)
+                    url = oldProduct.CoverPath;
+
+                var editedProduct = await _productsService.EditUserProductAsync(model.Id, model.FileName, model.ChevronProductId, model.ToyProductId, float.Parse(model.X), float.Parse(model.Y), float.Parse(model.Size), url);
+
+                if (editedProduct != null)
+                {
+                    if (fullPath != null)
                     {
-                        await model.CoverFile.CopyToAsync(fs);
+                        using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                        {
+                            await model.CoverFile.CopyToAsync(fs);
+                        }
                     }
+
+                    return Ok(new OperationResponse<UserCreatedProduct>
+                    {
+                        IsSuccess = true,
+                        Message = $"{editedProduct.Name} продукт успешно отредактирован!",
+                        Record = editedProduct
+                    });
                 }
 
-                return Ok(new OperationResponse<UserCreatedProduct>
+
+                return BadRequest(new OperationResponse<UserCreatedProduct>
                 {
-                    IsSuccess = true,
-                    Message = $"{editedProduct.Name} продукт успешно отредактирован!",
-                    Record = editedProduct
+                    Message = "Что-то пошло не так",
+                    IsSuccess = false
                 });
             }
-
-
-            return BadRequest(new OperationResponse<UserCreatedProduct>
+            catch (Exception e)
             {
-                Message = "Что-то пошло не так",
-                IsSuccess = false
-            });
+                _logger.LogError($"Ошибка при изменении пользовательских продуктов - {e}");
+                return Problem("Ошибка при изменении пользовательских продуктов");
+            }
 
         }
         #endregion

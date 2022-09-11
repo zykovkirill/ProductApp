@@ -263,7 +263,6 @@ namespace ProductApp.Server.Services
 
         public async Task<bool> AddProductTypeAsync(ProductType model)
         {
-
             await _db.ProductTypes.AddAsync(model);
             await _db.SaveChangesAsync();
             return true;
@@ -271,19 +270,11 @@ namespace ProductApp.Server.Services
 
         public async Task<bool> AddProductsTypeAsync(List<ProductType> models)
         {
-            try
-            {
-                //При первом добавлении типов user
-                await _db.ProductTypes.AddRangeAsync(models);
-                var user = await _db.Users.FirstOrDefaultAsync();
-                await _db.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogWarning($"Тип продукта не был добавлен, ошибка - {e}");
-                return false;
-            }
+            //При первом добавлении типов user
+            await _db.ProductTypes.AddRangeAsync(models);
+            var user = await _db.Users.FirstOrDefaultAsync();
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 

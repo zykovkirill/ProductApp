@@ -121,7 +121,6 @@ namespace ProductApp.Server.Controllers
             try
             {
 
-
                 if (ModelState.IsValid)
                 {
                     var result = await _userService.ResetPsswordAsync(model);

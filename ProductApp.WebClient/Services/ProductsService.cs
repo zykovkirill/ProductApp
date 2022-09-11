@@ -163,7 +163,7 @@ namespace ProductApp.WebClient.Services
             { new StringContent(model.Description), "Description" },
             { new StringContent(model.Price.ToString()), "Price" },
             { new StringContent(model.ProductType), "ProductType" },
-        };
+             };
             if (model.CoverFile != null)
             {
                 var streamContent = new StreamContent(model.CoverFile);
