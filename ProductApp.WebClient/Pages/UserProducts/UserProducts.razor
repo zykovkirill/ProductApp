@@ -2,7 +2,7 @@
 @page "/userproducts/{PageNumber:int}"
 @inject ProductsService productsService
 @inject NavigationManager navigationManager
-@attribute [Authorize(Roles = "Admin, User")]
+@attribute [Authorize(Roles = "Admin")]
 @using System.Security.Claims;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 

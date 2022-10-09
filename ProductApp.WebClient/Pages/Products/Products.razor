@@ -43,6 +43,7 @@ else
                         <h3> @product.Name </h3>
                         <h3>Цена: @product.Price</h3>
                         <h3>Тип продукта: @product.ProductType.TypeName</h3>
+                        <h3>Колличество на складе: @product.QuantityInStock</h3>
                         <hr />
                     </div>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Secondary" Text="Подробно" Icon="expand_more" class="btn-block" Click="async () => await moreInfo(product)" />
@@ -173,14 +174,25 @@ else
 
     async Task addProductToCartAsync()
     {
+        //TODO: на складе должен быть не снижаемый остаток для случаев одновременного заказа
         isBusy = true;
-        if (count != 0)
+        if (count != 0 && selectedProduct.QuantityInStock >= count)
         {
             var userState = authenticationState.Result;
             await SessionUtils.AddProductToCartSessionStorageAsync(sessionStorage, selectedProduct, count, /*userState.User.FindFirst("Id").Value*/userState.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            message = "Продукты добавлены в корзину";
+            messageType = Models.AlertMessageType.Success;
         }
-        message = "Продукты добавлены в корзину";
-        messageType = Models.AlertMessageType.Success;
+        else if (selectedProduct.QuantityInStock <= count)
+        {
+            message = "На складе не достаточно продуктов, свяжитесь с администратором для заказа";
+            messageType = Models.AlertMessageType.Warning;
+        }
+        else if (count == 0)
+        {
+            message = "Выберете колличество продуктов";
+            messageType = Models.AlertMessageType.Warning;
+        }
         isBusy = false;
     }
 

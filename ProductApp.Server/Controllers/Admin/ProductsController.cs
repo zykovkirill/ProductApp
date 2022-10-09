@@ -325,7 +325,7 @@ namespace WebAPIApp.Controllers
                 if (fullPath == null)
                     url = oldProduct.CoverPath;
 
-                var editedProduct = await _productsService.EditProductAsync(model.Id, model.Name, model.Description, model.Price, model.ProductType, url);
+                var editedProduct = await _productsService.EditProductAsync(model.Id, model.Name, model.Description, model.Price, model.ProductType, url, model.QuantityInStock);
 
                 if (editedProduct != null)
                 {

@@ -43,10 +43,19 @@ namespace ProductApp.Server.Services
             {
                 var order = await _db.UserOrders.AsNoTracking().FirstOrDefaultAsync(u => u.Id == model.Id);
                 if (order != null)
+                {
                     _db.UserOrders.Update(model);
+                }
                 else
+                {
                     await _db.UserOrders.AddAsync(model);
+                }
 
+                foreach (var item in model.Products)
+                {
+                    var prod = await _db.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId);
+                    prod.QuantityInStock = prod.QuantityInStock - item.Count;
+                }
 
                 //TODO: Может быть возвращать статусы ок или не ок
                 //TODO: Task завернуть в исключения и логировать

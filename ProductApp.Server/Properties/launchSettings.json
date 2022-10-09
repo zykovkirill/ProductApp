@@ -28,7 +28,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://192.168.1.7:1485"
+      "applicationUrl": "http://192.168.1.4:1485"
     },
     "WSL": {
       "commandName": "WSL2",

@@ -19,6 +19,7 @@
 
                 <RadzenTextBox Placeholder="Наименование" @bind-Value="model.Name" Style="margin:10px;" />
                 <RadzenNumeric Placeholder="Цена" @bind-Value="model.Price" Style="margin:10px;" />
+                <RadzenNumeric Placeholder="Колличество на складе" @bind-Value="model.QuantityInStock" Style="margin:10px;" />
                 <Radzen.Blazor.RadzenTextArea Placeholder="Description" @bind-Value="model.Description" Style="margin:10px;" />
                 <RadzenDropDown Placeholder="Тип продукта" AllowClear="true" @bind-Value=@model.ProductType 
                                 Data=@productTypes

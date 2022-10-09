@@ -24,7 +24,7 @@
         /// </summary>
         public int Count { get; set; }
         /// <summary>
-        /// Идентификатор продукта
+        /// Идентификатор продукта в заказе
         /// </summary>
         public string ProductId { get; set; }
     }

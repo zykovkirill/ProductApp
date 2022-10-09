@@ -18,8 +18,8 @@ namespace ProductApp.Server.Services
         Task<IEnumerable<ProductType>> GetProductTypesAsync();
         Task<(int, IEnumerable<Product>)> SearchProductsAsync(string query, int pageSize, int pageNumber);
         Task<(int,IEnumerable<Product>)> FilterProductsAsync(string filter, int pageSize, int pageNumber);
-        Task<Product> AddProductAsync(string name, string description, int price, string type, string imagePath, string editedUser);
-        Task<Product> EditProductAsync(string id, string newName, string description, int price, string type, string newImagePath);
+        Task<Product> AddProductAsync(string name, string description, int price, string type, string imagePath, string editedUser, int countInStock);
+        Task<Product> EditProductAsync(string id, string newName, string description, int price, string type, string newImagePath, int coutInStock);
         Task<UserCreatedProduct> AddUserProductAsync(UserCreatedProduct model, string userId);
         Task<ProductInfo> AddCommentAsync(string id, Comment comment);
         Task<ProductInfo> AddRatingAsync(string id, Rating comment);
@@ -45,7 +45,7 @@ namespace ProductApp.Server.Services
             _logger = logger;
         }
 
-        public async Task<Product> AddProductAsync(string name, string description, int price, string productTypeId, string imagePath, string editedUser)
+        public async Task<Product> AddProductAsync(string name, string description, int price, string productTypeId, string imagePath, string editedUser, int countInStock)
         {
             var productType = await _db.ProductTypes.FindAsync(productTypeId);
             var product = new Product
@@ -55,7 +55,8 @@ namespace ProductApp.Server.Services
                 Description = description,
                 Price = price,
                 ProductType = productType,
-                EditedUser = editedUser
+                EditedUser = editedUser,
+                QuantityInStock = countInStock
             };
             var productInfo = new ProductInfo()
             {
@@ -83,25 +84,26 @@ namespace ProductApp.Server.Services
             return prod;
         }
 
-        public async Task<Product> EditProductAsync(string id, string newName, string description, int price, string productTypeId, string newImagePath)
+        public async Task<Product> EditProductAsync(string id, string newName, string description, int price, string productTypeId, string newImagePath, int countInStock)
         {
-          
-                var productType = await _db.ProductTypes.FindAsync(productTypeId);
-                var prod = await _db.Products.FindAsync(id);
-                if (prod.IsDeleted)
-                    return null;
 
-                prod.Name = newName;
-                prod.Description = description;
-                prod.Price = price;
-                prod.ProductType = productType;
-                if (newImagePath != null)
-                    prod.CoverPath = newImagePath;
-                prod.ModifiedDate = DateTime.UtcNow;
-                //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
-                // _db.Products.Update(prod);
-                await _db.SaveChangesAsync();
-                return prod;
+            var productType = await _db.ProductTypes.FindAsync(productTypeId);
+            var prod = await _db.Products.FindAsync(id);
+            if (prod.IsDeleted)
+                return null;
+
+            prod.Name = newName;
+            prod.Description = description;
+            prod.Price = price;
+            prod.ProductType = productType;
+            if (newImagePath != null)
+                prod.CoverPath = newImagePath;
+            prod.ModifiedDate = DateTime.UtcNow;
+            prod.QuantityInStock = countInStock;
+            //TODO: ПЕРЕДАВАТЬ Модель и вставить её в Update()
+            // _db.Products.Update(prod);
+            await _db.SaveChangesAsync();
+            return prod;
         }
         //TODO :Сделать асинхронно используя кортежи
         public async Task<(int, IEnumerable<Product>)> GetAllProductsAsync(int pageSize, int pageNumber)

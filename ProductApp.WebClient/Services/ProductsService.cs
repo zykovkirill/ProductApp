@@ -13,12 +13,13 @@ namespace ProductApp.WebClient.Services
         private readonly string _baseUrl;
 
         ServiceClient client = new ServiceClient();
-        private readonly  HttpClient _httpClient; 
+        //private readonly  HttpClient _httpClient; 
 
-        public ProductsService(HttpClient httpClient)
+        public ProductsService(string url/*, HttpClient httpClient*/)
         {
-            _baseUrl = "http://192.168.1.7:1485";
-            _httpClient = httpClient;
+            _baseUrl= url;
+            //_baseUrl = "http://192.168.1.4:1485";
+            //_httpClient = httpClient;
         }
 
         public string AccessToken
@@ -154,25 +155,25 @@ namespace ProductApp.WebClient.Services
                 new StringFormKeyValue("ProductType", model.ProductType)
             };
 
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", client.AccessToken);
+            //_httpClient.DefaultRequestHeaders.Authorization =
+            //    new AuthenticationHeaderValue("Bearer", client.AccessToken);
 
-            var formData = new MultipartFormDataContent() {
-            { new StringContent(model.Id), "Id" },
-            { new StringContent(model.Name), "Name" },
-            { new StringContent(model.Description), "Description" },
-            { new StringContent(model.Price.ToString()), "Price" },
-            { new StringContent(model.ProductType), "ProductType" },
-             };
-            if (model.CoverFile != null)
-            {
-                var streamContent = new StreamContent(model.CoverFile);
-                formData.Add(streamContent, model.FileName);
-            }
+            //var formData = new MultipartFormDataContent() {
+            //{ new StringContent(model.Id), "Id" },
+            //{ new StringContent(model.Name), "Name" },
+            //{ new StringContent(model.Description), "Description" },
+            //{ new StringContent(model.Price.ToString()), "Price" },
+            //{ new StringContent(model.ProductType), "ProductType" },
+            // };
+            //if (model.CoverFile != null)
+            //{
+            //    var streamContent = new StreamContent(model.CoverFile);
+            //    formData.Add(streamContent, model.FileName);
+            //}
 
-            var response1 = await _httpClient.PutAsync($"{_httpClient.BaseAddress.AbsoluteUri}api/products", formData);
-            if(response1.StatusCode == System.Net.HttpStatusCode.BadRequest || response1.StatusCode == System.Net.HttpStatusCode.OK)
-            return await response1.Content.ReadAsAsync<OperationResponse<Product>>();
+            //var response1 = await _httpClient.PutAsync($"{_httpClient.BaseAddress.AbsoluteUri}api/products", formData);
+            //if(response1.StatusCode == System.Net.HttpStatusCode.BadRequest || response1.StatusCode == System.Net.HttpStatusCode.OK)
+            //return await response1.Content.ReadAsAsync<OperationResponse<Product>>();
             if (model.CoverFile != null)
                 formKeyValues.Add(new FileFormKeyValue("CoverFile", model.CoverFile, model.FileName));
 

@@ -9,7 +9,7 @@
 @inject ProductsService productsService
 @using System.Net.Http
 @inject HttpClient Http
-@attribute [Authorize(Roles = "Admin, User")]
+@attribute [Authorize(Roles = "Admin")]
 @*//TODO: ЧТО ЭТО AuthorizeView как её лучше применить*@
 <AuthorizeView>
      <div class="row">

@@ -13,7 +13,7 @@ namespace ProductApp.WebClient
 {
     public class Program
     {
-        private const string URL = "http://192.168.1.7:1485";//RELEASE /*http://188.235.156.133:1485*/
+        private const string URL = "http://192.168.1.4:1485";//RELEASE /*http://188.235.156.133:1485*/
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -22,11 +22,11 @@ namespace ProductApp.WebClient
             {
                 return new AuthenticationService(URL);
             });
-            builder.Services.AddScoped<ProductsService>();
-            //builder.Services.AddScoped<ProductsService>(s =>
-            //{
-            //    return new ProductsService(URL);
-            //});
+            //builder.Services.AddScoped<ProductsService>();
+            builder.Services.AddScoped<ProductsService>(s =>
+            {
+                return new ProductsService(URL);
+            });
 
             builder.Services.AddScoped<ProductTypesService>(s =>
             {
@@ -54,10 +54,10 @@ namespace ProductApp.WebClient
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddOptions();
             builder.Services.AddAuthorizationCore();
-            builder.Services.AddHttpClient<ProductsService>(client =>
-            {
-                client.BaseAddress = new Uri(URL);
-            });
+            //builder.Services.AddHttpClient<ProductsService>(client =>
+            //{
+            //    client.BaseAddress = new Uri(URL);
+            //});
             builder.Services.AddScoped<AuthenticationStateProvider, LocalAuthenticationStateProvider>();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

@@ -70,6 +70,7 @@ else
                         <h3> @product.Name </h3>
                         <h3>Цена: @product.Price</h3>
                         <h3>Тип продукта: @product.ProductType.TypeName</h3>
+                        <h3>Колличество на складе: @product.QuantityInStock</h3>
                         <hr />
                     </div>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Icon="build" Text="Изменить" Click=' () => navigationManager.NavigateTo($"/products/details/{product.Id}")' class="btn-block" />

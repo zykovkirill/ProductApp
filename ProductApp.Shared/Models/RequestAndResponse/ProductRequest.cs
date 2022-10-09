@@ -39,7 +39,10 @@ namespace ProductApp.Shared.Models
         //[Required]
         public string ProductType { get; set; }
 
-
+        /// <summary>
+        /// Колличество на складе
+        /// </summary>
+        public int QuantityInStock { get; set; }
     }
 }
 
